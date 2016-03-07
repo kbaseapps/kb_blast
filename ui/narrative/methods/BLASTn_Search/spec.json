@@ -120,8 +120,8 @@
     "behavior": {
         "service-mapping": {
             "url": "",
-            "name": "kb_vsearch",
-            "method": "VSearch_BasicSearch",
+            "name": "kb_blast",
+            "method": "BLASTn_Search",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",

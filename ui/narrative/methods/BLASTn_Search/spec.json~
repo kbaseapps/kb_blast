@@ -115,18 +115,6 @@
                 "validate_as": "int",
                 "min_integer" : 0
             }
-        },
-        {
-            "id": "rounds",
-            "optional": true,
-            "advanced": true,
-            "allow_multiple": false,
-            "default_values": [ "3" ],
-            "field_type": "text",
-            "text_options": {
-                "validate_as": "int",
-                "min_integer" : 0
-            }
         }
     ],
     "behavior": {
@@ -174,10 +162,6 @@
                 {
                     "input_parameter": "maxaccepts",
                     "target_property": "maxaccepts"
-                },
-                {
-                    "input_parameter": "rounds",
-                    "target_property": "rounds"
                 }
             ],
             "output_mapping": [
