@@ -735,8 +735,8 @@ class kb_blast:
             output_filtered_fasta_file_handle.close()
 
             if filtered_seq_total != hit_total:
-                self.log(console,'hits in VSearch alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
-                raise ValueError('hits in VSearch alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
+                self.log(console,'hits in BLAST alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
+                raise ValueError('hits in BLAST alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
 
 
         # FeatureSet input -> FeatureSet output
@@ -747,9 +747,9 @@ class kb_blast:
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
-                output_featureSet['description'] = input_many_featureSet['description'] + " - VSearch_BasicSearch filtered"
+                output_featureSet['description'] = input_many_featureSet['description'] + " - BLASTn_Search filtered"
             else:
-                output_featureSet['description'] = "VSearch_BasicSearch filtered"
+                output_featureSet['description'] = "BLASTn_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
@@ -781,9 +781,9 @@ class kb_blast:
 
             output_featureSet = dict()
             if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - VSearch_BasicSearch filtered"
+                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTn_Search filtered"
             else:
-                output_featureSet['description'] = "VSearch_BasicSearch filtered"
+                output_featureSet['description'] = "BLASTn_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for feature in input_many_genome['features']:
@@ -803,9 +803,9 @@ class kb_blast:
 
             output_featureSet = dict()
             if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
-                output_featureSet['description'] = input_many_genomeSet['description'] + " - VSearch_BasicSearch filtered"
+                output_featureSet['description'] = input_many_genomeSet['description'] + " - BLASTn_Search filtered"
             else:
-                output_featureSet['description'] = "VSearch_BasicSearch filtered"
+                output_featureSet['description'] = "BLASTn_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
@@ -851,8 +851,8 @@ class kb_blast:
         if 'input_one_name' in params and params['input_one_name'] != None:
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
         provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
-        provenance[0]['service'] = 'kb_vsearch'
-        provenance[0]['method'] = 'VSearch_BasicSearch'
+        provenance[0]['service'] = 'kb_blast'
+        provenance[0]['method'] = 'BLASTn_Search'
 
 
         # Upload results
@@ -891,11 +891,11 @@ class kb_blast:
         report += 'sequences in hit set:  '+str(hit_total)
 
         reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'VSearch_BasicSearch hits'}],
+            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTn_Search hits'}],
             'text_message':report
         }
 
-        reportName = 'vsearch_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -919,9 +919,9 @@ class kb_blast:
         returnVal = { 'report_name': reportName,
                       'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
                       }
-        self.log(console,"VSearch_BasicSearch DONE")
+        self.log(console,"BLASTn_Search DONE")
 
-        #END VSearch_BasicSearch
+        #END BLASTn_Search
 
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
