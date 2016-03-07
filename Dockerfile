@@ -36,7 +36,7 @@ WORKDIR /kb/module
 RUN make
 
 
-# Install VSEARCH
+# Install BLAST+
 #
 WORKDIR /kb/module
 RUN curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.3.0+-x64-linux.tar.gz > ncbi-blast-2.3.0+-x64-linux.tar.gz
