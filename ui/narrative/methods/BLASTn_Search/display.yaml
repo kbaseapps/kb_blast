@@ -75,7 +75,7 @@ parameters :
         ui-name : |
             Max Accepts
         short-hint : |
-            VSearch parameter limits the number of hits in result.  Default: 1000
+            limits the number of hits in result.  Default: 1000
 
 description : |
     <p>This method performs a nuc-nuc BLASTn Search using NCBI's BLAST+</p>
