@@ -1,0 +1,82 @@
+#
+# define display information
+#
+name: BLASTn
+tooltip: |
+    Search for matches of a single sequence within identity threshold
+screenshots: []
+
+icon: blast-cyan.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    input_one_sequence:
+        ui-name : |
+            Query Sequence
+        short-hint : |
+            Single sequence to use for the search.  If you enter something here, Query Object will be ignored.
+        placeholder : |
+            Enter DNA sequence...
+    input_one_name:
+        ui-name : |
+            Query Object
+        short-hint : |
+            Query with single sequence to use as query.  Data types may be Feature, SingleEndLibrary (with one sequence), or FeatureSet (with one sequence).
+        placeholder : |
+            ...or select Query Object
+    input_many_name:
+        ui-name : |
+            Targets Object
+        short-hint : |
+            Targets object to be searched.  Data types may be SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
+    output_filtered_name:
+        ui-name : |
+            Output Object
+        short-hint : |
+            Object containing matches.  Output will be SingleEndLibrary for SingleEndLibrary Targets, otherwise will be FeatureSet.
+    ident_thresh:
+        ui-name : |
+            Identity Threshold
+        short-hint : |
+            threshold for hits
+    e_value:
+        ui-name : |
+            E-value
+        short-hint : |
+            threshold for hits
+    bitscore:
+        ui-name : |
+            Bit Score
+        short-hint : |
+            threshold for hits
+    overlap_fraction:
+        ui-name : |
+            Overlap Fraction
+        short-hint : |
+            threshold for hits
+    maxaccepts:
+        ui-name : |
+            Max Accepts
+        short-hint : |
+            limits the number of hits in result.  Default: 1000
+
+description : |
+    <p>This method performs a nuc-nuc (in nuc space) BLASTn Search using NCBI's BLAST+</p>
+
