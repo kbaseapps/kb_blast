@@ -45,7 +45,7 @@ parameters :
         ui-name : |
             Targets Object
         short-hint : |
-            Targets object to be searched.  Data types may be SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
+            DNA Targets object to be searched.  Data types may be SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
     output_filtered_name:
         ui-name : |
             Output Object
