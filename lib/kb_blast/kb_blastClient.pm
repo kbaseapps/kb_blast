@@ -132,10 +132,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
-	bitscore has a value which is a float
 	ident_thresh has a value which is a float
-	overlap_fraction has a value which is a float
 	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -159,10 +160,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
-	bitscore has a value which is a float
 	ident_thresh has a value which is a float
-	overlap_fraction has a value which is a float
 	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -429,10 +431,11 @@ input_one_string has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
-bitscore has a value which is a float
 ident_thresh has a value which is a float
-overlap_fraction has a value which is a float
 e_value has a value which is a float
+bitscore has a value which is a float
+overlap_fraction has a value which is a float
+maxaccepts has a value which is a float
 rounds has a value which is a float
 
 </pre>
@@ -447,10 +450,11 @@ input_one_string has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
-bitscore has a value which is a float
 ident_thresh has a value which is a float
-overlap_fraction has a value which is a float
 e_value has a value which is a float
+bitscore has a value which is a float
+overlap_fraction has a value which is a float
+maxaccepts has a value which is a float
 rounds has a value which is a float
 
 
