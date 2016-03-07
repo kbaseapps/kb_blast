@@ -128,7 +128,7 @@ $params is a kb_blast.BLAST_Params
 $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
-	input_one_string has a value which is a kb_blast.sequence
+	input_one_sequence has a value which is a kb_blast.sequence
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
@@ -156,7 +156,7 @@ $params is a kb_blast.BLAST_Params
 $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
-	input_one_string has a value which is a kb_blast.sequence
+	input_one_sequence has a value which is a kb_blast.sequence
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
@@ -427,7 +427,7 @@ BLAST Input Params
 <pre>
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_blast.workspace_name
-input_one_string has a value which is a kb_blast.sequence
+input_one_sequence has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
@@ -446,7 +446,7 @@ rounds has a value which is a float
 
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_blast.workspace_name
-input_one_string has a value which is a kb_blast.sequence
+input_one_sequence has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
