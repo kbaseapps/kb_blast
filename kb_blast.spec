@@ -27,7 +27,7 @@ module kb_blast {
     */
     typedef structure {
         workspace_name workspace_name;
-	sequence       input_one_string;
+	sequence       input_one_sequence;
 	data_obj_name  input_one_name;
 	data_obj_name  input_many_name;
         data_obj_name  output_filtered_name;
