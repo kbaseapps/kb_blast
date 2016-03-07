@@ -925,7 +925,7 @@ class kb_blast:
 
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
-            raise ValueError('Method VSearch_BasicSearch return value ' +
+            raise ValueError('Method BLASTn_Search return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
