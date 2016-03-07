@@ -64,6 +64,18 @@ async_check_methods = {}
 async_run_methods['kb_blast.BLASTn_Search_async'] = ['kb_blast', 'BLASTn_Search']
 async_check_methods['kb_blast.BLASTn_Search_check'] = ['kb_blast', 'BLASTn_Search']
 sync_methods['kb_blast.BLASTn_Search'] = True
+async_run_methods['kb_blast.BLASTp_Search_async'] = ['kb_blast', 'BLASTp_Search']
+async_check_methods['kb_blast.BLASTp_Search_check'] = ['kb_blast', 'BLASTp_Search']
+sync_methods['kb_blast.BLASTp_Search'] = True
+async_run_methods['kb_blast.BLASTx_Search_async'] = ['kb_blast', 'BLASTx_Search']
+async_check_methods['kb_blast.BLASTx_Search_check'] = ['kb_blast', 'BLASTx_Search']
+sync_methods['kb_blast.BLASTx_Search'] = True
+async_run_methods['kb_blast.tBLASTn_Search_async'] = ['kb_blast', 'tBLASTn_Search']
+async_check_methods['kb_blast.tBLASTn_Search_check'] = ['kb_blast', 'tBLASTn_Search']
+sync_methods['kb_blast.tBLASTn_Search'] = True
+async_run_methods['kb_blast.tBLASTx_Search_async'] = ['kb_blast', 'tBLASTx_Search']
+async_check_methods['kb_blast.tBLASTx_Search_check'] = ['kb_blast', 'tBLASTx_Search']
+sync_methods['kb_blast.tBLASTx_Search'] = True
 
 class AsyncJobServiceClient(object):
 
@@ -339,6 +351,22 @@ class Application(object):
                              name='kb_blast.BLASTn_Search',
                              types=[dict])
         self.method_authentication['kb_blast.BLASTn_Search'] = 'required'
+        self.rpc_service.add(impl_kb_blast.BLASTp_Search,
+                             name='kb_blast.BLASTp_Search',
+                             types=[dict])
+        self.method_authentication['kb_blast.BLASTp_Search'] = 'required'
+        self.rpc_service.add(impl_kb_blast.BLASTx_Search,
+                             name='kb_blast.BLASTx_Search',
+                             types=[dict])
+        self.method_authentication['kb_blast.BLASTx_Search'] = 'required'
+        self.rpc_service.add(impl_kb_blast.tBLASTn_Search,
+                             name='kb_blast.tBLASTn_Search',
+                             types=[dict])
+        self.method_authentication['kb_blast.tBLASTn_Search'] = 'required'
+        self.rpc_service.add(impl_kb_blast.tBLASTx_Search,
+                             name='kb_blast.tBLASTx_Search',
+                             types=[dict])
+        self.method_authentication['kb_blast.tBLASTx_Search'] = 'required'
         self.auth_client = biokbase.nexus.Client(
             config={'server': 'nexus.api.globusonline.org',
                     'verify_ssl': True,

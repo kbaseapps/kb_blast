@@ -55,7 +55,7 @@ module kb_blast {
     } BLAST_Output;
 	
 
-    /*  Method for BLASTn of one sequence against many sequences 
+    /*  Methods for BLAST of various flavors of one sequence against many sequences 
     **
     **    overloading as follows:
     **        input_one_id: SingleEndLibrary, Feature, FeatureSet
@@ -63,4 +63,8 @@ module kb_blast {
     **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
     */
     funcdef BLASTn_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
+    funcdef BLASTp_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
+    funcdef BLASTx_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
+    funcdef tBLASTn_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
+    funcdef tBLASTx_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
 };

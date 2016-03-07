@@ -145,7 +145,7 @@ public class KbBlastClient {
     /**
      * <p>Original spec-file function name: BLASTn_Search</p>
      * <pre>
-     * Method for BLASTn of one sequence against many sequences 
+     * Methods for BLAST of various flavors of one sequence against many sequences 
      * **
      * **    overloading as follows:
      * **        input_one_id: SingleEndLibrary, Feature, FeatureSet
@@ -162,6 +162,74 @@ public class KbBlastClient {
         args.add(params);
         TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
         List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.BLASTn_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: BLASTp_Search</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput bLASTpSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.BLASTp_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: BLASTx_Search</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput bLASTxSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.BLASTx_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: tBLASTn_Search</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput tBLASTnSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.tBLASTn_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: tBLASTx_Search</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput tBLASTxSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.tBLASTx_Search", args, retType, true, true, jsonRpcContext);
         return res.get(0);
     }
 }

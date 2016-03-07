@@ -179,7 +179,7 @@ data_obj_ref is a string
 
 =item Description
 
-Method for BLASTn of one sequence against many sequences 
+Methods for BLAST of various flavors of one sequence against many sequences 
 **
 **    overloading as follows:
 **        input_one_id: SingleEndLibrary, Feature, FeatureSet
@@ -235,6 +235,482 @@ Method for BLASTn of one sequence against many sequences
     }
 }
  
+
+
+=head2 BLASTp_Search
+
+  $return = $obj->BLASTp_Search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub BLASTp_Search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function BLASTp_Search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to BLASTp_Search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'BLASTp_Search');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
+	method => "kb_blast.BLASTp_Search",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'BLASTp_Search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method BLASTp_Search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'BLASTp_Search',
+				       );
+    }
+}
+ 
+
+
+=head2 BLASTx_Search
+
+  $return = $obj->BLASTx_Search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub BLASTx_Search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function BLASTx_Search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to BLASTx_Search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'BLASTx_Search');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
+	method => "kb_blast.BLASTx_Search",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'BLASTx_Search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method BLASTx_Search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'BLASTx_Search',
+				       );
+    }
+}
+ 
+
+
+=head2 tBLASTn_Search
+
+  $return = $obj->tBLASTn_Search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub tBLASTn_Search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function tBLASTn_Search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to tBLASTn_Search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'tBLASTn_Search');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
+	method => "kb_blast.tBLASTn_Search",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'tBLASTn_Search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method tBLASTn_Search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'tBLASTn_Search',
+				       );
+    }
+}
+ 
+
+
+=head2 tBLASTx_Search
+
+  $return = $obj->tBLASTx_Search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_sequence has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	ident_thresh has a value which is a float
+	e_value has a value which is a float
+	bitscore has a value which is a float
+	overlap_fraction has a value which is a float
+	maxaccepts has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub tBLASTx_Search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function tBLASTx_Search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to tBLASTx_Search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'tBLASTx_Search');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
+	method => "kb_blast.tBLASTx_Search",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'tBLASTx_Search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method tBLASTx_Search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'tBLASTx_Search',
+				       );
+    }
+}
+ 
   
 
 sub version {
@@ -248,16 +724,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'BLASTn_Search',
+                method_name => 'tBLASTx_Search',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method BLASTn_Search",
+            error => "Error invoking method tBLASTx_Search",
             status_line => $self->{client}->status_line,
-            method_name => 'BLASTn_Search',
+            method_name => 'tBLASTx_Search',
         );
     }
 }

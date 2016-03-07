@@ -177,4 +177,32 @@ class kb_blast(object):
         resp = self._call('kb_blast.BLASTn_Search',
                           [params], json_rpc_context)
         return resp[0]
+  
+    def BLASTp_Search(self, params, json_rpc_context = None):
+        if json_rpc_context and type(json_rpc_context) is not dict:
+            raise ValueError('Method BLASTp_Search: argument json_rpc_context is not type dict as required.')
+        resp = self._call('kb_blast.BLASTp_Search',
+                          [params], json_rpc_context)
+        return resp[0]
+  
+    def BLASTx_Search(self, params, json_rpc_context = None):
+        if json_rpc_context and type(json_rpc_context) is not dict:
+            raise ValueError('Method BLASTx_Search: argument json_rpc_context is not type dict as required.')
+        resp = self._call('kb_blast.BLASTx_Search',
+                          [params], json_rpc_context)
+        return resp[0]
+  
+    def tBLASTn_Search(self, params, json_rpc_context = None):
+        if json_rpc_context and type(json_rpc_context) is not dict:
+            raise ValueError('Method tBLASTn_Search: argument json_rpc_context is not type dict as required.')
+        resp = self._call('kb_blast.tBLASTn_Search',
+                          [params], json_rpc_context)
+        return resp[0]
+  
+    def tBLASTx_Search(self, params, json_rpc_context = None):
+        if json_rpc_context and type(json_rpc_context) is not dict:
+            raise ValueError('Method tBLASTx_Search: argument json_rpc_context is not type dict as required.')
+        resp = self._call('kb_blast.tBLASTx_Search',
+                          [params], json_rpc_context)
+        return resp[0]
  
