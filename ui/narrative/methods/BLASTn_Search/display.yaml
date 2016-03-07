@@ -6,7 +6,7 @@ tooltip: |
     Search for matches of a single sequence within identity threshold
 screenshots: []
 
-icon: blast+-cyan.png
+icon: blast-cyan.png
 
 #
 # define a set of similar methods that might be useful to the user
