@@ -78,5 +78,5 @@ parameters :
             limits the number of hits in result.  Default: 1000
 
 description : |
-    <p>This method performs a nuc-nuc BLASTn Search using NCBI's BLAST+</p>
+    <p>This method performs a nuc-nuc (in nuc space) BLASTn Search using NCBI's BLAST+</p>
 
