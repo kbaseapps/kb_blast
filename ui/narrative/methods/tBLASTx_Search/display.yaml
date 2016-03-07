@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTn nuc-nuc Search
+name: tBLASTx nuc-nuc (translated) Search
 tooltip: |
     Search for matches of a single sequence within identity threshold
 screenshots: []
@@ -78,5 +78,5 @@ parameters :
             limits the number of hits in result.  Default: 1000
 
 description : |
-    <p>This method performs a nuc-nuc (in nuc space) BLASTn Search using NCBI's BLAST+</p>
+    <p>This method performs a nuc-nuc (in prot space) tBLASTx Search using NCBI's BLAST+</p>
 

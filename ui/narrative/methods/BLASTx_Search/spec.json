@@ -121,7 +121,7 @@
         "service-mapping": {
             "url": "",
             "name": "kb_blast",
-            "method": "BLASTn_Search",
+            "method": "BLASTx_Search",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
