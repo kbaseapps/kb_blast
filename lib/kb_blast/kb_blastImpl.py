@@ -598,7 +598,7 @@ class kb_blast:
         blast_cmd.append('-outfmt')
         blast_cmd.append('7')
         blast_cmd.append('-evalue')
-        blast_cmd.append(str(params['evalue']))
+        blast_cmd.append(str(params['e_value']))
 
         # options
         if 'maxaccepts' in params:
