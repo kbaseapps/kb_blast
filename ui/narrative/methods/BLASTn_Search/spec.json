@@ -1,0 +1,188 @@
+{
+    "ver": "0.0.1",
+    "authors": [
+        "dylan"
+    ],
+    "contact": "help@kbase.us",
+    "visible": true,
+    "categories": ["active","sequence"],
+    "widgets": {
+        "input": null,
+        "output": "kbaseReportView"
+    },
+    "parameters": [ 
+        {
+            "id": "input_one_sequence",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "textarea",
+            "textarea_options" : {
+                 "n_rows" : 10
+            }
+        },
+        {
+            "id": "input_one_name",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
+            }
+        },
+        {
+            "id": "input_many_name",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseSearch.GenomeSet" ]
+            }
+        },
+        {
+            "id": "output_filtered_name",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary" ],
+		"is_output_name": true		  
+            }
+        },
+        {
+            "id": "e_value",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ ".001" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "float",
+                "min_integer" : 0
+            }
+        },
+        {
+            "id": "bitscore",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "100" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "float",
+                "min_integer" : 25
+            }
+        },
+        {
+            "id": "ident_thresh",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "0.97" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "float",
+                "min_integer" : 0
+            }
+        },
+        {
+            "id": "overlap_fraction",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "0.5" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "float",
+                "min_integer" : 0
+            }
+        },
+        {
+            "id": "maxaccepts",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "1000" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "int",
+                "min_integer" : 0
+            }
+        }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "kb_vsearch",
+            "method": "VSearch_BasicSearch",
+            "input_mapping": [
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspace_name"
+                },
+                {
+                    "input_parameter": "input_one_sequence",
+                    "target_property": "input_one_sequence"
+                },
+                {
+                    "input_parameter": "input_one_name",
+                    "target_property": "input_one_name"
+                },
+                {
+                    "input_parameter": "input_many_name",
+                    "target_property": "input_many_name"
+                },
+                {
+                    "input_parameter": "output_filtered_name",
+                    "target_property": "output_filtered_name"
+                },
+                {
+                    "input_parameter": "e_value",
+                    "target_property": "e_value"
+                },
+                {
+                    "input_parameter": "bitscore",
+                    "target_property": "bitscore"
+                },
+                {
+                    "input_parameter": "ident_thresh",
+                    "target_property": "ident_thresh"
+                },
+                {
+                    "input_parameter": "overlap_fraction",
+                    "target_property": "overlap_fraction"
+                },
+                {
+                    "input_parameter": "maxaccepts",
+                    "target_property": "maxaccepts"
+                }
+            ],
+            "output_mapping": [
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspaceName"
+                },
+                {
+                    "service_method_output_path": [0, "report_name"],
+                    "target_property": "report_name"
+                },
+                {
+                    "service_method_output_path": [0, "report_ref"],
+                    "target_property": "report_ref"
+                },
+                {
+		    "constant_value": "16",
+                    "target_property": "report_window_line_height"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}
