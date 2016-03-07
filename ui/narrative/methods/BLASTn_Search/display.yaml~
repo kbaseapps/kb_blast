@@ -1,0 +1,89 @@
+#
+# define display information
+#
+name: VSEARCH BasicSearch
+tooltip: |
+    Search for matches of a single sequence within identity threshold
+screenshots: []
+
+icon: vsearch-cyan.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    input_one_sequence:
+        ui-name : |
+            Query Sequence
+        short-hint : |
+            Single sequence to use for the search.  If you enter something here, Query Object will be ignored.
+        placeholder : |
+            Enter DNA sequence...
+    input_one_name:
+        ui-name : |
+            Query Object
+        short-hint : |
+            Query with single sequence to use as query.  Data types may be Feature, SingleEndLibrary (with one sequence), or FeatureSet (with one sequence).
+        placeholder : |
+            ...or select Query Object
+    input_many_name:
+        ui-name : |
+            Targets Object
+        short-hint : |
+            Targets object to be searched.  Data types may be SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
+    output_filtered_name:
+        ui-name : |
+            Output Object
+        short-hint : |
+            Object containing matches.  Output will be SingleEndLibrary for SingleEndLibrary Targets, otherwise will be FeatureSet.
+    maxaccepts:
+        ui-name : |
+            Max Accepts
+        short-hint : |
+            VSearch parameter limits the number of hits in result.  Default: 1000
+    maxrejects:
+        ui-name : |
+            Max Rejects
+        short-hint : |
+            VSearch parameter limits the number of discards.  Default: unbounded
+    wordlength:
+        ui-name : |
+            Word Length
+        short-hint : |
+            VSearch parameter sets the length of the continguous kmer used in search.  Default:8, values may be 7-15
+    minwordmatches:
+        ui-name : |
+            Min Word Matches
+        short-hint : |
+            VSearch parameter sets the minimum number of word matches to accept a hit.  Default:10
+    ident_thresh:
+        ui-name : |
+            Identity Threshold
+        short-hint : |
+            VSearch parameter sets minimum sequence identity to accept a hit.  Default: 0.97
+    ident_mode:
+        ui-name : |
+            Identity Mode
+        short-hint : |
+            VSearch parameter sets how to handle unaligned positions in calculating identity.  Default: 2, values may be 0-4: 0 (CD-HIT definition using shortest sequence as numerator), 1 (edit distance), 2 (edit distance excluding terminal gaps, default), 3 (Marine Biological Lab definition where entire gaps are considered a single difference) or 4 (BLAST, same as 2)
+
+
+description : |
+    <p>This method performs a BasicSearch using VSearch.</p>
+    <p>VSearch used here from https://github.com/torognes/vsearch</p>
+
