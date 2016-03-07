@@ -643,7 +643,7 @@ class kb_blast:
         for line in output_aln_buf:
             if line.startswith('#'):
                 continue
-            self.log(console,'HIT LINE: '+line)  # DEBUG
+            #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
             hit_ident      = float(hit_info[2]) / 100.0
@@ -657,17 +657,17 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
-            self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
+            #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
                 continue
-            self.log(console,"AFTER ident_thresh")
+            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
                 continue
-            self.log(console,"AFTER bitscore")
+            #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
             if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
                 continue
-            self.log(console,"AFTER overlap_fraction")
+            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
