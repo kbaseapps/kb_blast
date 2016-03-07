@@ -1,14 +1,25 @@
 package us.kbase.kbblast;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JsonClientCaller;
+import us.kbase.common.service.JsonClientException;
+import us.kbase.common.service.RpcContext;
+import us.kbase.common.service.UnauthorizedException;
 
 /**
  * <p>Original spec-file module name: kb_blast</p>
  * <pre>
- * A KBase module: kb_blast
+ * ** A KBase module: kb_blast
+ * **
+ * ** This module contains 7 methods from BLAST+: BLASTn, BLASTp, BLASTx, tBLASTx, tBLASTn, PSI-BLAST, and RPS-BLAST
+ * ** 
+ * ** Initially only basic query/db search will be implemented between read sets
  * </pre>
  */
 public class KbBlastClient {
@@ -20,6 +31,35 @@ public class KbBlastClient {
      */
     public KbBlastClient(URL url) {
         caller = new JsonClientCaller(url);
+    }
+    /** Constructs a client with a custom URL.
+     * @param url the URL of the service.
+     * @param token the user's authorization token.
+     * @throws UnauthorizedException if the token is not valid.
+     * @throws IOException if an IOException occurs when checking the token's
+     * validity.
+     */
+    public KbBlastClient(URL url, AuthToken token) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, token);
+    }
+
+    /** Constructs a client with a custom URL.
+     * @param url the URL of the service.
+     * @param user the user name.
+     * @param password the password for the user name.
+     * @throws UnauthorizedException if the credentials are not valid.
+     * @throws IOException if an IOException occurs when checking the user's
+     * credentials.
+     */
+    public KbBlastClient(URL url, String user, String password) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, user, password);
+    }
+
+    /** Get the token this client uses to communicate with the server.
+     * @return the authorization token.
+     */
+    public AuthToken getToken() {
+        return caller.getToken();
     }
 
     /** Get the URL of the service with which this client communicates.
@@ -100,5 +140,28 @@ public class KbBlastClient {
 
     public void _setFileForNextRpcResponse(File f) {
         caller.setFileForNextRpcResponse(f);
+    }
+
+    /**
+     * <p>Original spec-file function name: BLASTn_Search</p>
+     * <pre>
+     * Method for BLASTn of one sequence against many sequences 
+     * **
+     * **    overloading as follows:
+     * **        input_one_id: SingleEndLibrary, Feature, FeatureSet
+     * **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
+     * **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput bLASTnSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.BLASTn_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
     }
 }

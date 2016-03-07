@@ -12,6 +12,7 @@ eval {
     $get_time = sub { Time::HiRes::gettimeofday() };
 };
 
+use Bio::KBase::AuthToken;
 
 # Client version should match Impl version
 # This is a Semantic Version number,
@@ -25,7 +26,11 @@ kb_blast::kb_blastClient
 =head1 DESCRIPTION
 
 
-A KBase module: kb_blast
+** A KBase module: kb_blast
+**
+** This module contains 7 methods from BLAST+: BLASTn, BLASTp, BLASTx, tBLASTx, tBLASTn, PSI-BLAST, and RPS-BLAST
+** 
+** Initially only basic query/db search will be implemented between read sets
 
 
 =cut
@@ -74,6 +79,28 @@ sub new
 	push(@{$self->{headers}}, 'Kbrpc-Errordest', $self->{kbrpc_error_dest});
     }
 
+    #
+    # This module requires authentication.
+    #
+    # We create an auth token, passing through the arguments that we were (hopefully) given.
+
+    {
+	my $token = Bio::KBase::AuthToken->new(@args);
+	
+	if (!$token->error_message)
+	{
+	    $self->{token} = $token->token;
+	    $self->{client}->{token} = $token->token;
+	}
+        else
+        {
+	    #
+	    # All methods in this module require authentication. In this case, if we
+	    # don't have a token, we can't continue.
+	    #
+	    die "Authentication failed: " . $token->error_message;
+	}
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -84,12 +111,134 @@ sub new
 }
 
 
+
+
+=head2 BLASTn_Search
+
+  $return = $obj->BLASTn_Search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_string has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	bitscore has a value which is a float
+	ident_thresh has a value which is a float
+	overlap_fraction has a value which is a float
+	e_value has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kb_blast.BLAST_Params
+$return is a kb_blast.BLAST_Output
+BLAST_Params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a kb_blast.workspace_name
+	input_one_string has a value which is a kb_blast.sequence
+	input_one_name has a value which is a kb_blast.data_obj_name
+	input_many_name has a value which is a kb_blast.data_obj_name
+	output_filtered_name has a value which is a kb_blast.data_obj_name
+	bitscore has a value which is a float
+	ident_thresh has a value which is a float
+	overlap_fraction has a value which is a float
+	e_value has a value which is a float
+	rounds has a value which is a float
+workspace_name is a string
+sequence is a string
+data_obj_name is a string
+BLAST_Output is a reference to a hash where the following keys are defined:
+	report_name has a value which is a kb_blast.data_obj_name
+	report_ref has a value which is a kb_blast.data_obj_ref
+data_obj_ref is a string
+
+
+=end text
+
+=item Description
+
+Method for BLASTn of one sequence against many sequences 
+**
+**    overloading as follows:
+**        input_one_id: SingleEndLibrary, Feature, FeatureSet
+**        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
+**        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+
+=back
+
+=cut
+
+ sub BLASTn_Search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function BLASTn_Search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to BLASTn_Search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'BLASTn_Search');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
+	method => "kb_blast.BLASTn_Search",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'BLASTn_Search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method BLASTn_Search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'BLASTn_Search',
+				       );
+    }
+}
+ 
   
 
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, $self->{headers}, {
-        method => "${last_module.module_name}.version",
+        method => "kb_blast.version",
         params => [],
     });
     if ($result) {
@@ -97,16 +246,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => '${last_method.name}',
+                method_name => 'BLASTn_Search',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method ${last_method.name}",
+            error => "Error invoking method BLASTn_Search",
             status_line => $self->{client}->status_line,
-            method_name => '${last_method.name}',
+            method_name => 'BLASTn_Search',
         );
     }
 }
@@ -140,6 +289,211 @@ sub _validate_version {
 }
 
 =head1 TYPES
+
+
+
+=head2 workspace_name
+
+=over 4
+
+
+
+=item Description
+
+** The workspace object refs are of form:
+**
+**    objects = ws.get_objects([{'ref': params['workspace_id']+'/'+params['obj_name']}])
+**
+** "ref" means the entire name combining the workspace id and the object name
+** "id" is a numerical identifier of the workspace or object, and should just be used for workspace
+** "name" is a string identifier of a workspace or object.  This is received from Narrative.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 sequence
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 data_obj_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 data_obj_ref
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 BLAST_Params
+
+=over 4
+
+
+
+=item Description
+
+BLAST Input Params
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a kb_blast.workspace_name
+input_one_string has a value which is a kb_blast.sequence
+input_one_name has a value which is a kb_blast.data_obj_name
+input_many_name has a value which is a kb_blast.data_obj_name
+output_filtered_name has a value which is a kb_blast.data_obj_name
+bitscore has a value which is a float
+ident_thresh has a value which is a float
+overlap_fraction has a value which is a float
+e_value has a value which is a float
+rounds has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a kb_blast.workspace_name
+input_one_string has a value which is a kb_blast.sequence
+input_one_name has a value which is a kb_blast.data_obj_name
+input_many_name has a value which is a kb_blast.data_obj_name
+output_filtered_name has a value which is a kb_blast.data_obj_name
+bitscore has a value which is a float
+ident_thresh has a value which is a float
+overlap_fraction has a value which is a float
+e_value has a value which is a float
+rounds has a value which is a float
+
+
+=end text
+
+=back
+
+
+
+=head2 BLAST_Output
+
+=over 4
+
+
+
+=item Description
+
+BLAST Output
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+report_name has a value which is a kb_blast.data_obj_name
+report_ref has a value which is a kb_blast.data_obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+report_name has a value which is a kb_blast.data_obj_name
+report_ref has a value which is a kb_blast.data_obj_ref
+
+
+=end text
+
+=back
 
 
 

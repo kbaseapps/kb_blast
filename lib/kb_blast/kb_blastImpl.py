@@ -8,7 +8,11 @@ class kb_blast:
     kb_blast
 
     Module Description:
-    A KBase module: kb_blast
+    ** A KBase module: kb_blast
+**
+** This module contains 7 methods from BLAST+: BLASTn, BLASTp, BLASTx, tBLASTx, tBLASTn, PSI-BLAST, and RPS-BLAST
+** 
+** Initially only basic query/db search will be implemented between read sets
     '''
 
     ######## WARNING FOR GEVENT USERS #######
@@ -26,3 +30,16 @@ class kb_blast:
         #BEGIN_CONSTRUCTOR
         #END_CONSTRUCTOR
         pass
+
+    def BLASTn_Search(self, ctx, params):
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN BLASTn_Search
+        #END BLASTn_Search
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method BLASTn_Search return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]

@@ -2,7 +2,7 @@ module-name:
     kb_blast
 
 module-description:
-    A KBase module
+    BLAST+
 
 service-language:
     python
