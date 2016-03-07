@@ -31,16 +31,16 @@ parameters :
         ui-name : |
             Query Sequence
         short-hint : |
-            Single sequence to use for the search.  If you enter something here, Query Object will be ignored.
+            Single DNA sequence to use for the search.  If you enter something here, Query Object will be ignored.
         placeholder : |
             Enter DNA sequence...
     input_one_name:
         ui-name : |
             Query Object
         short-hint : |
-            Query with single sequence to use as query.  Data types may be Feature, SingleEndLibrary (with one sequence), or FeatureSet (with one sequence).
+            Query with single DNA sequence to use as query.  Data types may be Feature, SingleEndLibrary (with one sequence), or FeatureSet (with one sequence).
         placeholder : |
-            ...or select Query Object
+            ...or select DNA Query Object
     input_many_name:
         ui-name : |
             Targets Object
