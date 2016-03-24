@@ -28,9 +28,8 @@ kb_blast::kb_blastClient
 
 ** A KBase module: kb_blast
 **
-** This module contains 7 methods from BLAST+: BLASTn, BLASTp, BLASTx, tBLASTx, tBLASTn, PSI-BLAST, and RPS-BLAST
-** 
-** Initially only basic query/db search will be implemented between read sets
+** This module contains 6 methods from BLAST+: BLASTn, BLASTp, BLASTx, tBLASTx, tBLASTn, and PSI-BLAST
+**
 
 
 =cut
