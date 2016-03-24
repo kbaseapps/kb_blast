@@ -695,16 +695,21 @@ class kb_blast:
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
             records = []
+            feature_written = dict()
             for genomeRef in genome2Features:
                 genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
-                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                        # BLASTn is nuc-nuc
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                        records.append(record)
+                        try:
+                            f_written = feature_written[feature['id']]
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTn is nuc-nuc
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+                        except:
+                            feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -718,12 +723,17 @@ class kb_blast:
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
             records = []
+            feature_written = dict()
             for feature in input_many_genome['features']:
-                #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                # BLASTn is nuc-nuc
-                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                records.append(record)
+                try:
+                    f_written = feature_written[feature['id']]
+                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                    # BLASTn is nuc-nuc
+                    record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
+                    #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
+                    records.append(record)
+                except:
+                    feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -737,26 +747,35 @@ class kb_blast:
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
 
             records = []
+            feature_written = dict()
             for genome_name in input_many_genomeSet['elements'].keys():
                 if 'ref' in input_many_genomeSet['elements'][genome_name] and \
                          input_many_genomeSet['elements'][genome_name]['ref'] != None:
                     genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
                     for feature in genome['features']:
-                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                        # BLASTn is nuc-nuc
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                        records.append(record)
+                        try:
+                            f_written = feature_written[feature['id']]
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTn is nuc-nuc
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+                        except:
+                            feature_written[feature['id']] = True
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
                     genome = input_many_genomeSet['elements'][genome_name]['data']
                     for feature in genome['features']:
-                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                        # BLASTn is nuc-nuc
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                        records.append(record)
+                        try:
+                            f_written = feature_written[feature['id']]
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTn is nuc-nuc
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+                        except:
+                            feature_written[feature['id']] = True
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
