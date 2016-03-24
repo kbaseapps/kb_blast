@@ -24,13 +24,13 @@
         },
         {
             "id": "input_one_name",
-            "optional": true,
+            "optional": false,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
+                "valid_ws_types": [ "KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
             }
         },
         {
@@ -41,7 +41,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseSearch.GenomeSet" ]
+                "valid_ws_types": [ "KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseSearch.GenomeSet" ]
             }
         },
         {
@@ -52,7 +52,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseAssembly.SingleEndLibrary" ],
+                "valid_ws_types": [ "KBaseCollections.FeatureSet" ],
 		"is_output_name": true		  
             }
         },
@@ -167,7 +167,7 @@
             "output_mapping": [
                 {
                     "narrative_system_variable": "workspace",
-                    "target_property": "workspaceName"
+                    "target_property": "workspace_name"
                 },
                 {
                     "service_method_output_path": [0, "report_name"],
