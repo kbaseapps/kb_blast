@@ -1163,8 +1163,8 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)
-        report += 'sequences in hit set:  '+str(hit_total)
+        report += 'sequences in many set: '+str(seq_total)+"\n"
+        report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
         for line in output_aln_buf:
             report += line
