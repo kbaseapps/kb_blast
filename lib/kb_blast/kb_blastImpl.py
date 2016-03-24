@@ -912,7 +912,6 @@ class kb_blast:
         output_aln_file_handle.close()
         hit_total = 0
         for line in output_aln_buf:
-            report += line
             if line.startswith('#'):
                 continue
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -1167,7 +1166,8 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)
         report += 'sequences in hit set:  '+str(hit_total)
         report += "\n"
-        report += output_aln_buf
+        for line in output_aln_buf:
+            report += line
 
         reportObj = {
             'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTn_Search hits'}],
