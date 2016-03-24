@@ -54,7 +54,6 @@ class kb_blast:
     tBLASTn       = '/kb/module/blast/bin/tblastn'
     tBLASTx       = '/kb/module/blast/bin/tblastx'
     psiBLAST      = '/kb/module/blast/bin/psiblast'
-    rpsBLAST      = '/kb/module/blast/bin/rpsblast'
 
     # target is a list for collecting log messages
     def log(self, target, message):
@@ -234,6 +233,7 @@ class kb_blast:
         console = []
         self.log(console,'Running BLASTn_Search with params=')
         self.log(console, "\n"+pformat(params))
+        report = ''
 #        report = 'Running BLASTn_Search with params='
 #        report += "\n"+pformat(params)
 
@@ -794,8 +794,8 @@ class kb_blast:
         #
         self.log(console, 'RUNNING Make_BLAST_DB:')
         self.log(console, '    '+' '.join(makeblastdb_cmd))
-        report += "\n"+'running Make_BLAST_DB:'+"\n"
-        report += '    '+' '.join(makeblastdb_cmd)+"\n"
+#        report += "\n"+'running Make_BLAST_DB:'+"\n"
+#        report += '    '+' '.join(makeblastdb_cmd)+"\n"
 
         p = subprocess.Popen(makeblastdb_cmd, \
                              cwd = self.scratch, \
@@ -862,8 +862,8 @@ class kb_blast:
         #
         self.log(console, 'RUNNING BLAST:')
         self.log(console, '    '+' '.join(blast_cmd))
-        report += "\n"+'running BLAST:'+"\n"
-        report += '    '+' '.join(blast_cmd)+"\n"
+#        report += "\n"+'running BLAST:'+"\n"
+#        report += '    '+' '.join(blast_cmd)+"\n"
 
         p = subprocess.Popen(blast_cmd, \
                              cwd = self.scratch, \
@@ -893,6 +893,7 @@ class kb_blast:
         output_aln_file_handle.close()
         hit_total = 0
         for line in output_aln_buf:
+            report += line
             if line.startswith('#'):
                 continue
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -1146,6 +1147,8 @@ class kb_blast:
         self.log(console,"BUILDING REPORT")  # DEBUG
         report += 'sequences in many set: '+str(seq_total)
         report += 'sequences in hit set:  '+str(hit_total)
+        report += "\n"
+        report += output_aln_buf
 
         reportObj = {
             'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTn_Search hits'}],
