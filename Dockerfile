@@ -39,25 +39,26 @@ RUN make
 # Install BLAST+
 #
 WORKDIR /kb/module
-RUN curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.3.0+-x64-linux.tar.gz > ncbi-blast-2.3.0+-x64-linux.tar.gz
-RUN tar xfz ncbi-blast-2.3.0+-x64-linux.tar.gz
-RUN ln -s ncbi-blast-2.3.0+ blast
-RUN rm -f ncbi-blast-2.3.0+-x64-linux.tar.gz
-RUN rm -f blast/bin/blastdb_aliastool
-RUN rm -f blast/bin/blastdbcheck
-RUN rm -f blast/bin/blastdbcmd
-RUN rm -f blast/bin/blast_formatter
-RUN rm -f blast/bin/convert2blastmask
-RUN rm -f blast/bin/deltablast
-RUN rm -f blast/bin/dustmasker
-RUN rm -f blast/bin/legacy_blast.pl
-RUN rm -f blast/bin/makembindex
-RUN rm -f blast/bin/makeprofiledb
-RUN rm -f blast/bin/rpsblast
-RUN rm -f blast/bin/rpstblastn
-RUN rm -f blast/bin/segmasker
-RUN rm -f blast/bin/update_blastdb.pl
-RUN rm -f blast/bin/windowmasker
+RUN \
+  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.3.0+-x64-linux.tar.gz > ncbi-blast-2.3.0+-x64-linux.tar.gz && \
+  tar xfz ncbi-blast-2.3.0+-x64-linux.tar.gz && \
+  ln -s ncbi-blast-2.3.0+ blast && \
+  rm -f ncbi-blast-2.3.0+-x64-linux.tar.gz && \
+  rm -f blast/bin/blastdb_aliastool && \
+  rm -f blast/bin/blastdbcheck && \
+  rm -f blast/bin/blastdbcmd && \
+  rm -f blast/bin/blast_formatter && \
+  rm -f blast/bin/convert2blastmask && \
+  rm -f blast/bin/deltablast && \
+  rm -f blast/bin/dustmasker && \
+  rm -f blast/bin/legacy_blast.pl && \
+  rm -f blast/bin/makembindex && \
+  rm -f blast/bin/makeprofiledb && \
+  rm -f blast/bin/rpsblast && \
+  rm -f blast/bin/rpstblastn && \
+  rm -f blast/bin/segmasker && \
+  rm -f blast/bin/update_blastdb.pl && \
+  rm -f blast/bin/windowmasker
 
 
 WORKDIR /kb/module
