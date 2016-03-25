@@ -948,7 +948,7 @@ class kb_blast:
                 high_bitscore_line[hit_seq_id] = line
 
         for hit_seq_id in hit_order:
-            hit_buf.append(high_bitscore_line[hit_seq_id]
+            hit_buf.append(high_bitscore_line[hit_seq_id])
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
@@ -1691,7 +1691,7 @@ class kb_blast:
                 high_bitscore_line[hit_seq_id] = line
 
         for hit_seq_id in hit_order:
-            hit_buf.append(high_bitscore_line[hit_seq_id]
+            hit_buf.append(high_bitscore_line[hit_seq_id])
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
@@ -2526,7 +2526,7 @@ class kb_blast:
                 high_bitscore_line[hit_seq_id] = line
 
         for hit_seq_id in hit_order:
-            hit_buf.append(high_bitscore_line[hit_seq_id]
+            hit_buf.append(high_bitscore_line[hit_seq_id])
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
@@ -3297,7 +3297,7 @@ class kb_blast:
                 high_bitscore_line[hit_seq_id] = line
 
         for hit_seq_id in hit_order:
-            hit_buf.append(high_bitscore_line[hit_seq_id]
+            hit_buf.append(high_bitscore_line[hit_seq_id])
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
@@ -4305,11 +4305,13 @@ class kb_blast:
 
             try:
                 if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    self.log(console,"OVERRIDE ID: "+hit_seq_id)  # DEBUG
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
                     high_bitscore_line[hit_seq_id] = line
             except:
+                self.log(console,"NEW ID: "+hit_seq_id)  # DEBUG
                 hit_order.append(hit_seq_id)
                 high_bitscore_score[hit_seq_id] = hit_bitscore
                 high_bitscore_ident[hit_seq_id] = hit_ident
@@ -4317,7 +4319,7 @@ class kb_blast:
                 high_bitscore_line[hit_seq_id] = line
 
         for hit_seq_id in hit_order:
-            hit_buf.append(high_bitscore_line[hit_seq_id]
+            hit_buf.append(high_bitscore_line[hit_seq_id])
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
