@@ -946,7 +946,7 @@ class kb_blast:
         self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
 
 
-        # SinleEndLibrary input -> SingleEndLibrary output
+        # SingleEndLibrary input -> SingleEndLibrary output
         #
         if many_type_name == 'SingleEndLibrary':
 
@@ -1196,7 +1196,6 @@ class kb_blast:
                       'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
                       }
         self.log(console,"BLASTn_Search DONE")
-
         #END BLASTn_Search
 
         # At some point might do deeper type checking...
@@ -1835,7 +1834,6 @@ class kb_blast:
                       'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
                       }
         self.log(console,"BLASTp_Search DONE")
-
         #END BLASTp_Search
 
         # At some point might do deeper type checking...
@@ -1849,7 +1847,802 @@ class kb_blast:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN BLASTx_Search
-        returnVal = dict()
+        console = []
+        self.log(console,'Running BLASTx_Search with params=')
+        self.log(console, "\n"+pformat(params))
+        report = ''
+#        report = 'Running BLASTx_Search with params='
+#        report += "\n"+pformat(params)
+
+
+        #### do some basic checks
+        #
+        if 'workspace_name' not in params:
+            raise ValueError('workspace_name parameter is required')
+#        if 'input_one_name' not in params and 'input_one_sequence' not in params:
+#            raise ValueError('input_one_sequence or input_one_name parameter is required')
+        if 'input_one_name' not in params:
+            raise ValueError('input_one_name parameter is required')
+        if 'input_many_name' not in params:
+            raise ValueError('input_many_name parameter is required')
+        if 'output_filtered_name' not in params:
+            raise ValueError('output_filtered_name parameter is required')
+
+
+        # Write the input_one_sequence to a SingleEndLibrary object
+        #
+        if 'input_one_sequence' in params \
+                and params['input_one_sequence'] != None \
+                and params['input_one_sequence'] != "Optionally enter DNA sequence...":
+            input_one_file_name = params['input_one_name']
+            one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
+
+#            input_sequence_buf = params['input_one_sequence'].split("\n")
+#            one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
+#            query_line_seen = False
+#            for line in input_sequence_buf:
+#                if not line.startswith('>'):
+#                    one_forward_reads_file_handle.write(line+"\n")
+#                else:
+#                    if query_line_seen:
+#                        break
+#                    query_line_seen = True
+#            one_forward_reads_file_handle.close();
+
+            fastq_format = False
+            input_sequence_buf = params['input_one_sequence']
+            if input_sequence_buf.startswith('@'):
+                fastq_format = True
+                #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
+            input_sequence_buf = re.sub ('&apos;', "'", input_sequence_buf)
+            input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#39;',  "'", input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#34;',  '"', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&lt;;',  '<', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#60;',  '<', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&gt;',   '>', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#62;',  '>', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#36;',  '$', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#37;',  '%', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#47;',  '/', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#63;',  '?', input_sequence_buf)
+##        input_sequence_buf = re.sub ('&#92;',  chr(92), input_sequence_buf)  # FIX LATER
+#        input_sequence_buf = re.sub ('&#96;',  '`', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#124;', '|', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&amp;', '&', input_sequence_buf)
+#        input_sequence_buf = re.sub ('&#38;', '&', input_sequence_buf)
+#        self.log(console,"INPUT_SEQ AFTER: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
+
+            DNA_pattern = re.compile("^[acgtuACGTU ]+$")
+            space_pattern = re.compile("^[ \t]*$")
+            split_input_sequence_buf = input_sequence_buf.split("\n")
+
+            # no header rows, just sequence
+            if not input_sequence_buf.startswith('>') and not input_sequence_buf.startswith('@'):
+                one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
+                for line in split_input_sequence_buf:
+                    if not space_pattern.match(line):
+                        line = re.sub (" ","",line)
+                        line = re.sub ("\t","",line)
+                        if not DNA_pattern.match(line):
+                            raise ValueError ("BAD record:\n"+line+"\n")
+                            sys.exit(0)
+                        one_forward_reads_file_handle.write(line.lower()+"\n")
+                one_forward_reads_file_handle.close()
+
+            else:
+                # format checks
+                for i,line in enumerate(split_input_sequence_buf):
+                    if line.startswith('>') or line.startswith('@'):
+                        if not DNA_pattern.match(split_input_sequence_buf[i+1]):
+                            if fastq_format:
+                                bad_record = "\n".join([split_input_sequence_buf[i],
+                                                        split_input_sequence_buf[i+1],
+                                                        split_input_sequence_buf[i+2],
+                                                        split_input_sequence_buf[i+3]])
+                            else:
+                                bad_record = "\n".join([split_input_sequence_buf[i],
+                                                    split_input_sequence_buf[i+1]])
+                            raise ValueError ("BAD record:\n"+bad_record+"\n")
+                            sys.exit(0)
+                        if fastq_format and line.startswith('@'):
+                            format_ok = True
+                            seq_len = len(split_input_sequence_buf[i+1])
+                            if not seq_len > 0:
+                                format_ok = False
+                            if not split_input_sequence_buf[i+2].startswith('+'):
+                                format_ok = False
+                            if not seq_len == len(split_input_sequence_buf[i+3]):
+                                format_ok = False
+                            if not format_ok:
+                                bad_record = "\n".join([split_input_sequence_buf[i],
+                                                    split_input_sequence_buf[i+1],
+                                                    split_input_sequence_buf[i+2],
+                                                    split_input_sequence_buf[i+3]])
+                                raise ValueError ("BAD record:\n"+bad_record+"\n")
+                                sys.exit(0)
+
+                # write that sucker, removing spaces
+                #
+                #forward_reads_file_handle.write(input_sequence_buf)        input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
+                for i,line in enumerate(split_input_sequence_buf):
+                    if line.startswith('>'):
+                        record_buf = []
+                        record_buf.append(line)
+                        for j in range(i+1,len(split_input_sequence_buf)):
+                            if split_input_sequence_buf[j].startswith('>'):
+                                break
+                            seq_line = re.sub (" ","",split_input_sequence_buf[j])
+                            seq_line = re.sub ("\t","",seq_line)
+                            seq_line = seq_line.lower()
+                            record_buf.append(seq_line)
+                        record = "\n".join(record_buf)+"\n"
+                        one_forward_reads_file_handle.write(record)
+                        break  # only want first record
+                    elif line.startswith('@'):
+                        seq_line = re.sub (" ","",split_input_sequence_buf[i+1])
+                        seq_line = re.sub ("\t","",seq_line)
+                        seq_line = seq_line.lower()
+                        qual_line = re.sub (" ","",split_input_sequence_buf[i+3])
+                        qual_line = re.sub ("\t","",qual_line)
+                        record = "\n".join([line, seq_line, split_input_sequence_buf[i+2], qual_line])+"\n"
+                        one_forward_reads_file_handle.write(record)
+                        break  # only want first record
+
+                one_forward_reads_file_handle.close()
+
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+                provenance[0]['input_ws_objects'] = []
+                provenance[0]['service'] = 'kb_blast'
+                provenance[0]['method'] = 'BLASTx_Search'
+
+                
+                # Upload results
+                #
+                self.log(console,"UPLOADING QUERY OBJECT")  # DEBUG
+
+                sequencing_tech = 'N/A'
+                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
+                                                      console,  # DEBUG
+                                                      params['workspace_name'],
+                                                      params['input_one_name'],
+                                                      one_forward_reads_file_path,
+                                                      provenance,
+                                                      sequencing_tech
+                                                      )
+
+            self.log(console, 'done')
+
+        #### Get the input_one object
+        ##
+        try:
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
+            data = objects[0]['data']
+            info = objects[0]['info']
+            # Object Info Contents
+            # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
+            # 0 - obj_id objid
+            # 1 - obj_name name
+            # 2 - type_string type
+            # 3 - timestamp save_date
+            # 4 - int version
+            # 5 - username saved_by
+            # 6 - ws_id wsid
+            # 7 - ws_name workspace
+            # 8 - string chsum
+            # 9 - int size 
+            # 10 - usermeta meta
+            one_type_name = info[2].split('.')[1].split('-')[0]
+        except Exception as e:
+            raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+        #to get the full stack trace: traceback.format_exc()
+
+        if 'input_one_sequence' in params \
+                and params['input_one_sequence'] != None \
+                and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
+                and one_type_name != 'SingleEndLibrary':
+
+            raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
+            sys.exit (0)
+
+
+        # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
+        #
+        if one_type_name == 'SingleEndLibrary':
+            try:
+                if 'lib' in data:
+                    one_forward_reads = data['lib']['file']
+                elif 'handle' in data:
+                    one_forward_reads = data['handle']
+                else:
+                    self.log(console,"bad structure for 'one_forward_reads'")
+                    raise ValueError("bad structure for 'one_forward_reads'")
+
+                ### NOTE: this section is what could be replaced by the transform services
+                one_forward_reads_file_path = os.path.join(self.scratch,one_forward_reads['file_name'])
+                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+                self.log(console, 'downloading reads file: '+str(one_forward_reads_file_path))
+                headers = {'Authorization': 'OAuth '+ctx['token']}
+                r = requests.get(one_forward_reads['url']+'/node/'+one_forward_reads['id']+'?download', stream=True, headers=headers)
+                for chunk in r.iter_content(1024):
+                    one_forward_reads_file_handle.write(chunk)
+                one_forward_reads_file_handle.close();
+                self.log(console, 'done')
+                ### END NOTE
+
+
+                # remove carriage returns
+                new_file_path = one_forward_reads_file_path+"-CRfree"
+                new_file_handle = open(new_file_path, 'w', 0)
+                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
+                for line in one_forward_reads_file_handle:
+                    line = re.sub("\r","",line)
+                    new_file_handle.write(line)
+                one_forward_reads_file_handle.close();
+                new_file_handle.close()
+                one_forward_reads_file_path = new_file_path
+
+
+                # convert FASTQ to FASTA (if necessary)
+                new_file_path = one_forward_reads_file_path+".fna"
+                new_file_handle = open(new_file_path, 'w', 0)
+                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
+                header = None
+                last_header = None
+                last_seq_buf = None
+                last_line_was_header = False
+                was_fastq = False
+                for line in one_forward_reads_file_handle:
+                    if line.startswith('>'):
+                        break
+                    elif line.startswith('@'):
+                        was_fastq = True
+                        header = line[1:]
+                        if last_header != None:
+                            new_file_handle.write('>'+last_header)
+                            new_file_handle.write(last_seq_buf)
+                        last_seq_buf = None
+                        last_header = header
+                        last_line_was_header = True
+                    elif last_line_was_header:
+                        last_seq_buf = line
+                        last_line_was_header = False
+                    else:
+                        continue
+                if last_header != None:
+                    new_file_handle.write('>'+last_header)
+                    new_file_handle.write(last_seq_buf)
+
+                new_file_handle.close()
+                one_forward_reads_file_handle.close()
+                if was_fastq:
+                    one_forward_reads_file_path = new_file_path
+
+            except Exception as e:
+                print(traceback.format_exc())
+                raise ValueError('Unable to download single-end read library files: ' + str(e))
+
+        elif one_type_name == 'FeatureSet':
+            # retrieve sequences for features
+            input_one_featureSet = data
+            
+            genome2Features = {}
+            features = input_one_featureSet['elements']
+            for fId in features.keys():
+                genomeRef = features[fId][0]
+                if genomeRef not in genome2Features:
+                    genome2Features[genomeRef] = []
+                genome2Features[genomeRef].append(fId)
+
+            # export features to FASTA file
+            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
+            records = []
+            for genomeRef in genome2Features:
+                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+                these_genomeFeatureIds = genome2Features[genomeRef]
+                for feature in genome['features']:
+                    if feature['id'] in these_genomeFeatureIds:
+                        # BLASTx is nuc-prot
+                        if feature['type'] != 'CDS':
+                            raise ValueError (params['input_one_name']+" feature type must be CDS")
+                            sys.exit(0)
+                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                        records.append(record)
+            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+
+        elif one_type_name == 'Feature':
+            # export feature to FASTA file
+            feature = data
+            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
+            # BLASTx is nuc-prot
+            if feature['type'] != 'CDS':
+                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                sys.exit(0)
+            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
+            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
+            SeqIO.write([record], one_forward_reads_file_path, "fasta")
+
+        else:
+            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+
+        #### Get the input_many object
+        ##
+        try:
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            data = objects[0]['data']
+            info = objects[0]['info']
+            many_type_name = info[2].split('.')[1].split('-')[0]
+
+        except Exception as e:
+            raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
+            #to get the full stack trace: traceback.format_exc()
+
+        # Handle overloading (input_many can be FeatureSet, Genome, or GenomeSet)
+        #
+        if many_type_name == 'FeatureSet':
+            # retrieve sequences for features
+            input_many_featureSet = data
+
+            genome2Features = {}
+            features = input_many_featureSet['elements']
+            for fId in features.keys():
+                genomeRef = features[fId][0]
+                if genomeRef not in genome2Features:
+                    genome2Features[genomeRef] = []
+                genome2Features[genomeRef].append(fId)
+
+            # export features to FASTA file
+            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
+            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            records = []
+            feature_written = dict()
+            for genomeRef in genome2Features:
+                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+                these_genomeFeatureIds = genome2Features[genomeRef]
+                for feature in genome['features']:
+                    if feature['id'] in these_genomeFeatureIds:
+                        if feature['type'] != 'CDS':
+                            raise ValueError (params['input_many_name']+" feature types must all be CDS")
+                            sys.exit(0)
+                        try:
+                            f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTx is nuc-prot
+                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+
+
+        # Genome
+        #
+        elif many_type_name == 'Genome':
+            input_many_genome = data
+            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+
+            # export features to FASTA file
+            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
+            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            records = []
+            feature_written = dict()
+            for feature in input_many_genome['features']:
+                try:
+                    f_written = feature_written[feature['id']]
+                except:
+                    feature_written[feature['id']] = True
+                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                    # BLASTx is nuc-prot
+                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
+                    if feature['type'] != 'CDS':
+                        continue
+                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
+                    records.append(record)
+            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+
+
+        # GenomeSet
+        #
+        elif many_type_name == 'GenomeSet':
+            input_many_genomeSet = data
+
+            # export features to FASTA file
+            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
+            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+
+            records = []
+            feature_written = dict()
+            for genome_name in input_many_genomeSet['elements'].keys():
+                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
+                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
+                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
+                    for feature in genome['features']:
+                        try:
+                            f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTx is nuc-prot
+                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            if feature['type'] != 'CDS':
+                                continue
+                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+
+                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
+                        input_many_genomeSet['elements'][genome_name]['data'] != None:
+                    genome = input_many_genomeSet['elements'][genome_name]['data']
+                    for feature in genome['features']:
+                        try:
+                            f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
+                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                            # BLASTx is nuc-prot
+                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            if feature['type'] != 'CDS':
+                                continue
+                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+
+                else:
+                    raise ValueError('genome '+genome_name+' missing')
+
+            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            
+        # Missing proper input_many_type
+        #
+        else:
+            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+        # FORMAT DB
+        #
+        # OLD SYNTAX: formatdb -i $database -o T -p F -> $database.nsq or $database.00.nsq
+        # NEW SYNTAX: makeblastdb -in $database -parse_seqids -dbtype prot/nucl -out <basename>
+        makeblastdb_cmd = [self.Make_BLAST_DB]
+
+        # check for necessary files
+        if not os.path.isfile(self.Make_BLAST_DB):
+            raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
+        if not os.path.isfile(one_forward_reads_file_path):
+            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        if not os.path.isfile(many_forward_reads_file_path):
+            raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+
+        makeblastdb_cmd.append('-in')
+        makeblastdb_cmd.append(many_forward_reads_file_path)
+        makeblastdb_cmd.append('-parse_seqids')
+        makeblastdb_cmd.append('-dbtype')
+        makeblastdb_cmd.append('prot')
+        makeblastdb_cmd.append('-out')
+        makeblastdb_cmd.append(many_forward_reads_file_path)
+
+        # Run Make_BLAST_DB, capture output as it happens
+        #
+        self.log(console, 'RUNNING Make_BLAST_DB:')
+        self.log(console, '    '+' '.join(makeblastdb_cmd))
+#        report += "\n"+'running Make_BLAST_DB:'+"\n"
+#        report += '    '+' '.join(makeblastdb_cmd)+"\n"
+
+        p = subprocess.Popen(makeblastdb_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+        while True:
+            line = p.stdout.readline()
+            if not line: break
+            self.log(console, line.replace('\n', ''))
+
+        p.stdout.close()
+        p.wait()
+        self.log(console, 'return code: ' + str(p.returncode))
+        if p.returncode != 0:
+            raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+
+        ### Construct the BLAST command
+        #
+        # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p blastx -i $fasta_file -d $database -o $out_file
+        # NEW SYNTAX: blastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        #
+        blast_bin = self.BLASTx
+        blast_cmd = [blast_bin]
+
+        # check for necessary files
+        if not os.path.isfile(blast_bin):
+            raise ValueError("no such file '"+blast_bin+"'")
+        if not os.path.isfile(one_forward_reads_file_path):
+            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        if not os.path.isfile(many_forward_reads_file_path):
+            raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+
+        # set the output path
+        timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
+        output_dir = os.path.join(self.scratch,'output.'+str(timestamp))
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
+
+        # this is command for basic search mode
+        blast_cmd.append('-query')
+        blast_cmd.append(one_forward_reads_file_path)
+        blast_cmd.append('-db')
+        blast_cmd.append(many_forward_reads_file_path)
+        blast_cmd.append('-out')
+        blast_cmd.append(output_aln_file_path)
+        blast_cmd.append('-outfmt')
+        blast_cmd.append('7')
+        blast_cmd.append('-evalue')
+        blast_cmd.append(str(params['e_value']))
+
+        # options
+        if 'maxaccepts' in params:
+            if params['maxaccepts']:
+                blast_cmd.append('-max_target_seqs')
+                blast_cmd.append(str(params['maxaccepts']))
+
+        # Run BLAST, capture output as it happens
+        #
+        self.log(console, 'RUNNING BLAST:')
+        self.log(console, '    '+' '.join(blast_cmd))
+#        report += "\n"+'running BLAST:'+"\n"
+#        report += '    '+' '.join(blast_cmd)+"\n"
+
+        p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+        while True:
+            line = p.stdout.readline()
+            if not line: break
+            self.log(console, line.replace('\n', ''))
+
+        p.stdout.close()
+        p.wait()
+        self.log(console, 'return code: ' + str(p.returncode))
+        if p.returncode != 0:
+            raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+
+        # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
+        #
+        self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        hit_seq_ids = dict()
+        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_buf = output_aln_file_handle.readlines()
+        output_aln_file_handle.close()
+        hit_total = 0
+        for line in output_aln_buf:
+            if line.startswith('#'):
+                continue
+            #self.log(console,'HIT LINE: '+line)  # DEBUG
+            hit_info = line.split("\t")
+            hit_seq_id     = hit_info[1]
+            hit_ident      = float(hit_info[2]) / 100.0
+            hit_aln_len    = hit_info[3]
+            hit_mismatches = hit_info[4]
+            hit_gaps       = hit_info[5]
+            hit_q_beg      = hit_info[6]
+            hit_q_end      = hit_info[7]
+            hit_t_beg      = hit_info[8]
+            hit_t_end      = hit_info[9]
+            hit_e_value    = hit_info[10]
+            hit_bitscore   = hit_info[11]
+
+            #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+                continue
+            #self.log(console,"AFTER ident_thresh")
+            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+                continue
+            #self.log(console,"AFTER bitscore")
+            # need to fix this by reading query len
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+                continue
+            #self.log(console,"AFTER overlap_fraction")
+            
+            hit_total += 1
+            hit_seq_ids[hit_seq_id] = True
+            self.log(console, "HIT: '"+hit_seq_id+"'")  # DEBUG
+        
+
+        self.log(console, 'EXTRACTING HITS FROM INPUT')
+        self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
+
+
+        # FeatureSet input -> FeatureSet output
+        #
+        if many_type_name == 'FeatureSet':
+
+            seq_total = len(input_many_featureSet['elements'].keys())
+
+            output_featureSet = dict()
+            if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
+                output_featureSet['description'] = input_many_featureSet['description'] + " - BLASTx_Search filtered"
+            else:
+                output_featureSet['description'] = "BLASTx_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
+                for fId in input_many_featureSet['element_ordering']:
+                    try:
+                        in_filtered_set = hit_seq_ids[fId]
+                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
+                        output_featureSet['element_ordering'].append(fId)
+                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                    except:
+                        pass
+            else:
+                fId_list = input_many_featureSet['elements'].keys()
+                self.log(console,"ADDING FEATURES TO FEATURESET")
+                for fId in sorted(fId_list):
+                    try:
+                        #self.log(console,"checking '"+fId+"'")
+                        in_filtered_set = hit_seq_ids[fId]
+                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
+                        output_featureSet['element_ordering'].append(fId)
+                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                    except:
+                        pass
+
+        # Parse Genome hits into FeatureSet
+        #
+        elif many_type_name == 'Genome':
+            seq_total = 0
+
+            output_featureSet = dict()
+            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTx_Search filtered"
+            else:
+                output_featureSet['description'] = "BLASTx_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+            for feature in input_many_genome['features']:
+                seq_total += 1
+                try:
+                    in_filtered_set = hit_seq_ids[feature['id']]
+                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                    output_featureSet['element_ordering'].append(feature['id'])
+                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                except:
+                    pass
+
+        # Parse GenomeSet hits into FeatureSet
+        #
+        elif many_type_name == 'GenomeSet':
+            seq_total = 0
+
+            output_featureSet = dict()
+            if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
+                output_featureSet['description'] = input_many_genomeSet['description'] + " - BLASTx_Search filtered"
+            else:
+                output_featureSet['description'] = "BLASTx_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+
+            for genome_name in input_many_genomeSet['elements'].keys():
+                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
+                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
+                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
+                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+                    for feature in genome['features']:
+                        seq_total += 1
+                        try:
+                            in_filtered_set = hit_seq_ids[feature['id']]
+                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                            output_featureSet['element_ordering'].append(feature['id'])
+                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                        except:
+                            pass
+
+                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
+                        input_many_genomeSet['elements'][genome_name]['data'] != None:
+#                    genome = input_many_genomeSet['elements'][genome_name]['data']
+#                    for feature in genome['features']:
+#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+#                        seq_total += 1
+#                        try:
+#                            in_filtered_set = hit_seq_ids[feature['id']]
+#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+#                            output_featureSet['element_ordering'].append(feature['id'])
+                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
+#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
+#                        except:
+#                            pass
+
+
+        # load the method provenance from the context object
+        #
+        self.log(console,"SETTING PROVENANCE")  # DEBUG
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects'] = []
+        if 'input_one_name' in params and params['input_one_name'] != None:
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['service'] = 'kb_blast'
+        provenance[0]['method'] = 'BLASTx_Search'
+
+
+        # Upload results
+        #
+        self.log(console,"UPLOADING RESULTS")  # DEBUG
+
+        # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+        new_obj_info = ws.save_objects({
+                            'workspace': params['workspace_name'],
+                            'objects':[{
+                                    'type': 'KBaseCollections.FeatureSet',
+                                    'data': output_featureSet,
+                                    'name': params['output_filtered_name'],
+                                    'meta': {},
+                                    'provenance': provenance
+                                }]
+                        })
+
+        # build output report object
+        #
+        self.log(console,"BUILDING REPORT")  # DEBUG
+        report += 'sequences in many set: '+str(seq_total)+"\n"
+        report += 'sequences in hit set:  '+str(hit_total)+"\n"
+        report += "\n"
+        for line in output_aln_buf:
+            report += line
+
+        reportObj = {
+            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTx_Search hits'}],
+            'text_message':report
+        }
+
+        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        report_obj_info = ws.save_objects({
+#                'id':info[6],
+                'workspace':params['workspace_name'],
+                'objects':[
+                    {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance
+                    }
+                ]
+            })[0]
+
+        self.log(console,"BUILDING RETURN OBJECT")
+#        returnVal = { 'output_report_name': reportName,
+#                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+#                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
+#                      }
+        returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+        self.log(console,"BLASTx_Search DONE")
         #END BLASTx_Search
 
         # At some point might do deeper type checking...
