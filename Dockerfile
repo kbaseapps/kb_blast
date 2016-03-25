@@ -42,6 +42,7 @@ WORKDIR /kb/module
 RUN curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.3.0+-x64-linux.tar.gz > ncbi-blast-2.3.0+-x64-linux.tar.gz
 RUN tar xfz ncbi-blast-2.3.0+-x64-linux.tar.gz
 RUN ln -s ncbi-blast-2.3.0+ blast
+RUN rm -f ncbi-blast-2.3.0+-x64-linux.tar.gz
 RUN rm -f blast/bin/blastdb_aliastool
 RUN rm -f blast/bin/blastdbcheck
 RUN rm -f blast/bin/blastdbcmd
