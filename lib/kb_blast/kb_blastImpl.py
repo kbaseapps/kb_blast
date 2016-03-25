@@ -936,7 +936,7 @@ class kb_blast:
             hit_bitscore   = hit_info[11]
 
             try:
-                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
@@ -1680,7 +1680,7 @@ class kb_blast:
             hit_bitscore   = hit_info[11]
 
             try:
-                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
@@ -2516,7 +2516,7 @@ class kb_blast:
             hit_bitscore   = hit_info[11]
 
             try:
-                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
@@ -3288,7 +3288,7 @@ class kb_blast:
             hit_bitscore   = hit_info[11]
 
             try:
-                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
@@ -4309,7 +4309,7 @@ class kb_blast:
             hit_bitscore   = hit_info[11]
 
             try:
-                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     self.log(console,"OVERRIDE ID: "+hit_seq_id)  # DEBUG
                     self.log(console,line)  # DEBUG
                     high_bitscore_score[hit_seq_id] = hit_bitscore
