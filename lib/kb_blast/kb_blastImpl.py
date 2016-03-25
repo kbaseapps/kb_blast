@@ -587,8 +587,6 @@ class kb_blast:
 
         # Handle overloading (input_many can be SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
         #
-        #  Note: currently only support SingleEndLibrary
-        #
         if many_type_name == 'SingleEndLibrary':
 
             # DEBUG
@@ -1837,6 +1835,7 @@ class kb_blast:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN BLASTx_Search
+        returnVal = dict()
         #END BLASTx_Search
 
         # At some point might do deeper type checking...
@@ -1850,6 +1849,7 @@ class kb_blast:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN tBLASTn_Search
+        returnVal = dict()
         #END tBLASTn_Search
 
         # At some point might do deeper type checking...
@@ -1863,6 +1863,7 @@ class kb_blast:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN tBLASTx_Search
+        returnVal = dict()
         #END tBLASTx_Search
 
         # At some point might do deeper type checking...
