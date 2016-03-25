@@ -1238,7 +1238,8 @@ class kb_blast:
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter PROTEIN sequence...":
             #input_one_file_name = params['input_one_name']
-            input_one_file_name = 'query.faa'
+            input_one_name = 'query.faa'
+            input_one_file_name = input_one_name
             one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
             self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
@@ -1261,7 +1262,7 @@ class kb_blast:
 
             # no header rows, just sequence
             if not input_sequence_buf.startswith('>'):
-                one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
+                one_forward_reads_file_handle.write('>'input_one_name+"\n")
                 for line in split_input_sequence_buf:
                     if not space_pattern.match(line):
                         line = re.sub (" ","",line)
