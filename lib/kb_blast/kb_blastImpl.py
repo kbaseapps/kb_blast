@@ -1239,7 +1239,8 @@ class kb_blast:
         if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter PROTEIN sequence...":
-            input_one_file_name = params['input_one_name']
+            #input_one_file_name = params['input_one_name']
+            input_one_file_name = 'query.faa'
             one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
             self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
