@@ -700,13 +700,13 @@ class kb_blast:
                     if feature['id'] in these_genomeFeatureIds:
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
                             record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -724,13 +724,13 @@ class kb_blast:
             for feature in input_many_genome['features']:
                 try:
                     f_written = feature_written[feature['id']]
+                except:
+                    feature_written[feature['id']] = True
                     #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                     # BLASTn is nuc-nuc
                     record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
                     #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
                     records.append(record)
-                except:
-                    feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -752,13 +752,13 @@ class kb_blast:
                     for feature in genome['features']:
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
                             record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -766,13 +766,13 @@ class kb_blast:
                     for feature in genome['features']:
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
                             record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
@@ -1343,6 +1343,9 @@ class kb_blast:
                         if feature['id'] in these_genomeFeatureIds:
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                            if feature['type'] != 'CDS':
+                                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                                sys.exit(0)
                             record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             records.append(record)
                 SeqIO.write(records, one_forward_reads_file_path, "fasta")
@@ -1354,6 +1357,9 @@ class kb_blast:
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 # BLASTp is prot-prot
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
+                if feature['type'] != 'CDS':
+                    raise ValueError (params['input_one_name']+" feature type must be CDS")
+                    sys.exit(0)
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
@@ -1401,15 +1407,18 @@ class kb_blast:
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
+                        if feature['type'] != 'CDS':
+                            raise ValueError (params['input_many_name']+" feature types must all be CDS")
+                            sys.exit(0)
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -1427,13 +1436,15 @@ class kb_blast:
             for feature in input_many_genome['features']:
                 try:
                     f_written = feature_written[feature['id']]
+                except:
+                    feature_written[feature['id']] = True
                     #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                     # BLASTp is prot-prot
                     #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
+                    if feature['type'] != 'CDS':
+                        continue
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
                     records.append(record)
-                except:
-                    feature_written[feature['id']] = True
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -1455,13 +1466,15 @@ class kb_blast:
                     for feature in genome['features']:
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            if feature['type'] != 'CDS':
+                                continue
                             record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -1469,13 +1482,15 @@ class kb_blast:
                     for feature in genome['features']:
                         try:
                             f_written = feature_written[feature['id']]
+                        except:
+                            feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            if feature['type'] != 'CDS':
+                                continue
                             record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                             records.append(record)
-                        except:
-                            feature_written[feature['id']] = True
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
