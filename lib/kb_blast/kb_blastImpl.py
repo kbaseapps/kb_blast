@@ -908,9 +908,18 @@ class kb_blast:
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
         for line in output_aln_buf:
-            if line.startswith('#'):
+            if line.startswith('#') and not header_done:
+                hit_buf.append(line)
                 continue
+            header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
@@ -925,11 +934,27 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            try:
+                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id]
+
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
             #self.log(console,"AFTER ident_thresh")
-            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
             #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
@@ -1163,7 +1188,7 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)+"\n"
         report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
-        for line in output_aln_buf:
+        for line in hit_buf:
             report += line
 
         reportObj = {
@@ -1626,9 +1651,18 @@ class kb_blast:
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
         for line in output_aln_buf:
-            if line.startswith('#'):
+            if line.startswith('#') and not header_done:
+                hit_buf.append(line)
                 continue
+            header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
@@ -1643,11 +1677,27 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            try:
+                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id]
+
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
             #self.log(console,"AFTER ident_thresh")
-            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
             #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
@@ -1802,7 +1852,7 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)+"\n"
         report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
-        for line in output_aln_buf:
+        for line in hit_buf:
             report += line
 
         reportObj = {
@@ -2436,9 +2486,18 @@ class kb_blast:
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
         for line in output_aln_buf:
-            if line.startswith('#'):
+            if line.startswith('#') and not header_done:
+                hit_buf.append(line)
                 continue
+            header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
@@ -2453,11 +2512,27 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            try:
+                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id]
+
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
             #self.log(console,"AFTER ident_thresh")
-            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
             #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
@@ -2612,7 +2687,7 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)+"\n"
         report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
-        for line in output_aln_buf:
+        for line in hit_buf:
             report += line
 
         reportObj = {
@@ -3182,9 +3257,18 @@ class kb_blast:
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
         for line in output_aln_buf:
-            if line.startswith('#'):
+            if line.startswith('#') and not header_done:
+                hit_buf.append(line)
                 continue
+            header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
@@ -3199,11 +3283,27 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            try:
+                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id]
+
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
             #self.log(console,"AFTER ident_thresh")
-            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
             #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
@@ -3437,7 +3537,7 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)+"\n"
         report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
-        for line in output_aln_buf:
+        for line in hit_buf:
             report += line
 
         reportObj = {
@@ -4177,9 +4277,18 @@ class kb_blast:
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
         for line in output_aln_buf:
-            if line.startswith('#'):
+            if line.startswith('#') and not header_done:
+                hit_buf.append(line)
                 continue
+            header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
@@ -4194,11 +4303,27 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            try:
+                if hit_bitscore > high_bitscore_score[hit_seq_id]:
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id]
+
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(hit_ident):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
             #self.log(console,"AFTER ident_thresh")
-            if 'bitscore' in params and float(params['bitscore']) > float(hit_bitscore):
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
             #self.log(console,"AFTER bitscore")
             # need to fix this by reading query len
@@ -4432,7 +4557,7 @@ class kb_blast:
         report += 'sequences in many set: '+str(seq_total)+"\n"
         report += 'sequences in hit set:  '+str(hit_total)+"\n"
         report += "\n"
-        for line in output_aln_buf:
+        for line in hit_buf:
             report += line
 
         reportObj = {
