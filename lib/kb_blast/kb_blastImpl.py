@@ -225,7 +225,6 @@ class kb_blast:
         #END_CONSTRUCTOR
         pass
 
-
     def BLASTn_Search(self, ctx, params):
         # ctx is the context object
         # return variables are: returnVal
@@ -1207,7 +1206,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTp_Search(self, ctx, params):
         # ctx is the context object
         # return variables are: returnVal
@@ -1830,7 +1828,6 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
 
     def BLASTx_Search(self, ctx, params):
         # ctx is the context object
