@@ -1262,7 +1262,7 @@ class kb_blast:
 
             # no header rows, just sequence
             if not input_sequence_buf.startswith('>'):
-                one_forward_reads_file_handle.write('>'input_one_name+"\n")
+                one_forward_reads_file_handle.write('>'+input_one_name+"\n")
                 for line in split_input_sequence_buf:
                     if not space_pattern.match(line):
                         line = re.sub (" ","",line)
