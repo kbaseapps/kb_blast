@@ -916,8 +916,9 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            if line.startswith('#') and not header_done:
-                hit_buf.append(line)
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
                 continue
             header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -1659,8 +1660,9 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            if line.startswith('#') and not header_done:
-                hit_buf.append(line)
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
                 continue
             header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -2494,8 +2496,9 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            if line.startswith('#') and not header_done:
-                hit_buf.append(line)
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
                 continue
             header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -3265,8 +3268,9 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            if line.startswith('#') and not header_done:
-                hit_buf.append(line)
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
                 continue
             header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -4285,8 +4289,9 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            if line.startswith('#') and not header_done:
-                hit_buf.append(line)
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
                 continue
             header_done = True
             #self.log(console,'HIT LINE: '+line)  # DEBUG
@@ -4306,12 +4311,14 @@ class kb_blast:
             try:
                 if hit_bitscore > high_bitscore_score[hit_seq_id]:
                     self.log(console,"OVERRIDE ID: "+hit_seq_id)  # DEBUG
+                    self.log(console,line)  # DEBUG
                     high_bitscore_score[hit_seq_id] = hit_bitscore
                     high_bitscore_ident[hit_seq_id] = hit_ident
                     high_bitscore_alnlen[hit_seq_id] = hit_aln_len
                     high_bitscore_line[hit_seq_id] = line
             except:
                 self.log(console,"NEW ID: "+hit_seq_id)  # DEBUG
+                self.log(console,line)  # DEBUG
                 hit_order.append(hit_seq_id)
                 high_bitscore_score[hit_seq_id] = hit_bitscore
                 high_bitscore_ident[hit_seq_id] = hit_ident
