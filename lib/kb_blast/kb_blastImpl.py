@@ -552,7 +552,7 @@ class kb_blast:
             SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_one type of: '+type_name)
 
 
         #### Get the input_many object
@@ -782,7 +782,8 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+type_name)
+
 
         # FORMAT DB
         #
@@ -900,6 +901,16 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
 
+        # get query_len for filtering later
+        #
+        query_len = 0
+        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(r" ","", line.rstrip())) 
+        
+
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -951,17 +962,12 @@ class kb_blast:
         for hit_seq_id in hit_order:
             hit_buf.append(high_bitscore_line[hit_seq_id])
 
-            #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER bitscore")
-            # need to fix this by reading query len
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 continue
-            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
@@ -1644,6 +1650,16 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
 
+        # get query_len for filtering later
+        #
+        query_len = 0
+        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(r" ","", line.rstrip())) 
+        
+
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -1698,14 +1714,10 @@ class kb_blast:
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER bitscore")
-            # need to fix this by reading query len
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 continue
-            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
@@ -2480,6 +2492,17 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
 
+        # get query_len for filtering later
+        #
+        query_len = 0
+        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(r" ","", line.rstrip())) 
+        query_len = query_len/3.0  # BLASTx is nuc-prot
+
+                
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -2534,14 +2557,10 @@ class kb_blast:
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER bitscore")
-            # need to fix this by reading query len
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 continue
-            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
@@ -3252,6 +3271,17 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
 
+        # get query_len for filtering later
+        #
+        query_len = 0
+        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(r" ","", line.rstrip())) 
+        #query_len = query_len/1.0  # tBLASTn is prot-nuc
+
+                
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -3306,14 +3336,10 @@ class kb_blast:
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER bitscore")
-            # need to fix this by reading query len
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 continue
-            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
@@ -4273,6 +4299,17 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
 
+        # get query_len for filtering later
+        #
+        query_len = 0
+        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(r" ","", line.rstrip())) 
+        query_len = query_len/3.0  # tBLASTx is nuc-nuc (translated) and reports alnlen in protein length
+
+                
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -4331,14 +4368,10 @@ class kb_blast:
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER ident_thresh")
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 continue
-            #self.log(console,"AFTER bitscore")
-            # need to fix this by reading query len
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 1.0:
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 continue
-            #self.log(console,"AFTER overlap_fraction")
             
             hit_total += 1
             hit_seq_ids[hit_seq_id] = True
