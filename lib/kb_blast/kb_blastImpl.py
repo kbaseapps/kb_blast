@@ -535,9 +535,11 @@ class kb_blast:
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
+
+                        # NOTE: SeqRecord messes up the ID, prepending 'gnl|' to it for some unknown reason.  Thanks BioPython.
+
                         # BLASTn is nuc-nuc
                         record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                         records.append(record)
             SeqIO.write(records, one_forward_reads_file_path, "fasta")
 
@@ -691,6 +693,7 @@ class kb_blast:
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
             records = []
             feature_written = dict()
             for genomeRef in genome2Features:
@@ -705,10 +708,9 @@ class kb_blast:
                             self.log(console,"GENOME FEATURE ID: "+feature['id']) # DEBUG
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+                            many_forward_reads_file_handle.write(">"+feature['id']+"\n"+feature['dna_sequence']+"\n")
+                            #many_forward_reads_file_handle.write(">"+feature['id']+"\n"+feature['protein_translation']+"\n")
+            many_forward_reads_file_handle.close()
 
 
         # Genome
