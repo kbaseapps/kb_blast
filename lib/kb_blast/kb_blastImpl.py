@@ -1081,9 +1081,9 @@ class kb_blast:
 
             # DEBUG
             self.log (console, "CHECKING ELEMENTS IN OUTPUT FEATURESET AT POS A")
-            for fId in element_ordering:
+            for fId in output_featureSet['element_ordering']:
                 self.log(console,'ELEMENT ORDERING: '+fId)
-                self.log(console,str(output_featureSet['elements'][fId])
+                self.log(console,str(output_featureSet['elements'][fId]))
 
 
         # Parse Genome hits into FeatureSet
@@ -1187,9 +1187,9 @@ class kb_blast:
         else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
             # DEBUG
             self.log (console, "CHECKING ELEMENTS IN OUTPUT FEATURESET AT POS B")
-            for fId in element_ordering:
+            for fId in output_featureSet['element_ordering']:
                 self.log(console,'ELEMENT ORDERING: '+fId)
-                self.log(console,str(output_featureSet['elements'][fId])
+                self.log(console,str(output_featureSet['elements'][fId]))
 
             new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
