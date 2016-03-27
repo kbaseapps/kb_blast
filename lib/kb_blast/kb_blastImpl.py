@@ -1081,6 +1081,10 @@ class kb_blast:
 
             # DEBUG
             self.log (console, "CHECKING ELEMENTS IN OUTPUT FEATURESET AT POS A")
+            for fId in sorted(hit_seq_ids.keys()):
+                self.log(console,"HIT IDs: "+fId)
+            for fId in sorted(input_many_featureSet['elements'].keys()):
+                self.log(console,"FS IDs: "+fId)
             for fId in output_featureSet['element_ordering']:
                 self.log(console,'ELEMENT ORDERING: '+fId)
                 self.log(console,str(output_featureSet['elements'][fId]))
