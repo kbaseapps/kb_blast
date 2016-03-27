@@ -535,7 +535,6 @@ class kb_blast:
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
-                        self.log(console,"GENOME FEATURE ID: "+feature['id']) # DEBUG
                         # BLASTn is nuc-nuc
                         record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                         #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
@@ -703,6 +702,7 @@ class kb_blast:
                             f_written = feature_written[feature['id']]
                         except:
                             feature_written[feature['id']] = True
+                            self.log(console,"GENOME FEATURE ID: "+feature['id']) # DEBUG
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
                             record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
