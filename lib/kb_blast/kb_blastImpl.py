@@ -693,7 +693,6 @@ class kb_blast:
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
             records = []
             feature_written = dict()
             for genomeRef in genome2Features:
@@ -705,12 +704,12 @@ class kb_blast:
                             f_written = feature_written[feature['id']]
                         except:
                             feature_written[feature['id']] = True
-                            self.log(console,"GENOME FEATURE ID: "+feature['id']) # DEBUG
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                             # BLASTn is nuc-nuc
-                            many_forward_reads_file_handle.write(">"+feature['id']+"\n"+feature['dna_sequence']+"\n")
-                            #many_forward_reads_file_handle.write(">"+feature['id']+"\n"+feature['protein_translation']+"\n")
-            many_forward_reads_file_handle.close()
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                            records.append(record)
+            SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
         # Genome
@@ -948,6 +947,10 @@ class kb_blast:
             hit_t_end      = hit_info[9]
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
+
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl|'):
+                hit_seq_id = hit_seq_id[4:]
 
             try:
                 if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
@@ -1714,6 +1717,10 @@ class kb_blast:
             hit_t_end      = hit_info[9]
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
+
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl|'):
+                hit_seq_id = hit_seq_id[4:]
 
             try:
                 if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
@@ -2558,6 +2565,10 @@ class kb_blast:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl|'):
+                hit_seq_id = hit_seq_id[4:]
+
             try:
                 if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
                     high_bitscore_score[hit_seq_id] = hit_bitscore
@@ -3336,6 +3347,10 @@ class kb_blast:
             hit_t_end      = hit_info[9]
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
+
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl|'):
+                hit_seq_id = hit_seq_id[4:]
 
             try:
                 if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
@@ -4364,6 +4379,10 @@ class kb_blast:
             hit_t_end      = hit_info[9]
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
+
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl|'):
+                hit_seq_id = hit_seq_id[4:]
 
             try:
                 if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
