@@ -310,7 +310,6 @@ class kb_blast:
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
                             raise ValueError ("BAD record:\n"+line+"\n")
-                            sys.exit(0)
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -328,7 +327,6 @@ class kb_blast:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
                             raise ValueError ("BAD record:\n"+bad_record+"\n")
-                            sys.exit(0)
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -344,7 +342,6 @@ class kb_blast:
                                                     split_input_sequence_buf[i+2],
                                                     split_input_sequence_buf[i+3]])
                                 raise ValueError ("BAD record:\n"+bad_record+"\n")
-                                sys.exit(0)
 
                 # write that sucker, removing spaces
                 #
@@ -435,7 +432,6 @@ class kb_blast:
                 and one_type_name != 'SingleEndLibrary':
 
             raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
-            sys.exit (0)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -536,12 +532,11 @@ class kb_blast:
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
 
-                        # NOTE: SeqRecord messes up the ID, prepending 'gnl|' to it for some unknown reason.  Thanks BioPython.
-
                         # BLASTn is nuc-nuc
                         record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                         records.append(record)
-            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                        SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                        break  # just want one record
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
@@ -796,10 +791,10 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         makeblastdb_cmd.append('-in')
         makeblastdb_cmd.append(many_forward_reads_file_path)
@@ -834,11 +829,17 @@ class kb_blast:
             raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # Check for db output
+        if not os.path.isfile(many_forward_reads_file_path+".nsq") and not os.path.isfile(many_forward_reads_file_path+".00.nsq"):
+            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".nsq'")
+        elif not os.path.getsize(many_forward_reads_file_path+".nsq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.nsq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".nsq'")
+
 
         ### Construct the BLAST command
         #
         # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p blastn -i $fasta_file -d $database -o $out_file
-        # NEW SYNTAX: blastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        # NEW SYNTAX: blastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTn
         blast_cmd = [blast_bin]
@@ -848,8 +849,12 @@ class kb_blast:
             raise ValueError("no such file '"+blast_bin+"'")
         if not os.path.isfile(one_forward_reads_file_path):
             raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path):
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -916,6 +921,10 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
@@ -1365,6 +1374,9 @@ class kb_blast:
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
+                if len(features.keys()) != 1:
+                    self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
                 for fId in features.keys():
                     genomeRef = features[fId][0]
                     if genomeRef not in genome2Features:
@@ -1383,11 +1395,16 @@ class kb_blast:
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             if feature['type'] != 'CDS':
+                                self.log(console,params['input_one_name']+" feature type must be CDS")
                                 raise ValueError (params['input_one_name']+" feature type must be CDS")
-                                sys.exit(0)
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            records.append(record)
-                SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                            else:
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                                records.append(record)
+                                SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                                break  # only want first record
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
@@ -1397,16 +1414,19 @@ class kb_blast:
                 # BLASTp is prot-prot
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
+                    self.log(console,params['input_one_name']+" feature type must be CDS")
                     raise ValueError (params['input_one_name']+" feature type must be CDS")
-                    sys.exit(0)
-                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-                SeqIO.write([record], one_forward_reads_file_path, "fasta")
+                elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                else:
+                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
+                    SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
             else:
                 raise ValueError('Cannot yet handle input_one type of: '+type_name)            
         else:
             raise ValueError('Must define either input_one_sequence or input_one_name')
-            sys.exit (0)
 
 
         #### Get the input_many object
@@ -1446,18 +1466,23 @@ class kb_blast:
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
-                        if feature['type'] != 'CDS':
-                            raise ValueError (params['input_many_name']+" feature types must all be CDS")
-                            sys.exit(0)
                         try:
                             f_written = feature_written[feature['id']]
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # BLASTp is prot-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            if feature['type'] != 'CDS':
+                                self.log(console,"skipping non-CDS feature "+feature['id'])
+                                continue
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -1481,9 +1506,14 @@ class kb_blast:
                     # BLASTp is prot-prot
                     #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
                     if feature['type'] != 'CDS':
+                        #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
                         continue
-                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                    records.append(record)
+                    elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                        self.log(console,"bad CDS feature "+feature['id'])
+                        raise ValueError("bad CDS feature "+feature['id'])
+                    else:
+                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
+                        records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -1511,9 +1541,14 @@ class kb_blast:
                             # BLASTp is prot-prot
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             if feature['type'] != 'CDS':
+                                #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
                                 continue
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -1528,8 +1563,12 @@ class kb_blast:
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             if feature['type'] != 'CDS':
                                 continue
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
@@ -1550,10 +1589,10 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         makeblastdb_cmd.append('-in')
         makeblastdb_cmd.append(many_forward_reads_file_path)
@@ -1588,11 +1627,17 @@ class kb_blast:
             raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # Check for db output
+        if not os.path.isfile(many_forward_reads_file_path+".psq") and not os.path.isfile(many_forward_reads_file_path+".00.psq"):
+            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".psq'")
+        elif not os.path.getsize(many_forward_reads_file_path+".psq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.psq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".psq'")
+
 
         ### Construct the BLAST command
         #
         # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p blastp -i $fasta_file -d $database -o $out_file
-        # NEW SYNTAX: blastp -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        # NEW SYNTAX: blastp -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTp
         blast_cmd = [blast_bin]
@@ -1602,8 +1647,12 @@ class kb_blast:
             raise ValueError("no such file '"+blast_bin+"'")
         if not os.path.isfile(one_forward_reads_file_path):
             raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path):
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -1670,6 +1719,10 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
@@ -2005,7 +2058,6 @@ class kb_blast:
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
                             raise ValueError ("BAD record:\n"+line+"\n")
-                            sys.exit(0)
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -2023,7 +2075,6 @@ class kb_blast:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
                             raise ValueError ("BAD record:\n"+bad_record+"\n")
-                            sys.exit(0)
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -2039,7 +2090,6 @@ class kb_blast:
                                                     split_input_sequence_buf[i+2],
                                                     split_input_sequence_buf[i+3]])
                                 raise ValueError ("BAD record:\n"+bad_record+"\n")
-                                sys.exit(0)
 
                 # write that sucker, removing spaces
                 #
@@ -2130,7 +2180,6 @@ class kb_blast:
                 and one_type_name != 'SingleEndLibrary':
 
             raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
-            sys.exit (0)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -2215,6 +2264,9 @@ class kb_blast:
             
             genome2Features = {}
             features = input_one_featureSet['elements']
+            if len(features.keys()) != 1:
+                self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
             for fId in features.keys():
                 genomeRef = features[fId][0]
                 if genomeRef not in genome2Features:
@@ -2232,12 +2284,17 @@ class kb_blast:
                     if feature['id'] in these_genomeFeatureIds:
                         # BLASTx is nuc-prot
                         if feature['type'] != 'CDS':
+                            self.log(console,params['input_one_name']+" feature type must be CDS")
                             raise ValueError (params['input_one_name']+" feature type must be CDS")
-                            sys.exit(0)
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        records.append(record)
-            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                        #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                        #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                        #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                        else:
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                            records.append(record)
+                            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                            break  # only want first record
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
@@ -2246,11 +2303,15 @@ class kb_blast:
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTx is nuc-prot
             if feature['type'] != 'CDS':
+                self.log(console,params['input_one_name']+" feature type must be CDS")
                 raise ValueError (params['input_one_name']+" feature type must be CDS")
-                sys.exit(0)
-            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            SeqIO.write([record], one_forward_reads_file_path, "fasta")
+            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+            #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+            #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+            else:
+                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
@@ -2292,18 +2353,23 @@ class kb_blast:
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
-                        if feature['type'] != 'CDS':
-                            raise ValueError (params['input_many_name']+" feature types must all be CDS")
-                            sys.exit(0)
                         try:
                             f_written = feature_written[feature['id']]
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # BLASTx is nuc-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            if feature['type'] != 'CDS':
+                                self.log(console,"skipping non-CDS feature "+feature['id'])
+                                continue
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -2324,12 +2390,17 @@ class kb_blast:
                 except:
                     feature_written[feature['id']] = True
                     #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                     # BLASTx is nuc-prot
-                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
                     if feature['type'] != 'CDS':
                         continue
-                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                    records.append(record)
+                    elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                        self.log(console,"bad CDS feature "+feature['id'])
+                        raise ValueError("bad CDS feature "+feature['id'])
+                    else:
+                        #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
+                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
+                        records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -2354,12 +2425,17 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # BLASTx is nuc-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             if feature['type'] != 'CDS':
                                 continue
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -2370,12 +2446,17 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # BLASTx is nuc-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                             if feature['type'] != 'CDS':
                                 continue
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS feature "+feature['id'])
+                                raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
@@ -2396,10 +2477,10 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         makeblastdb_cmd.append('-in')
         makeblastdb_cmd.append(many_forward_reads_file_path)
@@ -2434,11 +2515,17 @@ class kb_blast:
             raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # Check for db output
+        if not os.path.isfile(many_forward_reads_file_path+".psq") and not os.path.isfile(many_forward_reads_file_path+".00.psq"):
+            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".psq'")
+        elif not os.path.getsize(many_forward_reads_file_path+".psq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.psq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".psq'")
+
 
         ### Construct the BLAST command
         #
         # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p blastx -i $fasta_file -d $database -o $out_file
-        # NEW SYNTAX: blastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        # NEW SYNTAX: blastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTx
         blast_cmd = [blast_bin]
@@ -2448,8 +2535,12 @@ class kb_blast:
             raise ValueError("no such file '"+blast_bin+"'")
         if not os.path.isfile(one_forward_reads_file_path):
             raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path):
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -2517,6 +2608,10 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
@@ -2888,6 +2983,9 @@ class kb_blast:
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
+                if len(features.keys()) != 1:
+                    self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
                 for fId in features.keys():
                     genomeRef = features[fId][0]
                     if genomeRef not in genome2Features:
@@ -2906,11 +3004,16 @@ class kb_blast:
                             # tBLASTn is prot-nuc
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             if feature['type'] != 'CDS':
+                                self.log(console,params['input_one_name']+" feature type must be CDS")
                                 raise ValueError (params['input_one_name']+" feature type must be CDS")
-                                sys.exit(0)
-                            record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            records.append(record)
-                SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                            else:
+                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                                records.append(record)
+                                SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                                break  # only want first record
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
@@ -2920,16 +3023,19 @@ class kb_blast:
                 # tBLASTn is prot-nuc
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
+                    self.log(console,params['input_one_name']+" feature type must be CDS")
                     raise ValueError (params['input_one_name']+" feature type must be CDS")
-                    sys.exit(0)
-                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-                SeqIO.write([record], one_forward_reads_file_path, "fasta")
+                elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                else:
+                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                    SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
             else:
                 raise ValueError('Cannot yet handle input_one type of: '+type_name)            
         else:
             raise ValueError('Must define either input_one_sequence or input_one_name')
-            sys.exit (0)
 
 
         #### Get the input_many object
@@ -3080,13 +3186,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTn is prot-nuc
                             if feature['type'] != 'CDS':
-                                raise ValueError (params['input_many_sequence']+" features must all be CDS type")
-                                sys.exit(0)
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                                self.log(console,params['input_many_name']+" features must all be CDS type")
+                                continue
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -3107,12 +3218,18 @@ class kb_blast:
                 except:
                     feature_written[feature['id']] = True
                     #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                     # tBLASTn is prot-nuc
                     if feature['type'] != 'CDS':
+                        #self.log(console,params['input_many_name']+" features must all be CDS type")
                         continue
-                    record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                    #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                    records.append(record)
+                    #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                    #    self.log(console,"bad CDS feature "+feature['id'])
+                    #    raise ValueError("bad CDS feature "+feature['id'])
+                    else:
+                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                        records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -3137,12 +3254,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTn is prot-nuc
                             if feature['type'] != 'CDS':
+                                self.log(console,params['input_many_name']+" features must all be CDS type")
                                 continue
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -3153,12 +3276,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTn is prot-nuc
                             if feature['type'] != 'CDS':
+                                self.log(console,params['input_many_name']+" features must all be CDS type")
                                 continue
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
@@ -3179,10 +3308,10 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         makeblastdb_cmd.append('-in')
         makeblastdb_cmd.append(many_forward_reads_file_path)
@@ -3217,11 +3346,17 @@ class kb_blast:
             raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # Check for db output
+        if not os.path.isfile(many_forward_reads_file_path+".nsq") and not os.path.isfile(many_forward_reads_file_path+".00.nsq"):
+            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".nsq'")
+        elif not os.path.getsize(many_forward_reads_file_path+".nsq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.nsq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".nsq'")
+
 
         ### Construct the BLAST command
         #
         # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p tblastn -i $fasta_file -d $database -o $out_file
-        # NEW SYNTAX: tblastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        # NEW SYNTAX: tblastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.tBLASTn
         blast_cmd = [blast_bin]
@@ -3231,8 +3366,12 @@ class kb_blast:
             raise ValueError("no such file '"+blast_bin+"'")
         if not os.path.isfile(one_forward_reads_file_path):
             raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path):
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -3300,6 +3439,10 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
@@ -3714,7 +3857,6 @@ class kb_blast:
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
                             raise ValueError ("BAD record:\n"+line+"\n")
-                            sys.exit(0)
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -3732,7 +3874,6 @@ class kb_blast:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
                             raise ValueError ("BAD record:\n"+bad_record+"\n")
-                            sys.exit(0)
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -3748,7 +3889,6 @@ class kb_blast:
                                                     split_input_sequence_buf[i+2],
                                                     split_input_sequence_buf[i+3]])
                                 raise ValueError ("BAD record:\n"+bad_record+"\n")
-                                sys.exit(0)
 
                 # write that sucker, removing spaces
                 #
@@ -3839,7 +3979,6 @@ class kb_blast:
                 and one_type_name != 'SingleEndLibrary':
 
             raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
-            sys.exit (0)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -3924,6 +4063,9 @@ class kb_blast:
             
             genome2Features = {}
             features = input_one_featureSet['elements']
+            if len(features.keys()) != 1:
+                self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
             for fId in features.keys():
                 genomeRef = features[fId][0]
                 if genomeRef not in genome2Features:
@@ -3941,12 +4083,17 @@ class kb_blast:
                     if feature['id'] in these_genomeFeatureIds:
                         # tBLASTx is nuc-nuc (translated)
                         if feature['type'] != 'CDS':
+                            self.log(console,params['input_one_name']+" feature type must be CDS")
                             raise ValueError (params['input_one_name']+" feature type must be CDS")
-                            sys.exit(0)
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        records.append(record)
-            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                        #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                        #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                        #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                        else:
+                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                            records.append(record)
+                            SeqIO.write(records, one_forward_reads_file_path, "fasta")
+                            break  # just want one record
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
@@ -3955,11 +4102,15 @@ class kb_blast:
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTx is nuc-nuc (translated)
             if feature['type'] != 'CDS':
+                self.log(console,params['input_one_name']+" feature type must be CDS")
                 raise ValueError (params['input_one_name']+" feature type must be CDS")
-                sys.exit(0)
-            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            SeqIO.write([record], one_forward_reads_file_path, "fasta")
+            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+            #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+            #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+            else:
+                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
@@ -4112,13 +4263,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTx is nuc-nuc (translated)
                             if feature['type'] != 'CDS':
-                                raise ValueError (params['input_many_sequence']+" features must all be CDS type")
-                                sys.exit(0)
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                                self.log(console,params['input_many_name']+" features must all be CDS type")
+                                continue
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -4139,12 +4295,18 @@ class kb_blast:
                 except:
                     feature_written[feature['id']] = True
                     #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                     # tBLASTx is nuc-nuc (translated)
                     if feature['type'] != 'CDS':
+                        #self.log(console,params['input_many_name']+" features must all be CDS type")
                         continue
-                    record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                    #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                    records.append(record)
+                    #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                    #    self.log(console,"bad CDS feature "+feature['id'])
+                    #    raise ValueError("bad CDS feature "+feature['id'])
+                    else:
+                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                        records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
@@ -4169,12 +4331,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTx is nuc-nuc (translated)
                             if feature['type'] != 'CDS':
+                                #self.log(console,params['input_many_name']+" features must all be CDS type")
                                 continue
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
@@ -4185,12 +4353,18 @@ class kb_blast:
                         except:
                             feature_written[feature['id']] = True
                             #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
                             # tBLASTx is nuc-nuc (translated)
                             if feature['type'] != 'CDS':
+                                #self.log(console,params['input_many_name']+" features must all be CDS type")
                                 continue
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            #    self.log(console,"bad CDS feature "+feature['id'])
+                            #    raise ValueError("bad CDS feature "+feature['id'])
+                            else:
+                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
+                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
+                                records.append(record)
 
                 else:
                     raise ValueError('genome '+genome_name+' missing')
@@ -4211,10 +4385,10 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         makeblastdb_cmd.append('-in')
         makeblastdb_cmd.append(many_forward_reads_file_path)
@@ -4249,11 +4423,17 @@ class kb_blast:
             raise ValueError('Error running makeblastdb, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # Check for db output
+        if not os.path.isfile(many_forward_reads_file_path+".nsq") and not os.path.isfile(many_forward_reads_file_path+".00.nsq"):
+            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".nsq'")
+        elif not os.path.getsize(many_forward_reads_file_path+".nsq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.nsq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".nsq'")
+
 
         ### Construct the BLAST command
         #
         # OLD SYNTAX: $blast -q $q -G $G -E $E -m $m -e $e_value -v $limit -b $limit -K $limit -p tblastx -i $fasta_file -d $database -o $out_file
-        # NEW SYNTAX: tblastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (DNA) -num_threads <num_cores>
+        # NEW SYNTAX: tblastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.tBLASTx
         blast_cmd = [blast_bin]
@@ -4263,8 +4443,12 @@ class kb_blast:
             raise ValueError("no such file '"+blast_bin+"'")
         if not os.path.isfile(one_forward_reads_file_path):
             raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
+        elif not os.path.getsize(many_forward_reads_file_path):
+            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -4332,6 +4516,10 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
