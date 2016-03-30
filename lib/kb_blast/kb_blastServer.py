@@ -76,6 +76,9 @@ sync_methods['kb_blast.tBLASTn_Search'] = True
 async_run_methods['kb_blast.tBLASTx_Search_async'] = ['kb_blast', 'tBLASTx_Search']
 async_check_methods['kb_blast.tBLASTx_Search_check'] = ['kb_blast', 'tBLASTx_Search']
 sync_methods['kb_blast.tBLASTx_Search'] = True
+async_run_methods['kb_blast.psiBLAST_msa_start_Search_async'] = ['kb_blast', 'psiBLAST_msa_start_Search']
+async_check_methods['kb_blast.psiBLAST_msa_start_Search_check'] = ['kb_blast', 'psiBLAST_msa_start_Search']
+sync_methods['kb_blast.psiBLAST_msa_start_Search'] = True
 
 class AsyncJobServiceClient(object):
 
@@ -367,6 +370,10 @@ class Application(object):
                              name='kb_blast.tBLASTx_Search',
                              types=[dict])
         self.method_authentication['kb_blast.tBLASTx_Search'] = 'required'
+        self.rpc_service.add(impl_kb_blast.psiBLAST_msa_start_Search,
+                             name='kb_blast.psiBLAST_msa_start_Search',
+                             types=[dict])
+        self.method_authentication['kb_blast.psiBLAST_msa_start_Search'] = 'required'
         self.auth_client = biokbase.nexus.Client(
             config={'server': 'nexus.api.globusonline.org',
                     'verify_ssl': True,

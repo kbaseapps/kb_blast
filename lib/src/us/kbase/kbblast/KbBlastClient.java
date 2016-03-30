@@ -231,4 +231,21 @@ public class KbBlastClient {
         List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.tBLASTx_Search", args, retType, true, true, jsonRpcContext);
         return res.get(0);
     }
+
+    /**
+     * <p>Original spec-file function name: psiBLAST_msa_start_Search</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
+     * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BLASTOutput psiBLASTMsaStartSearch(BLASTParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BLASTOutput>> retType = new TypeReference<List<BLASTOutput>>() {};
+        List<BLASTOutput> res = caller.jsonrpcCall("kb_blast.psiBLAST_msa_start_Search", args, retType, true, true, jsonRpcContext);
+        return res.get(0);
+    }
 }

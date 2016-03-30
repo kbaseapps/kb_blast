@@ -1253,7 +1253,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTp_Search(self, ctx, params):
         # ctx is the context object
         # return variables are: returnVal
@@ -1971,7 +1970,6 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
 
     def BLASTx_Search(self, ctx, params):
         # ctx is the context object
@@ -2860,7 +2858,6 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
 
     def tBLASTn_Search(self, ctx, params):
         # ctx is the context object
@@ -3770,7 +3767,6 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
 
     def tBLASTx_Search(self, ctx, params):
         # ctx is the context object
@@ -4848,6 +4844,19 @@ class kb_blast:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method tBLASTx_Search return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def psiBLAST_msa_start_Search(self, ctx, params):
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN psiBLAST_msa_start_Search
+        #END psiBLAST_msa_start_Search
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method psiBLAST_msa_start_Search return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

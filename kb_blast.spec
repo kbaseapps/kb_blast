@@ -29,6 +29,7 @@ module kb_blast {
 	sequence       input_one_sequence;
 	data_obj_name  input_one_name;
 	data_obj_name  input_many_name;
+	data_obj_name  input_msa_name;  /* for psiBLAST_msa_start */
         data_obj_name  output_filtered_name;
 
 	float ident_thresh;
@@ -36,7 +37,7 @@ module kb_blast {
 	float bitscore;
 	float overlap_fraction;
 	float maxaccepts;
-	float rounds;  /* for PSI-BLAST */
+	float rounds;  /* for psiBLAST_iter */
     } BLAST_Params;
 
 
@@ -66,4 +67,5 @@ module kb_blast {
     funcdef BLASTx_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
     funcdef tBLASTn_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
     funcdef tBLASTx_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
+    funcdef psiBLAST_msa_start_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
 };
