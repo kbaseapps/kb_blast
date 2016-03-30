@@ -1,0 +1,79 @@
+#
+# define display information
+#
+name: psiBLAST MSA start prot-prot Search
+tooltip: |
+    Search for matches of a single sequence within identity threshold using a Multiple Sequence Alignment (MSA) for a profile search.
+screenshots: []
+
+icon: blast-cyan.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    input_one_name:
+        ui-name : |
+            Query Object
+        short-hint : |
+            Query with single PROTEIN sequence to use as query.  Data types may be Feature, or FeatureSet (with one sequence).
+    input_msa_name:
+        ui-name : |
+            Query MSA
+        short-hint : |
+            Multiple PROTEIN sequence alignment that includes the Query sequence with the same ID as the Query Object.
+    input_many_name:
+        ui-name : |
+            Targets Object
+        short-hint : |
+            PROTEIN Targets object to be searched.  Data types may be FeatureSet, Genome, or GenomeSet.
+    output_filtered_name:
+        ui-name : |
+            Output Object
+        short-hint : |
+            Object containing matches.  Output will be will be FeatureSet.
+    ident_thresh:
+        ui-name : |
+            Identity Threshold
+        short-hint : |
+            threshold for hits
+    e_value:
+        ui-name : |
+            E-value
+        short-hint : |
+            threshold for hits
+    bitscore:
+        ui-name : |
+            Bit Score
+        short-hint : |
+            threshold for hits
+    overlap_fraction:
+        ui-name : |
+            Overlap Fraction
+        short-hint : |
+            threshold for hits
+    maxaccepts:
+        ui-name : |
+            Max Accepts
+        short-hint : |
+            limits the number of hits in result.  Default: 1000
+
+description : |
+    <p>This method performs a prot-prot (protein sequence alignment) psiBLAST Search that uses the input MSA as the profile with which to search using NCBI's BLAST+</p>
+    <p><A HREF="http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-421">Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, Madden TL. (2009) "BLAST+: architecture and applications." BMC Bioinformatics. 2009 Dec 15;10:421.</A> doi: 10.1186/1471-2105-10-421</p>
+    <p><A HREF="http://nar.oxfordjournals.org/content/25/17/3389.long">Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, & Lipman DJ. (1997) "Gapped BLAST and PSI-BLAST: a new generation of protein database search programs." Nucleic Acids Res. 25:3389-3402.</A> doi: 10.1093/nar/25.17.3389</p>
