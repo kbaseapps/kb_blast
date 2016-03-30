@@ -5530,6 +5530,7 @@ class kb_blast:
         provenance[0]['input_ws_objects'] = []
         if 'input_one_name' in params and params['input_one_name'] != None:
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_msa_name'])
         provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = 'psiBLAST_msa_start_Search'
