@@ -5008,7 +5008,7 @@ class kb_blast:
 
             
             # export features to Clustal-esque file that PSI-BLAST likes
-            input_MSA_file_path = os.path.join(self.scratch, params['input_name']+".fasta")
+            input_MSA_file_path = os.path.join(self.scratch, params['input_msa_name']+".fasta")
             self.log(console, 'writing MSA file: '+input_MSA_file_path)
             records = []
             longest_row_id_len = 0
