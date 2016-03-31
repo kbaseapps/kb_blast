@@ -5291,7 +5291,7 @@ class kb_blast:
         blast_cmd.append('-in_msa')
         blast_cmd.append(input_MSA_file_path)
         blast_cmd.append('-msa_master_idx')
-        blast_cmd.append(master_row_idx)
+        blast_cmd.append(str(master_row_idx))
         blast_cmd.append('-db')
         blast_cmd.append(many_forward_reads_file_path)
         blast_cmd.append('-out')
