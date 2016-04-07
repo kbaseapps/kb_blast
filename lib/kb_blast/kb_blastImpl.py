@@ -230,6 +230,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN BLASTn_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running BLASTn_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -1178,13 +1179,14 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        if many_type_name == 'SingleEndLibrary':
+            if many_type_name == 'SingleEndLibrary':
             
-            # input SingleEndLibrary -> upload SingleEndLibrary
-            #
-            self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
+                # input SingleEndLibrary -> upload SingleEndLibrary
+                #
+                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
                                                           console,  # DEBUG
                                                           params['workspace_name'],
                                                           params['output_filtered_name'],
@@ -1193,8 +1195,8 @@ class kb_blast:
                                                           sequencing_tech
                                                          )
 
-        else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-            new_obj_info = ws.save_objects({
+            else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+                new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -1208,16 +1210,22 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTn_Search hits'}],
-            'text_message':report
-        }
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTn_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
 
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
@@ -1258,6 +1266,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN BLASTp_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running BLASTp_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -1909,10 +1918,11 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-        new_obj_info = ws.save_objects({
+            # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+            new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -1926,16 +1936,22 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTp_Search hits'}],
-            'text_message':report
-        }
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTp_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
 
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
@@ -1976,6 +1992,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN BLASTx_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running BLASTx_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -2797,10 +2814,11 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-        new_obj_info = ws.save_objects({
+            # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+            new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -2814,17 +2832,23 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTx_Search hits'}],
-            'text_message':report
-        }
-
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'BLASTx_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+            
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
 #                'id':info[6],
@@ -2864,6 +2888,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN tBLASTn_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running tBLASTn_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -3693,13 +3718,14 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        if many_type_name == 'SingleEndLibrary':
-            
-            # input SingleEndLibrary -> upload SingleEndLibrary
-            #
-            self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
+            if many_type_name == 'SingleEndLibrary':
+                
+                # input SingleEndLibrary -> upload SingleEndLibrary
+                #
+                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
                                                           console,  # DEBUG
                                                           params['workspace_name'],
                                                           params['output_filtered_name'],
@@ -3708,8 +3734,8 @@ class kb_blast:
                                                           sequencing_tech
                                                          )
 
-        else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-            new_obj_info = ws.save_objects({
+            else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+                new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -3723,16 +3749,22 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'tBLASTn_Search hits'}],
-            'text_message':report
-        }
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'tBLASTn_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
 
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
@@ -3773,6 +3805,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN tBLASTx_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running tBLASTx_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -4773,13 +4806,14 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        if many_type_name == 'SingleEndLibrary':
+            if many_type_name == 'SingleEndLibrary':
             
-            # input SingleEndLibrary -> upload SingleEndLibrary
-            #
-            self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
+                # input SingleEndLibrary -> upload SingleEndLibrary
+                #
+                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
                                                           console,  # DEBUG
                                                           params['workspace_name'],
                                                           params['output_filtered_name'],
@@ -4788,8 +4822,8 @@ class kb_blast:
                                                           sequencing_tech
                                                          )
 
-        else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-            new_obj_info = ws.save_objects({
+            else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+                new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -4803,16 +4837,22 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'tBLASTx_Search hits'}],
-            'text_message':report
-        }
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'tBLASTx_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
 
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
@@ -4853,6 +4893,7 @@ class kb_blast:
         # return variables are: returnVal
         #BEGIN psiBLAST_msa_start_Search
         console = []
+        invalid_msgs = []
         self.log(console,'Running psiBLAST_msa_start_Search with params=')
         self.log(console, "\n"+pformat(params))
         report = ''
@@ -5538,10 +5579,11 @@ class kb_blast:
 
         # Upload results
         #
-        self.log(console,"UPLOADING RESULTS")  # DEBUG
+        if len(invalid_msgs) == 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-        # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-        new_obj_info = ws.save_objects({
+            # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+            new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -5555,16 +5597,22 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        report += 'sequences in many set: '+str(seq_total)+"\n"
-        report += 'sequences in hit set:  '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'psiBLAST_msa_start_Search hits'}],
-            'text_message':report
-        }
+        if len(invalid_msgs) == 0:
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            reportObj = {
+                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':'psiBLAST_msa_start_Search hits'}],
+                'text_message':report
+                }
+        else:
+            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
 
         reportName = 'blast_report_'+str(hex(uuid.getnode()))
         report_obj_info = ws.save_objects({
