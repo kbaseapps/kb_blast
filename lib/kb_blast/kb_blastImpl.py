@@ -5294,6 +5294,8 @@ class kb_blast:
                 if NUC_MSA_pattern.match(MSA_in['alignment'][row_id]) == None:
                     all_seqs_nuc = False
                     break
+                else:
+                    protein_sequence_found_in_MSA_input = True
 
         # Missing proper input_type
         #
