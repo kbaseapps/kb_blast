@@ -1261,6 +1261,7 @@ class kb_blast:
         # return the results
         return [returnVal]
 
+
     def BLASTp_Search(self, ctx, params):
         # ctx is the context object
         # return variables are: returnVal
@@ -1587,6 +1588,66 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+        # check for failed input file creation
+        #
+        if not protein_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if not protein_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
+        #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = 'BLASTp_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,"BLASTp_Search DONE")
+            return [returnVal]
+
 
         # FORMAT DB
         #
@@ -1986,6 +2047,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def BLASTx_Search(self, ctx, params):
         # ctx is the context object
@@ -2483,6 +2545,66 @@ class kb_blast:
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
 
+        # check for failed input file creation
+        #
+#        if not protein_sequence_found_in_one_input:
+#            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if not protein_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
+        #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = 'BLASTx_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,"BLASTx_Search DONE")
+            return [returnVal]
+
+
         # FORMAT DB
         #
         # OLD SYNTAX: formatdb -i $database -o T -p F -> $database.nsq or $database.00.nsq
@@ -2882,6 +3004,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def tBLASTn_Search(self, ctx, params):
         # ctx is the context object
@@ -3320,6 +3443,66 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+        # check for failed input file creation
+        #
+        if not protein_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+#        if not protein_sequence_found_in_many_input:
+#            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
+        #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = 'tBLASTn_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,"tBLASTn_Search DONE")
+            return [returnVal]
+
 
         # FORMAT DB
         #
@@ -3799,6 +3982,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def tBLASTx_Search(self, ctx, params):
         # ctx is the context object
@@ -4404,6 +4588,11 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+        #
+        # no input validation because query and db are both nuc
+        #
+
 
         # FORMAT DB
         #
@@ -5239,6 +5428,7 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
 
         # FORMAT DB
         #
