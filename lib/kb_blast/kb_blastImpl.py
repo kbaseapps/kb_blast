@@ -1273,6 +1273,8 @@ class kb_blast:
         report = ''
 #        report = 'Running BLASTp_Search with params='
 #        report += "\n"+pformat(params)
+        protein_sequence_found_in_one_input = False
+        protein_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -1405,11 +1407,12 @@ class kb_blast:
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             if feature['type'] != 'CDS':
                                 self.log(console,params['input_one_name']+" feature type must be CDS")
-                                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                             else:
+                                protein_sequence_found_in_one_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                                 records.append(record)
                                 SeqIO.write(records, one_forward_reads_file_path, "fasta")
@@ -1424,11 +1427,12 @@ class kb_blast:
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
                     self.log(console,params['input_one_name']+" feature type must be CDS")
-                    raise ValueError (params['input_one_name']+" feature type must be CDS")
+                    self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                 elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                    raise ValueError("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 else:
+                    protein_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                     SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
@@ -1489,6 +1493,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
@@ -1521,6 +1526,7 @@ class kb_blast:
                         self.log(console,"bad CDS feature "+feature['id'])
                         raise ValueError("bad CDS feature "+feature['id'])
                     else:
+                        protein_sequence_found_in_many_input = True
                         record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
                         records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
@@ -1556,6 +1562,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
 
@@ -1576,6 +1583,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
 
@@ -2060,6 +2068,8 @@ class kb_blast:
         report = ''
 #        report = 'Running BLASTx_Search with params='
 #        report += "\n"+pformat(params)
+        #protein_sequence_found_in_one_input = False
+        protein_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -2362,7 +2372,7 @@ class kb_blast:
                         # BLASTx is nuc-prot
                         if feature['type'] != 'CDS':
                             self.log(console,params['input_one_name']+" feature type must be CDS")
-                            raise ValueError (params['input_one_name']+" feature type must be CDS")
+                            self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                         #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                         #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                         #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -2444,6 +2454,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
@@ -2475,6 +2486,7 @@ class kb_blast:
                         self.log(console,"bad CDS feature "+feature['id'])
                         raise ValueError("bad CDS feature "+feature['id'])
                     else:
+                        protein_sequence_found_in_many_input = True
                         #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
                         record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
                         records.append(record)
@@ -2510,6 +2522,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
@@ -2531,6 +2544,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
@@ -3017,6 +3031,8 @@ class kb_blast:
         report = ''
 #        report = 'Running tBLASTn_Search with params='
 #        report += "\n"+pformat(params)
+        protein_sequence_found_in_one_input = False
+        #protein_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -3155,6 +3171,7 @@ class kb_blast:
                                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                             else:
+                                protein_sequence_found_in_one_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                                 records.append(record)
                                 SeqIO.write(records, one_forward_reads_file_path, "fasta")
@@ -3174,6 +3191,7 @@ class kb_blast:
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                     raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 else:
+                    protein_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                     SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
@@ -5088,6 +5106,9 @@ class kb_blast:
         report = ''
 #        report = 'Running psiBLAST_msa_start_Search with params='
 #        report += "\n"+pformat(params)
+        protein_sequence_found_in_one_input = False
+        protein_sequence_found_in_MSA_input = False
+        protein_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -5168,6 +5189,7 @@ class kb_blast:
                                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                             else:
+                                protein_sequence_found_in_one_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                                 records.append(record)
                                 SeqIO.write(records, one_forward_reads_file_path, "fasta")
@@ -5188,6 +5210,7 @@ class kb_blast:
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                     raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 else:
+                    protein_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                     SeqIO.write([record], one_forward_reads_file_path, "fasta")
 
@@ -5328,6 +5351,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
@@ -5361,6 +5385,7 @@ class kb_blast:
                         self.log(console,"bad CDS feature "+feature['id'])
                         raise ValueError("bad CDS feature "+feature['id'])
                     else:
+                        protein_sequence_found_in_many_input = True
                         record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
                         records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
@@ -5396,6 +5421,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
 
@@ -5416,6 +5442,7 @@ class kb_blast:
                                 self.log(console,"bad CDS feature "+feature['id'])
                                 raise ValueError("bad CDS feature "+feature['id'])
                             else:
+                                protein_sequence_found_in_many_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
 
@@ -5428,6 +5455,69 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+
+        # check for failed input file creation
+        #
+        if not protein_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if not protein_sequence_found_in_MSA_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_msa_name']+"'")
+        if not protein_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
+        #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_msa_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = 'psiBLAST_msa_start_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,"psiBLAST_msa_start_Search DONE")
+            return [returnVal]
 
 
         # FORMAT DB
