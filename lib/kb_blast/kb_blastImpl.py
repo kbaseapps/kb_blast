@@ -310,7 +310,8 @@ class kb_blast:
                         line = re.sub (" ","",line)
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
-                            raise ValueError ("BAD record:\n"+line+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+line+"\n")
+                            continue
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -327,7 +328,7 @@ class kb_blast:
                             else:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
-                            raise ValueError ("BAD record:\n"+bad_record+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -342,7 +343,7 @@ class kb_blast:
                                                     split_input_sequence_buf[i+1],
                                                     split_input_sequence_buf[i+2],
                                                     split_input_sequence_buf[i+3]])
-                                raise ValueError ("BAD record:\n"+bad_record+"\n")
+                                self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
 
                 # write that sucker, removing spaces
                 #
@@ -432,7 +433,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SingleEndLibrary':
 
-            raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SingleEndLibrary instead of: "+one_type_name)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -1385,9 +1386,14 @@ class kb_blast:
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
-                if len(features.keys()) != 1:
-                    self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
+                if len(features.keys()) == 0:
+                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                if len(features.keys()) > 1:
+                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
                 for fId in features.keys():
                     genomeRef = features[fId][0]
                     if genomeRef not in genome2Features:
@@ -2144,7 +2150,8 @@ class kb_blast:
                         line = re.sub (" ","",line)
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
-                            raise ValueError ("BAD record:\n"+line+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+line+"\n")
+                            continue
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -2161,7 +2168,7 @@ class kb_blast:
                             else:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
-                            raise ValueError ("BAD record:\n"+bad_record+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -2266,7 +2273,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SingleEndLibrary':
 
-            raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SingleEndLibrary instead of: "+one_type_name)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -2351,9 +2358,14 @@ class kb_blast:
             
             genome2Features = {}
             features = input_one_featureSet['elements']
-            if len(features.keys()) != 1:
-                self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
+            if len(features.keys()) == 0:
+                self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+            if len(features.keys()) > 1:
+                self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
             for fId in features.keys():
                 genomeRef = features[fId][0]
                 if genomeRef not in genome2Features:
@@ -2391,7 +2403,7 @@ class kb_blast:
             # BLASTx is nuc-prot
             if feature['type'] != 'CDS':
                 self.log(console,params['input_one_name']+" feature type must be CDS")
-                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
             #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
             #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -3144,9 +3156,14 @@ class kb_blast:
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
-                if len(features.keys()) != 1:
-                    self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
+                if len(features.keys()) == 0:
+                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                if len(features.keys()) > 1:
+                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
                 for fId in features.keys():
                     genomeRef = features[fId][0]
                     if genomeRef not in genome2Features:
@@ -3166,7 +3183,7 @@ class kb_blast:
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             if feature['type'] != 'CDS':
                                 self.log(console,params['input_one_name']+" feature type must be CDS")
-                                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -3186,7 +3203,7 @@ class kb_blast:
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
                     self.log(console,params['input_one_name']+" feature type must be CDS")
-                    raise ValueError (params['input_one_name']+" feature type must be CDS")
+                    self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                 elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                     raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -4087,7 +4104,8 @@ class kb_blast:
                         line = re.sub (" ","",line)
                         line = re.sub ("\t","",line)
                         if not DNA_pattern.match(line):
-                            raise ValueError ("BAD record:\n"+line+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+line+"\n")
+                            continue
                         one_forward_reads_file_handle.write(line.lower()+"\n")
                 one_forward_reads_file_handle.close()
 
@@ -4104,7 +4122,7 @@ class kb_blast:
                             else:
                                 bad_record = "\n".join([split_input_sequence_buf[i],
                                                     split_input_sequence_buf[i+1]])
-                            raise ValueError ("BAD record:\n"+bad_record+"\n")
+                            self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
                         if fastq_format and line.startswith('@'):
                             format_ok = True
                             seq_len = len(split_input_sequence_buf[i+1])
@@ -4119,7 +4137,7 @@ class kb_blast:
                                                     split_input_sequence_buf[i+1],
                                                     split_input_sequence_buf[i+2],
                                                     split_input_sequence_buf[i+3]])
-                                raise ValueError ("BAD record:\n"+bad_record+"\n")
+                                self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
 
                 # write that sucker, removing spaces
                 #
@@ -4209,8 +4227,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SingleEndLibrary':
 
-            raise ValueError("ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
-
+            self.log(invalid_msgs,"ERROR: Mismatched input type: input_one_name should be SingleEndLibrary instead of: "+one_type_name)
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
         #
@@ -4294,9 +4311,14 @@ class kb_blast:
             
             genome2Features = {}
             features = input_one_featureSet['elements']
-            if len(features.keys()) != 1:
-                self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
+            if len(features.keys()) == 0:
+                self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+            if len(features.keys()) > 1:
+                self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
             for fId in features.keys():
                 genomeRef = features[fId][0]
                 if genomeRef not in genome2Features:
@@ -4315,7 +4337,7 @@ class kb_blast:
                         # tBLASTx is nuc-nuc (translated)
                         if feature['type'] != 'CDS':
                             self.log(console,params['input_one_name']+" feature type must be CDS")
-                            raise ValueError (params['input_one_name']+" feature type must be CDS")
+                            self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                         #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                         #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                         #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -4334,7 +4356,7 @@ class kb_blast:
             # tBLASTx is nuc-nuc (translated)
             if feature['type'] != 'CDS':
                 self.log(console,params['input_one_name']+" feature type must be CDS")
-                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
             #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
             #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -5161,9 +5183,14 @@ class kb_blast:
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
-                if len(features.keys()) != 1:
-                    self.log(console,"Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    raise ValueError("Too may features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
+                if len(features.keys()) == 0:
+                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                if len(features.keys()) > 1:
+                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+
                 for fId in features.keys():
                     input_one_feature_id = fId
                     genomeRef = features[fId][0]
@@ -5184,7 +5211,7 @@ class kb_blast:
                             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                             if feature['type'] != 'CDS':
                                 self.log(console,params['input_one_name']+" feature type must be CDS")
-                                raise ValueError (params['input_one_name']+" feature type must be CDS")
+                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -5205,7 +5232,7 @@ class kb_blast:
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
                     self.log(console,params['input_one_name']+" feature type must be CDS")
-                    raise ValueError (params['input_one_name']+" feature type must be CDS")
+                    self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
                 elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                     raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -5223,7 +5250,7 @@ class kb_blast:
         #### Get the input_msa object
         ##
         if input_one_feature_id == None:
-            raise ValueError("input_one_feature_id was not obtained")
+            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+params['input_one_name'])
         master_row_idx = 0
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -5257,7 +5284,7 @@ class kb_blast:
                 if row_id == input_one_feature_id:
                     break
             if master_row_idx == 0:
-                raise ValueError("failed to find query id within MSA")
+                self.log(invalid_msgs,"Failed to find query id "+input_one_feature_id+" from Query Object "+params['input_one_name']+" within MSA: "+params['input_msa_name'])
 
             
             # export features to Clustal-esque file that PSI-BLAST likes
