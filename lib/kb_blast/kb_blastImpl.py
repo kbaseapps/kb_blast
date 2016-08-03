@@ -67,6 +67,10 @@ class kb_blast:
         print(message)
         sys.stdout.flush()
 
+    def translate_nuc_to_prot (self, nuc_seq):
+        prot_seq = ''
+        return prot_seq
+
     def get_single_end_read_library(self, ws_data, ws_info, forward):
         pass
 
