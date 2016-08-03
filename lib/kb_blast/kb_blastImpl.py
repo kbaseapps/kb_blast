@@ -67,8 +67,10 @@ class kb_blast:
         print(message)
         sys.stdout.flush()
 
-    def translate_nuc_to_prot (self, nuc_seq):
+    def translate_nuc_to_prot_seq (self, nuc_seq, table='11'):
         prot_seq = ''
+        prot_seq = 'ACDEFGHIKLMNPQRSTVWY'
+
         return prot_seq
 
     def get_single_end_read_library(self, ws_data, ws_info, forward):
@@ -1574,7 +1576,14 @@ class kb_blast:
                                 continue
                             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
                                 self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
+                                if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
+                                    raise ValueError("bad CDS feature "+feature['id'])
+                                else:
+                                    protein_sequence_found_in_many_input = True
+                                    protein_translation = self.translate_nuc_to_prot_seq (feature['dna_sequence'], table='11')
+                                    record = SeqRecord(Seq(protein_translation), id=feature['id'], description=genome['id'])
+                                    records.append(record)
+                                    
                             else:
                                 protein_sequence_found_in_many_input = True
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
