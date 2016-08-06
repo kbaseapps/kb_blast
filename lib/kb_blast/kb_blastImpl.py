@@ -92,7 +92,6 @@ class kb_blast:
             'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W'
             }
         prot_seq = ''.join([genetic_code[table].get(nuc_seq[3*i:3*i+3],'X') for i in range(len(nuc_seq)//3)])
-
         return prot_seq
 
     def get_single_end_read_library(self, ws_data, ws_info, forward):
@@ -103,6 +102,12 @@ class kb_blast:
 
     def get_genome_feature_seqs(self, ws_data, ws_info):
         pass
+
+    def KB_SDK_data2file_Genome2Fasta(self):
+        return 'HELLO KITTY'
+
+#    def KB_SDK_data2file_GenomeAnnotation2Fasta(self):
+#        return 'HELLO KITTY'
 
     def get_genome_set_feature_seqs(self, ws_data, ws_info):
         pass
@@ -1544,6 +1549,8 @@ class kb_blast:
             input_many_genome = data
             input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
 
+            self.log(console,"'"+self.KB_SDK_data2file_Genome2Fasta()+"'\n")
+
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
             self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
@@ -1603,7 +1610,8 @@ class kb_blast:
                                 else:
                                     protein_sequence_found_in_many_input = True
                                     protein_translation = self.translate_nuc_to_prot_seq (feature['dna_sequence'], table='11')
-                                    console.log("protein_seq: %s"%protein_translation)
+                                    self.log(console, "nucleotide_seq: '%s'"%protein_translation)
+                                    self.log(console, "protein_seq: '%s'"%protein_translation)
                                     record = SeqRecord(Seq(protein_translation), id=feature['id'], description=genome['id'])
                                     records.append(record)
                                     
