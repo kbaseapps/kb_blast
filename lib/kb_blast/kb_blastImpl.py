@@ -175,7 +175,7 @@ class kb_blast:
         else:
             SeqIO.write(records, fasta_file_path, "fasta")
 
-        self.log(invalid_msgs, "DEBUGGING INVALID_MSGS")  # DEBUG
+        #self.log(invalid_msgs, "DEBUGGING INVALID_MSGS")  # DEBUG
 
         return fasta_file_path
 
@@ -1733,7 +1733,8 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            if 'input_one_name' in params and params['input_one_name'] != None:
+                provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = 'BLASTp_Search'
@@ -3610,7 +3611,8 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            if 'input_one_name' in params and params['input_one_name'] != None:
+                provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = 'tBLASTn_Search'
