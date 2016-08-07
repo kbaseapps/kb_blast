@@ -103,17 +103,27 @@ class kb_blast:
     def get_genome_feature_seqs(self, ws_data, ws_info):
         pass
 
+
     # export feature sequences to FASTA file
+    #
     def KB_SDK_data2file_Genome2Fasta(self,
                                       genome_object = None,
                                       file = None,
                                       dir = None,
                                       console = [],
                                       invalid_msgs = [],
-                                      residue_type = 'nuc'
+                                      residue_type = 'nuc',
+                                      feature_type  = 'ALL',
+                                      record_id_pattern = '%%feature_id%%',
+                                      record_desc_pattern = '[%%genome_id%%]'
                                       ):
 
         residue_type = residue_type[0:3].lower()
+        feature_type = feature_type.upper()
+
+        def record_header_sub(str, feature_id, genome_id):
+            str = str.replace('%%feature_id%%', feature_id)
+            str = str.replace('%%genome_id%%', genome_id)
 
         if file == None:
             file = 'runfile.fasta'
@@ -123,29 +133,46 @@ class kb_blast:
         self.log(console, 'writing fasta file: '+fasta_file_path)
 
         records = []
-        feature_written = dict()
-        protein_sequence_found = False
+        feature_sequence_found = False
 
         for feature in genome_object['features']:
-            try:
-                f_written = feature_written[feature['id']]
-            except:
-                feature_written[feature['id']] = True
-                #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+
+            if feature_type == 'ALL' or feature_type == feature['type']:
+
+                # protein recs
                 if residue_type == 'pro' or residue_type == 'pep':
-                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome_object['id'])
                     if feature['type'] != 'CDS':
-                        #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
                         continue
                     elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        self.log(console,"bad CDS feature "+feature['id'])
-                        raise ValueError("bad CDS feature "+feature['id'])
+                        invalid_msgs.append("bad CDS feature "+feature['id']+": No protein_translation field.")
                     else:
-                        protein_sequence_found = True
-                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome_object['id'])
+                        feature_sequence_found = True
+                        rec_id = record_id_pattern
+                        rec_desc = record_desc_pattern
+                        rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
+                        rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
+
+                        record = SeqRecord(Seq(feature['protein_translation']), id=rec_id, description=rec_desc)
                         records.append(record)
 
-        SeqIO.write(records, fasta_file_path, "fasta")
+                # nuc recs
+                else:
+                    if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
+                        invalid_msgs.append("bad feature "+feature['id']+": No dna_sequence field.")
+                    else:
+                        feature_sequence_found = True
+                        rec_id = record_id_pattern
+                        rec_desc = record_desc_pattern
+                        rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
+                        rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
+                        record = SeqRecord(Seq(feature['dna_sequence']), id=rec_id, description=rec_desc)
+                        records.append(record)
+
+        # Write fasta file
+        if not feature_sequence_found:
+            invalid_msgs.append("No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
+        else:
+            SeqIO.write(records, fasta_file_path, "fasta")
 
         return fasta_file_path
 
@@ -1600,9 +1627,10 @@ class kb_blast:
                 dir           = many_forward_reads_file_dir,
                 console       = console,
                 invalid_msgs  = invalid_msgs,
-                residue_type  = 'protein')
-
-            protein_sequence_found_in_many_input = True  # DEBUG
+                residue_type  = 'protein',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]')
 
         # GenomeSet
         #
