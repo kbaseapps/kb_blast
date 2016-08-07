@@ -124,6 +124,7 @@ class kb_blast:
         def record_header_sub(str, feature_id, genome_id):
             str = str.replace('%%feature_id%%', feature_id)
             str = str.replace('%%genome_id%%', genome_id)
+            return str
 
         if file == None:
             file = 'runfile.fasta'
@@ -173,6 +174,8 @@ class kb_blast:
             invalid_msgs.append("No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
         else:
             SeqIO.write(records, fasta_file_path, "fasta")
+
+        invalid_msgs.append("DEBUGGING INVALID_MSGS")  # DEBUG
 
         return fasta_file_path
 
