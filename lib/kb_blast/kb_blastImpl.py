@@ -131,7 +131,7 @@ class kb_blast:
                 f_written = feature_written[feature['id']]
             except:
                 feature_written[feature['id']] = True
-                self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+                #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
                 if residue_type == 'pro' or residue_type == 'pep':
                     #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome_object['id'])
                     if feature['type'] != 'CDS':
@@ -1602,6 +1602,7 @@ class kb_blast:
                 invalid_msgs  = invalid_msgs,
                 residue_type  = 'protein')
 
+            protein_sequence_found_in_many_input = True  # DEBUG
 
         # GenomeSet
         #
@@ -1679,8 +1680,9 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not protein_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if params['input_one_name'] != None:
+            if not protein_sequence_found_in_one_input:
+                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
         if not protein_sequence_found_in_many_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
@@ -3555,8 +3557,9 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not protein_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if params['input_one_name'] != None:
+            if not protein_sequence_found_in_one_input:
+                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
 #        if not protein_sequence_found_in_many_input:
 #            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
@@ -5562,8 +5565,9 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not protein_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if params['input_one_name'] != None:
+            if not protein_sequence_found_in_one_input:
+                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
         if not protein_sequence_found_in_MSA_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_msa_name']+"'")
         if not protein_sequence_found_in_many_input:
