@@ -145,7 +145,7 @@ class kb_blast:
                     if feature['type'] != 'CDS':
                         continue
                     elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        invalid_msgs.append("bad CDS feature "+feature['id']+": No protein_translation field.")
+                        self.log(invalid_msgs, "bad CDS feature "+feature['id']+": No protein_translation field.")
                     else:
                         feature_sequence_found = True
                         rec_id = record_id_pattern
@@ -159,7 +159,7 @@ class kb_blast:
                 # nuc recs
                 else:
                     if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
-                        invalid_msgs.append("bad feature "+feature['id']+": No dna_sequence field.")
+                        self.log(invalid_msgs, "bad feature "+feature['id']+": No dna_sequence field.")
                     else:
                         feature_sequence_found = True
                         rec_id = record_id_pattern
@@ -171,11 +171,11 @@ class kb_blast:
 
         # Write fasta file
         if not feature_sequence_found:
-            invalid_msgs.append("No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
+            self.log(invalid_msgs, "No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
         else:
             SeqIO.write(records, fasta_file_path, "fasta")
 
-        invalid_msgs.append("DEBUGGING INVALID_MSGS")  # DEBUG
+        self.log(invalid_msgs, "DEBUGGING INVALID_MSGS")  # DEBUG
 
         return fasta_file_path
 
@@ -1634,6 +1634,9 @@ class kb_blast:
                 feature_type  = 'CDS',
                 record_id_pattern = '%%feature_id%%',
                 record_desc_pattern = '[%%genome_id%%]')
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
+            
 
         # GenomeSet
         #
