@@ -131,7 +131,7 @@ class kb_blast:
         if dir == None:
             dir = self.scratch
         fasta_file_path = os.path.join(dir, file)
-        self.log(console, 'writing fasta file: '+fasta_file_path)
+        self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
 
         records = []
         feature_sequence_found = False
