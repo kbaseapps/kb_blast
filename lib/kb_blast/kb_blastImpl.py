@@ -114,8 +114,6 @@ class kb_blast:
                                       ):
 
         residue_type = residue_type[0:3].lower()
-        self.log (console,"residue_type: '"+residue_type+"'\n")
-        
 
         if file == None:
             file = 'runfile.fasta'
@@ -134,8 +132,8 @@ class kb_blast:
             except:
                 feature_written[feature['id']] = True
                 self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                if residue_type == 'pro':
-                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
+                if residue_type == 'pro' or residue_type == 'pep':
+                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome_object['id'])
                     if feature['type'] != 'CDS':
                         #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
                         continue
@@ -144,7 +142,7 @@ class kb_blast:
                         raise ValueError("bad CDS feature "+feature['id'])
                     else:
                         protein_sequence_found = True
-                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
+                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome_object['id'])
                         records.append(record)
 
         SeqIO.write(records, fasta_file_path, "fasta")
