@@ -1750,7 +1750,7 @@ class kb_blast:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
-        # Handle overloading (input_many can be FeatureSet, Genome, or GenomeSet)
+        # Handle overloading (input_many can be FeatureSet, Genome, GenomeAnnotation or GenomeSet)
         #
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
@@ -1804,6 +1804,29 @@ class kb_blast:
 
             many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
                 genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'protein',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
+            
+
+        # GenomeAnnotation
+        #
+        elif many_type_name == 'GenomeAnnotation':
+            input_many_genome = data
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
+
+            many_forward_reads_file_path = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
+                genome_ref    = input_many_type,
                 file          = many_forward_reads_file,
                 dir           = many_forward_reads_file_dir,
                 console       = console,
@@ -2206,6 +2229,28 @@ class kb_blast:
         elif many_type_name == 'Genome':
             seq_total = 0
 
+            output_featureSet = dict()
+            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
+            else:
+                output_featureSet['description'] = "BLASTp_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+            for feature in input_many_genome['features']:
+                seq_total += 1
+                try:
+                    in_filtered_set = hit_seq_ids[feature['id']]
+                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                    output_featureSet['element_ordering'].append(feature['id'])
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                except:
+                    pass
+
+        # Parse GenomeAnnotation hits into FeatureSet
+        #
+        elif many_type_name == 'GenomeAnnotation':
+            seq_total = 0
+# HERE
             output_featureSet = dict()
             if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
                 output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
