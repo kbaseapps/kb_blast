@@ -67,7 +67,13 @@ class kb_blast:
         print(message)
         sys.stdout.flush()
 
-    def translate_nuc_to_prot_seq (self, nuc_seq, table='11'):
+    def KB_SDK_data2file_translate_nuc_to_prot_seq (self, 
+                                                    nuc_seq, 
+                                                    table='11'):
+        if nuc_seq == None:
+            raise ValueError("KB_SDK_data2file_translate_nuc_to_prot_seq() FAILURE: nuc_seq required")
+
+        nuc_seq = nuc_seq.upper()
         prot_seq = ''
         if table != '11':
             raise ValueError ("error in translate_nuc_to_prot_seq.  Only know genetic code table 11 (value used '%s')"%table)
@@ -142,6 +148,7 @@ class kb_blast:
         fasta_file_path = os.path.join(dir, file)
         self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
 
+        TOPS = 5
 
         # FIX: should I write recs as we go to reduce memory footprint, or is a single buffer write much faster?  Check later.
         #
@@ -166,6 +173,13 @@ class kb_blast:
                             rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
                             seq = feature['protein_translation']
                             seq = seq.upper() if case == 'U' else seq.lower()
+
+                            # DEBUG
+                            if TOPS < 5:
+                                TOPS += 1
+                                alt = self.KB_SDK_data2file_translate_nuc_to_prot_seq (feature['dna_sequence'])
+                                self.log (console, "SEQ: "+seq)
+                                self.log (console, "ALT: "+alt+"\n")
 
                             rec_rows = []
                             rec_rows.append('>'+rec_id+' '+rec_desc)
