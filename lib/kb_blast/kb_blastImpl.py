@@ -116,7 +116,8 @@ class kb_blast:
                                       feature_type  = 'ALL',
                                       record_id_pattern = '%%feature_id%%',
                                       record_desc_pattern = '[%%genome_id%%]',
-                                      case = 'UPPER'
+                                      case = 'UPPER',
+                                      linewrap = None
                                       ):
 
         if genome_object == None:
@@ -143,49 +144,78 @@ class kb_blast:
         records = []
         feature_sequence_found = False
 
-        for feature in genome_object['features']:
+        with open(fasta_file_path, 'w', 0) as fasta_file_handle:
+                        
+            for feature in genome_object['features']:
 
-            if feature_type == 'ALL' or feature_type == feature['type']:
+                if feature_type == 'ALL' or feature_type == feature['type']:
 
-                # protein recs
-                if residue_type == 'pro' or residue_type == 'pep':
-                    if feature['type'] != 'CDS':
-                        continue
-                    elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        self.log(invalid_msgs, "bad CDS feature "+feature['id']+": No protein_translation field.")
+                    # protein recs
+                    if residue_type == 'pro' or residue_type == 'pep':
+                        if feature['type'] != 'CDS':
+                            continue
+                        elif 'protein_translation' not in feature or feature['protein_translation'] == None:
+                            self.log(invalid_msgs, "bad CDS feature "+feature['id']+": No protein_translation field.")
+                        else:
+                            feature_sequence_found = True
+                            rec_id = record_id_pattern
+                            rec_desc = record_desc_pattern
+                            rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
+                            rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
+                            seq = feature['protein_translation']
+                            seq = seq.upper() if case == 'U' else seq.lower()
+
+                            rec_rows = []
+                            rec_rows.append('>'+rec_id+' '+rec_desc)
+                            if linewrap == None or linewrap == 0:
+                                rec_rows.append(seq)
+                            else:
+                                seq_len = len(seq)
+                                base_rows_cnt = seq_len//linewrap
+                                for i in range(base_rows_cnt):
+                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
+                                rec_rows.append(seq[base_rows_cnt*linewrap:])
+                            rec = "\n".join(rec_rows)+"\n"
+
+                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
+                            #records.append(record)
+                            fasta_file_handle.write(rec)
+
+                    # nuc recs
                     else:
-                        feature_sequence_found = True
-                        rec_id = record_id_pattern
-                        rec_desc = record_desc_pattern
-                        rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
-                        rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-                        seq = feature['protein_translation']
-                        seq = seq.upper() if case == 'U' else seq.lower()
-                        record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                        records.append(record)
+                        if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
+                            self.log(invalid_msgs, "bad feature "+feature['id']+": No dna_sequence field.")
+                        else:
+                            feature_sequence_found = True
+                            rec_id = record_id_pattern
+                            rec_desc = record_desc_pattern
+                            rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
+                            rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
+                            seq = feature['dna_sequence']
+                            seq = seq.upper() if case == 'U' else seq.lower()
 
-                # nuc recs
-                else:
-                    if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
-                        self.log(invalid_msgs, "bad feature "+feature['id']+": No dna_sequence field.")
-                    else:
-                        feature_sequence_found = True
-                        rec_id = record_id_pattern
-                        rec_desc = record_desc_pattern
-                        rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
-                        rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-                        seq = feature['dna_sequence']
-                        seq = seq.upper() if case == 'U' else seq.lower()
-                        record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                        records.append(record)
+                            rec_rows = []
+                            rec_rows.append('>'+rec_id+' '+rec_desc)
+                            if linewrap == None or linewrap == 0:
+                                rec_rows.append(seq)
+                            else:
+                                seq_len = len(seq)
+                                base_rows_cnt = seq_len//linewrap
+                                for i in range(base_rows_cnt):
+                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
+                                rec_rows.append(seq[base_rows_cnt*linewrap:])
+                            rec = "\n".join(rec_rows)+"\n"
 
-        # Write fasta file
+                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
+                            #records.append(record)
+                            fasta_file_handle.write(rec)
+
+        # report if no features found
         if not feature_sequence_found:
             self.log(invalid_msgs, "No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
-        else:
-            SeqIO.write(records, fasta_file_path, "fasta")
+        #else:
+        #    SeqIO.write(records, fasta_file_path, "fasta")
 
-        #self.log(invalid_msgs, "DEBUGGING INVALID_MSGS")  # DEBUG
 
         return fasta_file_path
 
