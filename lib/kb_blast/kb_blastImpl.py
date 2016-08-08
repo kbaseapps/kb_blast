@@ -1683,8 +1683,8 @@ class kb_blast:
                 feature_type  = 'CDS',
                 record_id_pattern = '%%feature_id%%',
                 record_desc_pattern = '[%%genome_id%%]',
-                case='lower',
-                linewrap=20)
+                case='upper',
+                linewrap=50)
 
             protein_sequence_found_in_many_input = True  # FIX LATER
             
