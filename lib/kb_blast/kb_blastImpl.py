@@ -400,6 +400,7 @@ class kb_blast:
             if input_sequence_buf.startswith('@'):
                 fastq_format = True
                 #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
+            input_sequence_buf = input_sequence_buf.strip()
             input_sequence_buf = re.sub ('&apos;', "'", input_sequence_buf)
             input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
 #        input_sequence_buf = re.sub ('&#39;',  "'", input_sequence_buf)
@@ -1438,6 +1439,7 @@ class kb_blast:
 #            one_forward_reads_file_handle.close();
 
             input_sequence_buf = params['input_one_sequence']
+            input_sequence_buf = input_sequence_buf.strip()
             space_pattern = re.compile("^[ \t]*$")
             split_input_sequence_buf = input_sequence_buf.split("\n")
 
@@ -2241,6 +2243,7 @@ class kb_blast:
             if input_sequence_buf.startswith('@'):
                 fastq_format = True
                 #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
+            input_sequence_buf = input_sequence_buf.strip()
             input_sequence_buf = re.sub ('&apos;', "'", input_sequence_buf)
             input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
 #        input_sequence_buf = re.sub ('&#39;',  "'", input_sequence_buf)
@@ -3210,6 +3213,7 @@ class kb_blast:
 #            one_forward_reads_file_handle.close();
 
             input_sequence_buf = params['input_one_sequence']
+            input_sequence_buf = input_sequence_buf.strip()
             space_pattern = re.compile("^[ \t]*$")
             split_input_sequence_buf = input_sequence_buf.split("\n")
 
@@ -4196,6 +4200,7 @@ class kb_blast:
 
             fastq_format = False
             input_sequence_buf = params['input_one_sequence']
+            input_sequence_buf = input_sequence_buf.strip()
             if input_sequence_buf.startswith('@'):
                 fastq_format = True
                 #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
