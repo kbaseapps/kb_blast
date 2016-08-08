@@ -141,8 +141,9 @@ class kb_blast:
         fasta_file_path = os.path.join(dir, file)
         self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
 
-        records = []
+        #records = []
         feature_sequence_found = False
+        n = 0  # DEBUG
 
         with open(fasta_file_path, 'w', 0) as fasta_file_handle:
                         
@@ -180,6 +181,11 @@ class kb_blast:
                             #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
                             #records.append(record)
                             fasta_file_handle.write(rec)
+
+                            # DEBUG
+                            if n < 10:
+                                self.log(console,rec)
+                                n = n + 1
 
                     # nuc recs
                     else:
@@ -1676,7 +1682,9 @@ class kb_blast:
                 residue_type  = 'protein',
                 feature_type  = 'CDS',
                 record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]')
+                record_desc_pattern = '[%%genome_id%%]',
+                case='lower',
+                linewrap=20)
 
             protein_sequence_found_in_many_input = True  # FIX LATER
             
