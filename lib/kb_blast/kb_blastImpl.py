@@ -148,7 +148,6 @@ class kb_blast:
         fasta_file_path = os.path.join(dir, file)
         self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
 
-        TOPS = 0  # DEBUG
 
         # FIX: should I write recs as we go to reduce memory footprint, or is a single buffer write much faster?  Check later.
         #
@@ -173,13 +172,6 @@ class kb_blast:
                             rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
                             seq = feature['protein_translation']
                             seq = seq.upper() if case == 'U' else seq.lower()
-
-                            # DEBUG
-                            if TOPS < 5:
-                                TOPS += 1
-                                alt = self.KB_SDK_data2file_translate_nuc_to_prot_seq ('ACAAATTGAGGATCAACTTTTAAAGGGCCC')
-                                #self.log (console, "SEQ: '"+seq+"'\n")
-                                self.log (console, "ALT: '"+alt+"'\n\n")
 
                             rec_rows = []
                             rec_rows.append('>'+rec_id+' '+rec_desc)
