@@ -177,8 +177,8 @@ class kb_blast:
                             # DEBUG
                             if TOPS < 5:
                                 TOPS += 1
-                                alt = self.KB_SDK_data2file_translate_nuc_to_prot_seq (feature['dna_sequence'])
-                                self.log (console, "SEQ: '"+seq+"'\n")
+                                alt = self.KB_SDK_data2file_translate_nuc_to_prot_seq ('ACAAATTGAGGATCAACTTTTAAAGGGCCC')
+                                #self.log (console, "SEQ: '"+seq+"'\n")
                                 self.log (console, "ALT: '"+alt+"'\n\n")
 
                             rec_rows = []
