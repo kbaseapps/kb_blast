@@ -684,6 +684,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -834,7 +835,6 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
-            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -1236,7 +1236,7 @@ class kb_blast:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
@@ -1576,6 +1576,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -2047,9 +2048,9 @@ class kb_blast:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[feature['id']]
-                    self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
@@ -2543,6 +2544,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -3018,7 +3020,7 @@ class kb_blast:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
@@ -3348,6 +3350,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -3994,7 +3997,7 @@ class kb_blast:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
@@ -4500,6 +4503,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -5093,7 +5097,7 @@ class kb_blast:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
@@ -5459,6 +5463,7 @@ class kb_blast:
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
+            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -5946,7 +5951,7 @@ class kb_blast:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
+                    output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
 
