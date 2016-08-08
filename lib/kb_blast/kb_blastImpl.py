@@ -255,8 +255,8 @@ class kb_blast:
         #from doekbase.data_api.core import ObjectAPI
     
         # Standard setup for accessing Data API
-        services = {"workspace_service_url": "https://ci.kbase.us/services/ws/",
-                    "shock_service_url": "https://ci.kbase.us/services/shock-api/"}
+        services = {"workspace_service_url": "https://appdev.kbase.us/services/ws/",
+                    "shock_service_url": "https://appdev.kbase.us/services/shock-api/"}
         token = os.environ["KB_AUTH_TOKEN"]
 
         # init and clean up params
@@ -286,16 +286,18 @@ class kb_blast:
             #for feature in genome_object['features']:
             GA = GenomeAnnotationAPI(services, token=token, ref=genome_ref)
             features = GA.get_features()
+            if residue_type == 'pro' or residue_type == 'pep':
+                proteins = GA.get_proteins()
 
             for fid in features.keys():
 
-                if feature_type == 'ALL' or feature_type == features[fid]['type']:
+                if feature_type == 'ALL' or feature_type == features[fid]['feature_type']:
 
                     # protein recs
                     if residue_type == 'pro' or residue_type == 'pep':
-                        if features[fid]['type'] != 'CDS':
+                        if features[fid]['feature_type'] != 'CDS':
                             continue
-                        elif 'protein_translation' not in features[fid] or features[fid]['protein_translation'] == None:
+                        elif fid not in proteins or 'protein_amino_acid_sequence' not in proteins[fid] or proteins[fid]['protein_amino_acid_sequence'] == None:
                             self.log(invalid_msgs, "bad CDS feature "+fid+": No protein_translation field.")
                         else:
                             feature_sequence_found = True
@@ -303,7 +305,7 @@ class kb_blast:
                             rec_desc = record_desc_pattern
                             rec_id = record_header_sub(rec_id, fid, genome_ref)
                             rec_desc = record_header_sub(rec_desc, fid, genome_ref)
-                            seq = features[fid]['protein_translation']
+                            seq = proteins[fid]['protein_amino_acid_sequence']
                             seq = seq.upper() if case == 'U' else seq.lower()
 
                             rec_rows = []
