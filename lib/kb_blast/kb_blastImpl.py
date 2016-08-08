@@ -115,12 +115,19 @@ class kb_blast:
                                       residue_type = 'nuc',
                                       feature_type  = 'ALL',
                                       record_id_pattern = '%%feature_id%%',
-                                      record_desc_pattern = '[%%genome_id%%]'
+                                      record_desc_pattern = '[%%genome_id%%]',
+                                      case = 'UPPER'
                                       ):
 
+        if genome_object == None:
+            self.log(console,"KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
+            raise ValueError("KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
+
+        # clean up params
         residue_type = residue_type[0:3].lower()
         feature_type = feature_type.upper()
-
+        case = case[0:1].upper()
+        
         def record_header_sub(str, feature_id, genome_id):
             str = str.replace('%%feature_id%%', feature_id)
             str = str.replace('%%genome_id%%', genome_id)
@@ -152,8 +159,9 @@ class kb_blast:
                         rec_desc = record_desc_pattern
                         rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
                         rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-
-                        record = SeqRecord(Seq(feature['protein_translation']), id=rec_id, description=rec_desc)
+                        seq = feature['protein_translation']
+                        seq = seq.upper() if case == 'U' else seq.lower()
+                        record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
                         records.append(record)
 
                 # nuc recs
@@ -166,7 +174,9 @@ class kb_blast:
                         rec_desc = record_desc_pattern
                         rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
                         rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=rec_id, description=rec_desc)
+                        seq = feature['dna_sequence']
+                        seq = seq.upper() if case == 'U' else seq.lower()
+                        record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
                         records.append(record)
 
         # Write fasta file
@@ -2037,7 +2047,7 @@ class kb_blast:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                    self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     output_featureSet['element_ordering'].append(feature['id'])
                     output_featureSet['elements'][feature['id']] = [input_many_genome_ref]
                 except:
