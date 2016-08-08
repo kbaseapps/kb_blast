@@ -124,7 +124,8 @@ class kb_blast:
             self.log(console,"KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
             raise ValueError("KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
 
-        # clean up params
+        # init and clean up params
+        feature_sequence_found = False
         residue_type = residue_type[0:3].lower()
         feature_type = feature_type.upper()
         case = case[0:1].upper()
@@ -141,10 +142,10 @@ class kb_blast:
         fasta_file_path = os.path.join(dir, file)
         self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
 
-        #records = []
-        feature_sequence_found = False
-        n = 0  # DEBUG
 
+        # FIX: should I write recs as we go to reduce memory footprint, or is a single buffer write much faster?  Check later.
+        #
+        #records = []
         with open(fasta_file_path, 'w', 0) as fasta_file_handle:
                         
             for feature in genome_object['features']:
@@ -181,11 +182,6 @@ class kb_blast:
                             #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
                             #records.append(record)
                             fasta_file_handle.write(rec)
-
-                            # DEBUG
-                            if n < 10:
-                                self.log(console,rec)
-                                n = n + 1
 
                     # nuc recs
                     else:
@@ -872,23 +868,21 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for feature in input_many_genome['features']:
-                try:
-                    f_written = feature_written[feature['id']]
-                except:
-                    feature_written[feature['id']] = True
-                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                    # BLASTn is nuc-nuc
-                    record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                    #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                    records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
+                genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'nucleotide',
+                feature_type  = 'ALL',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
 
 
         # GenomeSet
@@ -2641,32 +2635,23 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
-            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for feature in input_many_genome['features']:
-                try:
-                    f_written = feature_written[feature['id']]
-                except:
-                    feature_written[feature['id']] = True
-                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
+                genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'protein',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
 
-                    # BLASTx is nuc-prot
-                    if feature['type'] != 'CDS':
-                        continue
-                    elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        self.log(console,"bad CDS feature "+feature['id'])
-                        raise ValueError("bad CDS feature "+feature['id'])
-                    else:
-                        protein_sequence_found_in_many_input = True
-                        #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                        records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            protein_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -3551,32 +3536,21 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
-            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for feature in input_many_genome['features']:
-                try:
-                    f_written = feature_written[feature['id']]
-                except:
-                    feature_written[feature['id']] = True
-                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-
-                    # tBLASTn is prot-nuc
-                    if feature['type'] != 'CDS':
-                        #self.log(console,params['input_many_name']+" features must all be CDS type")
-                        continue
-                    #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                    #    self.log(console,"bad CDS feature "+feature['id'])
-                    #    raise ValueError("bad CDS feature "+feature['id'])
-                    else:
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                        records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
+                genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'nucleotide',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
 
 
         # GenomeSet
@@ -4705,32 +4679,21 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
-            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for feature in input_many_genome['features']:
-                try:
-                    f_written = feature_written[feature['id']]
-                except:
-                    feature_written[feature['id']] = True
-                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-
-                    # tBLASTx is nuc-nuc (translated)
-                    if feature['type'] != 'CDS':
-                        #self.log(console,params['input_many_name']+" features must all be CDS type")
-                        continue
-                    #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                    #    self.log(console,"bad CDS feature "+feature['id'])
-                    #    raise ValueError("bad CDS feature "+feature['id'])
-                    else:
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                        #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                        records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
+                genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'nucleotide',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
 
 
         # GenomeSet
@@ -5562,33 +5525,23 @@ class kb_blast:
         #
         elif many_type_name == 'Genome':
             input_many_genome = data
-            input_many_genome_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for feature in input_many_genome['features']:
-                try:
-                    f_written = feature_written[feature['id']]
-                except:
-                    feature_written[feature['id']] = True
-                    #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
+                genome_object = input_many_genome,
+                file          = many_forward_reads_file,
+                dir           = many_forward_reads_file_dir,
+                console       = console,
+                invalid_msgs  = invalid_msgs,
+                residue_type  = 'protein',
+                feature_type  = 'CDS',
+                record_id_pattern = '%%feature_id%%',
+                record_desc_pattern = '[%%genome_id%%]',
+                case='upper',
+                linewrap=50)
 
-                    # psiBLAST is prot-prot
-                    #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=input_many_genome['id'])
-                    if feature['type'] != 'CDS':
-                        #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
-                        continue
-                    elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        self.log(console,"bad CDS feature "+feature['id'])
-                        raise ValueError("bad CDS feature "+feature['id'])
-                    else:
-                        protein_sequence_found_in_many_input = True
-                        record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=input_many_genome['id'])
-                        records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            protein_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
