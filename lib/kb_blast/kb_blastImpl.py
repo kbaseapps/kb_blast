@@ -359,7 +359,7 @@ class kb_blast:
         #else:
         #    SeqIO.write(records, fasta_file_path, "fasta")
 
-        return fasta_file_path
+        return (fasta_file_path, features.keys())
 
 
     def get_genome_set_feature_seqs(self, ws_data, ws_info):
@@ -1823,12 +1823,11 @@ class kb_blast:
         # GenomeAnnotation
         #
         elif many_type_name == 'GenomeAnnotation':
-            input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
-                genome_ref    = input_many_type,
+            (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
+                genome_ref    = input_many_ref,
                 file          = many_forward_reads_file,
                 dir           = many_forward_reads_file_dir,
                 console       = console,
@@ -2254,19 +2253,20 @@ class kb_blast:
             seq_total = 0
 # HERE
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
-            else:
-                output_featureSet['description'] = "BLASTp_Search filtered"
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
+#            else:
+#                output_featureSet['description'] = "BLASTp_Search filtered"
+            output_featureSet['description'] = "BLASTp_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in features.keys():
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
+                    in_filtered_set = hit_seq_ids[fid]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
