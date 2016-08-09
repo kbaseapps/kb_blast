@@ -29,9 +29,9 @@ MAINTAINER KBase Developer
 #    && pip install 'requests[security]' --upgrade
 
 # Install KBase Data API Library + dependencies
-#RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbase/data_api && \
-#    mkdir -p lib/ && cp -a data_api/lib/doekbase lib/ && \
-#    pip install -r /kb/module/data_api/requirements.txt
+RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbase/data_api && \
+    mkdir -p lib/ && cp -a data_api/lib/doekbase lib/ && \
+    pip install -r /kb/module/data_api/requirements.txt
 
 
 # RUN apt-get update
