@@ -1823,7 +1823,7 @@ class kb_blast:
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            start = datetime.time() # DEBUG
+            start = datetime.datetime.now.time() # DEBUG
             self.log(console,"GenomeAnnotation2Fasta() start time: "+str(start))
 
             (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
@@ -1839,7 +1839,7 @@ class kb_blast:
                 case='upper',
                 linewrap=50)
 
-            self.log(console, "GenomeAnnotation2Fasta() took "+str(datetime.time()-start)+" microseconds")
+            self.log(console, "GenomeAnnotation2Fasta() took "+str((datetime.datetime.now.time()-start).isoformat))
 
             protein_sequence_found_in_many_input = True  # FIX LATER
             
