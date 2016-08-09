@@ -1796,8 +1796,8 @@ class kb_blast:
 
         # Genome
         #
-        elif many_type_name == 'Genome':
-        #elif many_type_name == 'PlaBukaBow':
+        #elif many_type_name == 'Genome':
+        elif many_type_name == 'PlaBukaBow':
             input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
@@ -2240,8 +2240,8 @@ class kb_blast:
 
         # Parse Genome hits into FeatureSet
         #
-        #elif many_type_name == 'Genome':
-        elif many_type_name == 'PlaBukaBow':
+        elif many_type_name == 'Genome':
+        #elif many_type_name == 'PlaBukaBow':
             seq_total = 0
 
             output_featureSet = dict()
