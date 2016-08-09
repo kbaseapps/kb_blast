@@ -1823,6 +1823,9 @@ class kb_blast:
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
+            start = datetime.time() # DEBUG
+            self.log(console,"GenomeAnnotation2Fasta() start time: "+str(start))
+
             (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
                 genome_ref    = input_many_ref,
                 file          = many_forward_reads_file,
@@ -1835,6 +1838,8 @@ class kb_blast:
                 record_desc_pattern = '[%%genome_id%%]',
                 case='upper',
                 linewrap=50)
+
+            self.log(console, "GenomeAnnotation2Fasta() took "+str(datetime.time()-start)+" microseconds")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
             
@@ -2257,7 +2262,7 @@ class kb_blast:
             output_featureSet['description'] = "BLASTp_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for fid in feature_ids():
+            for fid in feature_ids:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[fid]
