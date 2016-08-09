@@ -29,7 +29,7 @@ MAINTAINER KBase Developer
 #    && pip install 'requests[security]' --upgrade
 
 # Install KBase Data API Library + dependencies
-RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbase/data_api && \
+RUN mkdir -p /kb/module && cd /kb/module && git clone -b develop https://github.com/kbase/data_api && \
     mkdir -p lib/ && cp -a data_api/lib/doekbase lib/ && \
     pip install -r /kb/module/data_api/requirements.txt
 
@@ -49,27 +49,27 @@ RUN make
 
 # Install BLAST+
 #
-WORKDIR /kb/module
-RUN \
-  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.4.0+-x64-linux.tar.gz > ncbi-blast-2.4.0+-x64-linux.tar.gz && \
-  tar xfz ncbi-blast-2.4.0+-x64-linux.tar.gz && \
-  ln -s ncbi-blast-2.4.0+ blast && \
-  rm -f ncbi-blast-2.4.0+-x64-linux.tar.gz && \
-  rm -f blast/bin/blastdb_aliastool && \
-  rm -f blast/bin/blastdbcheck && \
-  rm -f blast/bin/blastdbcmd && \
-  rm -f blast/bin/blast_formatter && \
-  rm -f blast/bin/convert2blastmask && \
-  rm -f blast/bin/deltablast && \
-  rm -f blast/bin/dustmasker && \
-  rm -f blast/bin/legacy_blast.pl && \
-  rm -f blast/bin/makembindex && \
-  rm -f blast/bin/makeprofiledb && \
-  rm -f blast/bin/rpsblast && \
-  rm -f blast/bin/rpstblastn && \
-  rm -f blast/bin/segmasker && \
-  rm -f blast/bin/update_blastdb.pl && \
-  rm -f blast/bin/windowmasker
+#WORKDIR /kb/module
+#RUN \
+#  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.4.0+-x64-linux.tar.gz > ncbi-blast-2.4.0+-x64-linux.tar.gz && \
+#  tar xfz ncbi-blast-2.4.0+-x64-linux.tar.gz && \
+#  ln -s ncbi-blast-2.4.0+ blast && \
+#  rm -f ncbi-blast-2.4.0+-x64-linux.tar.gz && \
+#  rm -f blast/bin/blastdb_aliastool && \
+#  rm -f blast/bin/blastdbcheck && \
+#  rm -f blast/bin/blastdbcmd && \
+#  rm -f blast/bin/blast_formatter && \
+#  rm -f blast/bin/convert2blastmask && \
+#  rm -f blast/bin/deltablast && \
+#  rm -f blast/bin/dustmasker && \
+#  rm -f blast/bin/legacy_blast.pl && \
+#  rm -f blast/bin/makembindex && \
+#  rm -f blast/bin/makeprofiledb && \
+#  rm -f blast/bin/rpsblast && \
+#  rm -f blast/bin/rpstblastn && \
+#  rm -f blast/bin/segmasker && \
+#  rm -f blast/bin/update_blastdb.pl && \
+#  rm -f blast/bin/windowmasker
 
 
 WORKDIR /kb/module
