@@ -22,8 +22,8 @@ from requests_toolbelt import MultipartEncoder
 from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
 # silence whining
-import requests
-requests.packages.urllib3.disable_warnings()
+#import requests
+#requests.packages.urllib3.disable_warnings()
 
 #END_HEADER
 
