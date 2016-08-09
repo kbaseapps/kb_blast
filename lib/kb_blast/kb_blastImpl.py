@@ -1796,11 +1796,14 @@ class kb_blast:
 
         # Genome
         #
-'''
+        '''
         elif many_type_name == 'Genome':
             input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
+
+            # DEBUG
+            beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
 
             many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
                 genome_object = input_many_genome,
@@ -1815,8 +1818,12 @@ class kb_blast:
                 case='upper',
                 linewrap=50)
 
+            # DEBUG
+            end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
+            self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+
             protein_sequence_found_in_many_input = True  # FIX LATER
-'''            
+            '''
 
         # GenomeAnnotation
         #
@@ -1826,9 +1833,7 @@ class kb_blast:
             many_forward_reads_file = params['input_many_name']+".fasta"
 
             # DEBUG
-            #start = datetime.datetime.now.time() # DEBUG
             beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
-            self.log(console,"GenomeAnnotation2Fasta() beg time: "+str(beg_time))
 
             (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
                 genome_ref    = input_many_ref,
@@ -1844,7 +1849,6 @@ class kb_blast:
                 linewrap=50)
 
             # DEBUG
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str((datetime.datetime.now.time()-start).isoformat))
             end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
             self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
@@ -2236,7 +2240,7 @@ class kb_blast:
 
         # Parse Genome hits into FeatureSet
         #
-'''
+        '''
         elif many_type_name == 'Genome':
             seq_total = 0
 
@@ -2256,7 +2260,7 @@ class kb_blast:
                     output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
-'''
+        '''
 
         # Parse GenomeAnnotation hits into FeatureSet
         #
