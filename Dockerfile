@@ -22,11 +22,11 @@ MAINTAINER KBase Developer
 #  exit 0;
 
 
-# Make sure SSL certs are properly installed
-RUN apt-get install python-dev libffi-dev libssl-dev \
-    && pip install pyopenssl ndg-httpsclient pyasn1 \
-    && pip install requests --upgrade \
-    && pip install 'requests[security]' --upgrade
+# Make sure SSL certs are properly installed  (NOT WORKING FOR ME ON APPDEV)
+#RUN apt-get install python-dev libffi-dev libssl-dev \
+#    && pip install pyopenssl ndg-httpsclient pyasn1 \
+#    && pip install requests --upgrade \
+#    && pip install 'requests[security]' --upgrade
 
 # Install KBase Data API Library + dependencies
 RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbase/data_api && \
