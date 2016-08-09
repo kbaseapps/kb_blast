@@ -1825,7 +1825,7 @@ class kb_blast:
 
             # DEBUG
             #start = datetime.datetime.now.time() # DEBUG
-            beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000
+            beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
             self.log(console,"GenomeAnnotation2Fasta() beg time: "+str(beg_time))
 
             (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
@@ -1843,7 +1843,7 @@ class kb_blast:
 
             # DEBUG
             #self.log(console, "GenomeAnnotation2Fasta() took "+str((datetime.datetime.now.time()-start).isoformat))
-            end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000
+            end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000000
             self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
