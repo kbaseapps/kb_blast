@@ -1796,8 +1796,8 @@ class kb_blast:
 
         # Genome
         #
-        '''
-        elif many_type_name == 'Genome':
+        #elif many_type_name == 'Genome':
+        elif many_type_name == 'PlaBukaBow':
             input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
@@ -1823,11 +1823,11 @@ class kb_blast:
             self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
-            '''
+
 
         # GenomeAnnotation
         #
-#        elif many_type_name == 'GenomeAnnotation':
+        #elif many_type_name == 'GenomeAnnotation':
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
@@ -2240,8 +2240,8 @@ class kb_blast:
 
         # Parse Genome hits into FeatureSet
         #
-        '''
-        elif many_type_name == 'Genome':
+        #elif many_type_name == 'Genome':
+        elif many_type_name == 'PlaBukaBow':
             seq_total = 0
 
             output_featureSet = dict()
@@ -2260,11 +2260,11 @@ class kb_blast:
                     output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
-        '''
+
 
         # Parse GenomeAnnotation hits into FeatureSet
         #
-#        elif many_type_name == 'GenomeAnnotation':
+        #elif many_type_name == 'GenomeAnnotation':
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
 # HERE
