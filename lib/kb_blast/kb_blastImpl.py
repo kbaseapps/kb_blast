@@ -366,7 +366,8 @@ class kb_blast:
     # be found
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
-        self.workspaceURL = config['workspace-url']
+        #self.workspaceURL = config['workspace-url']  # DEBUG
+        self.workspaceURL = 'https://appdev.kbase.us/services/ws'  # DEBUG
         self.shockURL = config['shock-url']
         self.handleURL = config['handle-service-url']
         self.scratch = os.path.abspath(config['scratch'])
@@ -1739,7 +1740,7 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects2([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
