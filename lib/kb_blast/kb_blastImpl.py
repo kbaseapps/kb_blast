@@ -1643,7 +1643,7 @@ class kb_blast:
         elif 'input_one_name' in params and params['input_one_name'] != None:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
-                objects = ws.get_objects2([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
+                objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
                 data = objects[0]['data']
                 info = objects[0]['info']
                 # Object Info Contents
@@ -1692,7 +1692,7 @@ class kb_blast:
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 records = []
                 for genomeRef in genome2Features:
-                    genome = ws.get_objects2([{'ref':genomeRef}])[0]['data']
+                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
                     these_genomeFeatureIds = genome2Features[genomeRef]
                     for feature in genome['features']:
                         if feature['id'] in these_genomeFeatureIds:
@@ -1739,7 +1739,7 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects2([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
@@ -1769,7 +1769,7 @@ class kb_blast:
             records = []
             feature_written = dict()
             for genomeRef in genome2Features:
-                genome = ws.get_objects2([{'ref':genomeRef}])[0]['data']
+                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
                 these_genomeFeatureIds = genome2Features[genomeRef]
                 for feature in genome['features']:
                     if feature['id'] in these_genomeFeatureIds:
@@ -1869,7 +1869,7 @@ class kb_blast:
             for genome_name in input_many_genomeSet['elements'].keys():
                 if 'ref' in input_many_genomeSet['elements'][genome_name] and \
                          input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects2([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
+                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
                     for feature in genome['features']:
                         try:
                             f_written = feature_written[feature['id']]
@@ -2303,7 +2303,7 @@ class kb_blast:
                 if 'ref' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
                     genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects2([{'ref':genomeRef}])[0]['data']
+                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
                     for feature in genome['features']:
                         seq_total += 1
                         try:
