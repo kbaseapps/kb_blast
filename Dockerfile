@@ -34,6 +34,11 @@ RUN mkdir -p /kb/module && cd /kb/module && git clone -b develop https://github.
     pip install -r /kb/module/data_api/requirements.txt
 
 
+# Install SDK utils
+RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbaseapps/KBaseDataObjectToFileUtils && \
+    mkdir -p lib/ && cp -a KBaseDataObjectToFileUtils/lib/* lib/
+
+
 # RUN apt-get update
 
 # -----------------------------------------
