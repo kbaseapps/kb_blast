@@ -1880,6 +1880,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             
             GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
