@@ -382,12 +382,9 @@ class kb_blast:
 #        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'
         self.callbackURL = os.environ['SDK_CALLBACK_URL']
         if self.callbackURL == None:
-            self.callbackURL = 'https://kbase.us/services/njs_wrapper'
+            raise ValueError ("SDK_CALLBACK_URL not set in environment")
         self.scratch = os.path.abspath(config['scratch'])
-        # HACK!! temporary hack for issue where megahit fails on mac because of silent named pipe error
-        #self.host_scratch = self.scratch
         self.scratch = os.path.join('/kb','module','local_scratch')
-        # end hack
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
 
@@ -508,24 +505,6 @@ class kb_blast:
 
     #END_CLASS_HEADER
 
-    # config contains contents of config file in a hash or None if it couldn't
-    # be found
-    def __init__(self, config):
-        #BEGIN_CONSTRUCTOR
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-        self.scratch = os.path.abspath(config['scratch'])
-        # HACK!! temporary hack for issue where megahit fails on mac because of silent named pipe error
-        #self.host_scratch = self.scratch
-        self.scratch = os.path.join('/kb','module','local_scratch')
-        # end hack
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-
-        #END_CONSTRUCTOR
-        pass
-    
 
     def BLASTn_Search(self, ctx, params):
         """
@@ -1883,8 +1862,6 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            if self.callbackURL == None:
-                self.callbackURL = 'https://kbase.us/services/njs_wrapper'
             self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             
