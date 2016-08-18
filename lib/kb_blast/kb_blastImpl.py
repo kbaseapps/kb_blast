@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #BEGIN_HEADER
 import os
 import sys
@@ -49,6 +50,10 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     #########################################
+    VERSION = "0.0.1"
+    GIT_URL = "https://github.com/dcchivian/kb_blast.git"
+    GIT_COMMIT_HASH = "18713a0bdb13040171676d2ac51d4e23d2e46da8"
+    
     #BEGIN_CLASS_HEADER
     workspaceURL = None
     shockURL     = None
@@ -517,8 +522,37 @@ class kb_blast:
 
         #END_CONSTRUCTOR
         pass
+    
 
     def BLASTn_Search(self, ctx, params):
+        """
+        Methods for BLAST of various flavors of one sequence against many sequences 
+        **
+        **    overloading as follows:
+        **        input_one_id: SingleEndLibrary, Feature, FeatureSet
+        **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
+        **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN BLASTn_Search
@@ -1554,8 +1588,29 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTp_Search(self, ctx, params):
+        """
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN BLASTp_Search
@@ -2444,8 +2499,29 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTx_Search(self, ctx, params):
+        """
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN BLASTx_Search
@@ -3406,8 +3482,29 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def tBLASTn_Search(self, ctx, params):
+        """
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN tBLASTn_Search
@@ -4386,8 +4483,29 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def tBLASTx_Search(self, ctx, params):
+        """
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN tBLASTx_Search
@@ -5477,6 +5595,28 @@ class kb_blast:
         return [returnVal]
 
     def psiBLAST_msa_start_Search(self, ctx, params):
+        """
+        :param params: instance of type "BLAST_Params" (BLAST Input Params)
+           -> structure: parameter "workspace_name" of type "workspace_name"
+           (** The workspace object refs are of form: ** **    objects =
+           ws.get_objects([{'ref':
+           params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
+           the entire name combining the workspace id and the object name **
+           "id" is a numerical identifier of the workspace or object, and
+           should just be used for workspace ** "name" is a string identifier
+           of a workspace or object.  This is received from Narrative.),
+           parameter "input_one_sequence" of type "sequence", parameter
+           "input_one_name" of type "data_obj_name", parameter
+           "input_many_name" of type "data_obj_name", parameter
+           "input_msa_name" of type "data_obj_name", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "ident_thresh" of Double, parameter "e_value" of Double, parameter
+           "bitscore" of Double, parameter "overlap_fraction" of Double,
+           parameter "maxaccepts" of Double, parameter "rounds" of Double
+        :returns: instance of type "BLAST_Output" (BLAST Output) ->
+           structure: parameter "report_name" of type "data_obj_name",
+           parameter "report_ref" of type "data_obj_ref"
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN psiBLAST_msa_start_Search
@@ -6306,4 +6446,11 @@ class kb_blast:
             raise ValueError('Method psiBLAST_msa_start_Search return value ' +
                              'returnVal is not type dict as required.')
         # return the results
+        return [returnVal]
+
+    def status(self, ctx):
+        #BEGIN_STATUS
+        returnVal = {'state': "OK", 'message': "", 'version': self.VERSION, 
+                     'git_url': self.GIT_URL, 'git_commit_hash': self.GIT_COMMIT_HASH}
+        #END_STATUS
         return [returnVal]
