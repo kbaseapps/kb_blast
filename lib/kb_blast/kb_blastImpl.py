@@ -1883,6 +1883,8 @@ class kb_blast:
                 'linewrap':            50
                 }
 
+            if self.callbackURL == None:
+                self.callbackURL = 'https://kbase.us/services/njs_wrapper'
             self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             
