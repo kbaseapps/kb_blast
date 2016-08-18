@@ -1877,7 +1877,8 @@ class kb_blast:
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
-                'linewrap':            50)
+                'linewrap':            50
+                }
 
             DOTFU = KBaseDataObjectToFileUtils (self.callbackURL, token=ctx['token'])
             
