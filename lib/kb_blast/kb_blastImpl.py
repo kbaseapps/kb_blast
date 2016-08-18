@@ -21,6 +21,9 @@ from biokbase.workspace.client import Workspace as workspaceService
 from requests_toolbelt import MultipartEncoder
 from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
+# SDK Utils
+from KBaseDataObjectToFileUtils.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+
 # silence whining
 import requests
 requests.packages.urllib3.disable_warnings()
@@ -48,8 +51,10 @@ class kb_blast:
     #########################################
     #BEGIN_CLASS_HEADER
     workspaceURL = None
-    shockURL = None
-    handleURL = None
+    shockURL     = None
+    handleURL    = None
+    callbackURL  = None
+    scratch      = None
 
     Make_BLAST_DB = '/kb/module/blast/bin/makeblastdb'
     BLASTn        = '/kb/module/blast/bin/blastn'
@@ -369,6 +374,7 @@ class kb_blast:
         self.workspaceURL = config['workspace-url']
         self.shockURL = config['shock-url']
         self.handleURL = config['handle-service-url']
+        self.callbackURL = os.environ['SDK_CALLBACK_URL']
         self.scratch = os.path.abspath(config['scratch'])
         # HACK!! temporary hack for issue where megahit fails on mac because of silent named pipe error
         #self.host_scratch = self.scratch
@@ -1796,15 +1802,36 @@ class kb_blast:
 
         # Genome
         #
-        #elif many_type_name == 'Genome':
-        elif many_type_name == 'PlaBukaBow':
-            input_many_genome = data
+        elif many_type_name == 'Genome':
+        #elif many_type_name == 'PlaBukaBow':
+            #input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
             # DEBUG
             beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            
+            GenomeToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50)
 
+            DOTFU = KBaseDataObjectToFileUtils (self.callbackURL, token=ctx['token'])
+            
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
+
+
+            '''
             many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
                 genome_object = input_many_genome,
                 file          = many_forward_reads_file,
@@ -1817,6 +1844,7 @@ class kb_blast:
                 record_desc_pattern = '[%%genome_id%%]',
                 case='upper',
                 linewrap=50)
+            '''
 
             # DEBUG
             end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1827,8 +1855,8 @@ class kb_blast:
 
         # GenomeAnnotation
         #
-        #elif many_type_name == 'GenomeAnnotation':
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'GenomeAnnotation':
+        #elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
