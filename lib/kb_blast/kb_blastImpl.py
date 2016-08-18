@@ -379,14 +379,15 @@ class kb_blast:
         self.workspaceURL = config['workspace-url']
         self.shockURL = config['shock-url']
         self.handleURL = config['handle-service-url']
+
 #        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'
-        raise ValueError ("ENVIRON KEYS:\n"+"\n".join(os.environ.keys()))
-            
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
         if self.callbackURL == None:
             raise ValueError ("SDK_CALLBACK_URL not set in environment")
+
         self.scratch = os.path.abspath(config['scratch'])
-        self.scratch = os.path.join('/kb','module','local_scratch')
+        if self.scratch == None:
+            self.scratch = os.path.join('/kb','module','local_scratch')
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
 
