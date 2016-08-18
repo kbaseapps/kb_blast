@@ -380,7 +380,7 @@ class kb_blast:
         self.shockURL = config['shock-url']
         self.handleURL = config['handle-service-url']
 #        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'
-        raise ValueError ("ENVIRON KEYS:\n"+"\n".join(os.environ.keys()):
+        raise ValueError ("ENVIRON KEYS:\n"+"\n".join(os.environ.keys()))
             
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
         if self.callbackURL == None:
