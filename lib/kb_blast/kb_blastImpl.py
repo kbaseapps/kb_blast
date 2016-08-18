@@ -1880,9 +1880,10 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            DOTFU = KBaseDataObjectToFileUtils (self.callbackURL, token=ctx['token'])
+            #DOTFU = KBaseDataObjectToFileUtils (self.callbackURL, token=ctx['token'])
             
-            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            #GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            GenomeToFASTA_retVal = KBaseDataObjectToFileUtils.GenomeToFASTA (GenomeToFASTA_params)
             many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeToFASTA_retVal['feature_ids']
 
