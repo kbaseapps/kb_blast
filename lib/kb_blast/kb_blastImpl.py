@@ -1842,8 +1842,8 @@ class kb_blast:
 
         # Genome
         #
-        elif many_type_name == 'Genome':
-        #elif many_type_name == 'PlaBukaBow':
+        #elif many_type_name == 'Genome':
+        elif many_type_name == 'PlaBukkaBow':
             #input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
@@ -1897,14 +1897,36 @@ class kb_blast:
 
         # GenomeAnnotation
         #
-        elif many_type_name == 'GenomeAnnotation':
-        #elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        #elif many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
             # DEBUG
             beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
 
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            '''
             (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
                 genome_ref    = input_many_ref,
                 file          = many_forward_reads_file,
@@ -1917,6 +1939,7 @@ class kb_blast:
                 record_desc_pattern = '[%%genome_id%%]',
                 case='upper',
                 linewrap=50)
+            '''
 
             # DEBUG
             end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
