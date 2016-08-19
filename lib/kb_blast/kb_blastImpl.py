@@ -1843,7 +1843,7 @@ class kb_blast:
         # Genome
         #
         #elif many_type_name == 'Genome':
-        elif many_type_name == 'PlaBukkaBow':
+        elif many_type_name == 'PlaBukaBow':
             #input_many_genome = data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
@@ -1922,7 +1922,7 @@ class kb_blast:
             self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeToFASTA_params)
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
 
