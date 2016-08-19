@@ -35,8 +35,8 @@ RUN mkdir -p /kb/module && cd /kb/module && git clone -b develop https://github.
 
 
 # Install SDK utils
-RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbaseapps/KBaseDataObjectToFileUtils && \
-    mkdir -p lib/ && cp -a KBaseDataObjectToFileUtils/lib/* lib/
+#RUN mkdir -p /kb/module && cd /kb/module && git clone https://github.com/kbaseapps/KBaseDataObjectToFileUtils && \
+#    mkdir -p lib/ && cp -a KBaseDataObjectToFileUtils/lib/* lib/
 
 
 # RUN apt-get update
