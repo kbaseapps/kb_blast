@@ -77,300 +77,6 @@ class kb_blast:
         print(message)
         sys.stdout.flush()
 
-    def KB_SDK_data2file_translate_nuc_to_prot_seq (self, 
-                                                    nuc_seq, 
-                                                    table='11'):
-        if nuc_seq == None:
-            raise ValueError("KB_SDK_data2file_translate_nuc_to_prot_seq() FAILURE: nuc_seq required")
-
-        nuc_seq = nuc_seq.upper()
-        prot_seq = ''
-        if table != '11':
-            raise ValueError ("error in translate_nuc_to_prot_seq.  Only know genetic code table 11 (value used '%s')"%table)
-
-        genetic_code = dict()
-        genetic_code['11'] = {
-            'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
-            'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
-            'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
-            'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
-            'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
-            'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
-            'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
-            'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
-            'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
-            'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
-            'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
-            'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
-            'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
-            'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
-            'TAC':'Y', 'TAT':'Y', 'TAA':'_', 'TAG':'_',
-            'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W'
-            }
-        prot_seq = ''.join([genetic_code[table].get(nuc_seq[3*i:3*i+3],'X') for i in range(len(nuc_seq)//3)])
-        return prot_seq
-
-    def get_single_end_read_library(self, ws_data, ws_info, forward):
-        pass
-
-    def get_feature_set_seqs(self, ws_data, ws_info):
-        pass
-
-    def get_genome_feature_seqs(self, ws_data, ws_info):
-        pass
-
-
-    # export feature sequences to FASTA file
-    #
-    def KB_SDK_data2file_Genome2Fasta(self,
-                                      genome_object = None,
-                                      file = None,
-                                      dir = None,
-                                      console = [],
-                                      invalid_msgs = [],
-                                      residue_type = 'nuc',
-                                      feature_type  = 'ALL',
-                                      record_id_pattern = '%%feature_id%%',
-                                      record_desc_pattern = '[%%genome_id%%]',
-                                      case = 'UPPER',
-                                      linewrap = None
-                                      ):
-
-        if genome_object == None:
-            self.log(console,"KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
-            raise ValueError("KB_SDK_data2file_Genome2Fasta() FAILURE: genome_object required")
-
-        # init and clean up params
-        feature_sequence_found = False
-        residue_type = residue_type[0:3].lower()
-        feature_type = feature_type.upper()
-        case = case[0:1].upper()
-        
-        def record_header_sub(str, feature_id, genome_id):
-            str = str.replace('%%feature_id%%', feature_id)
-            str = str.replace('%%genome_id%%', genome_id)
-            return str
-
-        if file == None:
-            file = 'runfile.fasta'
-        if dir == None:
-            dir = self.scratch
-        fasta_file_path = os.path.join(dir, file)
-        self.log(console, 'KB SDK data2file Genome2Fasta: writing fasta file: '+fasta_file_path)
-
-
-        # FIX: should I write recs as we go to reduce memory footprint, or is a single buffer write much faster?  Check later.
-        #
-        #records = []
-        with open(fasta_file_path, 'w', 0) as fasta_file_handle:
-                        
-            for feature in genome_object['features']:
-
-                if feature_type == 'ALL' or feature_type == feature['type']:
-
-                    # protein recs
-                    if residue_type == 'pro' or residue_type == 'pep':
-                        if feature['type'] != 'CDS':
-                            continue
-                        elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            self.log(invalid_msgs, "bad CDS feature "+feature['id']+": No protein_translation field.")
-                        else:
-                            feature_sequence_found = True
-                            rec_id = record_id_pattern
-                            rec_desc = record_desc_pattern
-                            rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
-                            rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-                            seq = feature['protein_translation']
-                            seq = seq.upper() if case == 'U' else seq.lower()
-
-                            rec_rows = []
-                            rec_rows.append('>'+rec_id+' '+rec_desc)
-                            if linewrap == None or linewrap == 0:
-                                rec_rows.append(seq)
-                            else:
-                                seq_len = len(seq)
-                                base_rows_cnt = seq_len//linewrap
-                                for i in range(base_rows_cnt):
-                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
-                                rec_rows.append(seq[base_rows_cnt*linewrap:])
-                            rec = "\n".join(rec_rows)+"\n"
-
-                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                            #records.append(record)
-                            fasta_file_handle.write(rec)
-
-                    # nuc recs
-                    else:
-                        if 'dna_sequence' not in feature or feature['dna_sequence'] == None:
-                            self.log(invalid_msgs, "bad feature "+feature['id']+": No dna_sequence field.")
-                        else:
-                            feature_sequence_found = True
-                            rec_id = record_id_pattern
-                            rec_desc = record_desc_pattern
-                            rec_id = record_header_sub(rec_id, feature['id'], genome_object['id'])
-                            rec_desc = record_header_sub(rec_desc, feature['id'], genome_object['id'])
-                            seq = feature['dna_sequence']
-                            seq = seq.upper() if case == 'U' else seq.lower()
-
-                            rec_rows = []
-                            rec_rows.append('>'+rec_id+' '+rec_desc)
-                            if linewrap == None or linewrap == 0:
-                                rec_rows.append(seq)
-                            else:
-                                seq_len = len(seq)
-                                base_rows_cnt = seq_len//linewrap
-                                for i in range(base_rows_cnt):
-                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
-                                rec_rows.append(seq[base_rows_cnt*linewrap:])
-                            rec = "\n".join(rec_rows)+"\n"
-
-                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                            #records.append(record)
-                            fasta_file_handle.write(rec)
-
-        # report if no features found
-        if not feature_sequence_found:
-            self.log(invalid_msgs, "No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
-        #else:
-        #    SeqIO.write(records, fasta_file_path, "fasta")
-
-        return fasta_file_path
-
-
-    # export feature sequences to FASTA file
-    #
-    def KB_SDK_data2file_GenomeAnnotation2Fasta(self,
-                                      genome_ref = None,
-                                      file = None,
-                                      dir = None,
-                                      console = [],
-                                      invalid_msgs = [],
-                                      residue_type = 'nuc',
-                                      feature_type  = 'ALL',
-                                      record_id_pattern = '%%feature_id%%',
-                                      record_desc_pattern = '[%%genome_id%%]',
-                                      case = 'UPPER',
-                                      linewrap = None
-                                      ):
-
-        if genome_ref == None:
-            self.log(console,"KB_SDK_data2file_GenomeAnnotation2Fasta() FAILURE: genome_ref required")
-            raise ValueError("KB_SDK_data2file_Genome2AnnotationFasta() FAILURE: genome_ref required")
-
-        # libs
-        from doekbase.data_api.annotation.genome_annotation.api import GenomeAnnotationAPI as GenomeAnnotationAPI
-    
-        # Standard setup for accessing Data API
-        services = {"workspace_service_url": self.workspaceURL,
-                    "shock_service_url": self.shockURL
-                   }
-        token = os.environ["KB_AUTH_TOKEN"]
-
-        # init and clean up params
-        feature_sequence_found = False
-        residue_type = residue_type[0:3].lower()
-        feature_type = feature_type.upper()
-        case = case[0:1].upper()
-        
-        def record_header_sub(str, feature_id, genome_id):
-            str = str.replace('%%feature_id%%', feature_id)
-            str = str.replace('%%genome_id%%', genome_id)
-            return str
-
-        if file == None:
-            file = 'runfile.fasta'
-        if dir == None:
-            dir = self.scratch
-        fasta_file_path = os.path.join(dir, file)
-        self.log(console, 'KB SDK data2file GenomeAnnotation2Fasta: writing fasta file: '+fasta_file_path)
-
-
-        # FIX: should I write recs as we go to reduce memory footprint, or is a single buffer write much faster?  Check later.
-        #
-        #records = []
-        with open(fasta_file_path, 'w', 0) as fasta_file_handle:
-                        
-            #for feature in genome_object['features']:
-            GA = GenomeAnnotationAPI(services, token=token, ref=genome_ref)
-            features = GA.get_features()
-            if residue_type == 'pro' or residue_type == 'pep':
-                proteins = GA.get_proteins()
-
-            for fid in features.keys():
-
-                if feature_type == 'ALL' or feature_type == features[fid]['feature_type']:
-
-                    # protein recs
-                    if residue_type == 'pro' or residue_type == 'pep':
-                        if features[fid]['feature_type'] != 'CDS':
-                            continue
-                        elif fid not in proteins or 'protein_amino_acid_sequence' not in proteins[fid] or proteins[fid]['protein_amino_acid_sequence'] == None:
-                            self.log(invalid_msgs, "bad CDS feature "+fid+": No protein_translation field.")
-                        else:
-                            feature_sequence_found = True
-                            rec_id = record_id_pattern
-                            rec_desc = record_desc_pattern
-                            rec_id = record_header_sub(rec_id, fid, genome_ref)
-                            rec_desc = record_header_sub(rec_desc, fid, genome_ref)
-                            seq = proteins[fid]['protein_amino_acid_sequence']
-                            seq = seq.upper() if case == 'U' else seq.lower()
-
-                            rec_rows = []
-                            rec_rows.append('>'+rec_id+' '+rec_desc)
-                            if linewrap == None or linewrap == 0:
-                                rec_rows.append(seq)
-                            else:
-                                seq_len = len(seq)
-                                base_rows_cnt = seq_len//linewrap
-                                for i in range(base_rows_cnt):
-                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
-                                rec_rows.append(seq[base_rows_cnt*linewrap:])
-                            rec = "\n".join(rec_rows)+"\n"
-
-                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                            #records.append(record)
-                            fasta_file_handle.write(rec)
-
-                    # nuc recs
-                    else:
-                        if 'dna_sequence' not in features[fid] or features[fid]['dna_sequence'] == None:
-                            self.log(invalid_msgs, "bad feature "+fid+": No dna_sequence field.")
-                        else:
-                            feature_sequence_found = True
-                            rec_id = record_id_pattern
-                            rec_desc = record_desc_pattern
-                            rec_id = record_header_sub(rec_id, fid, genome_ref)
-                            rec_desc = record_header_sub(rec_desc, fid, genome_ref)
-                            seq = features[fid]['dna_sequence']
-                            seq = seq.upper() if case == 'U' else seq.lower()
-
-                            rec_rows = []
-                            rec_rows.append('>'+rec_id+' '+rec_desc)
-                            if linewrap == None or linewrap == 0:
-                                rec_rows.append(seq)
-                            else:
-                                seq_len = len(seq)
-                                base_rows_cnt = seq_len//linewrap
-                                for i in range(base_rows_cnt):
-                                    rec_rows.append(seq[i*linewrap:(i+1)*linewrap])
-                                rec_rows.append(seq[base_rows_cnt*linewrap:])
-                            rec = "\n".join(rec_rows)+"\n"
-
-                            #record = SeqRecord(Seq(seq), id=rec_id, description=rec_desc)
-                            #records.append(record)
-                            fasta_file_handle.write(rec)
-
-        # report if no features found
-        if not feature_sequence_found:
-            self.log(invalid_msgs, "No sequence records found in Genome "+genome_object['id']+" of residue_type: "+residue_type+", feature_type: "+feature_type)
-        #else:
-        #    SeqIO.write(records, fasta_file_path, "fasta")
-
-        return (fasta_file_path, features.keys())
-
-
-    def get_genome_set_feature_seqs(self, ws_data, ws_info):
-        pass
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
@@ -1023,25 +729,37 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        elif many_type_name == 'Genome':
-            input_many_genome = data
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'nucleotide',
-                feature_type  = 'ALL',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -1840,71 +1558,14 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        #elif many_type_name == 'Genome':
-        elif many_type_name == 'PlaBukaBow':
-            #input_many_genome = data
-            many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
-
-            # DEBUG
-            beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            
-            GenomeToFASTA_params = {
-                'genome_ref':          input_many_ref,
-                'file':                many_forward_reads_file,
-                'dir':                 many_forward_reads_file_dir,
-                'console':             console,
-                'invalid_msgs':        invalid_msgs,
-                'residue_type':        'protein',
-                'feature_type':        'CDS',
-                'record_id_pattern':   '%%feature_id%%',
-                'record_desc_pattern': '[%%genome_id%%]',
-                'case':                'upper',
-                'linewrap':            50
-                }
-
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            
-            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
-            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeToFASTA_retVal['feature_ids']
-
-
-            '''
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'protein',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
-            '''
-
-            # DEBUG
-            end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
-
-            protein_sequence_found_in_many_input = True  # FIX LATER
-
-
-        # GenomeAnnotation
-        #
-        #elif many_type_name == 'GenomeAnnotation':
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
             # DEBUG
-            beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             GenomeAnnotationToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
@@ -1921,29 +1582,13 @@ class kb_blast:
 
             self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
 
-            '''
-            (many_forward_reads_file_path, feature_ids) = self.KB_SDK_data2file_GenomeAnnotation2Fasta (
-                genome_ref    = input_many_ref,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'protein',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
-            '''
-
             # DEBUG
-            end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
             
@@ -2943,28 +2588,40 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        elif many_type_name == 'Genome':
-            input_many_genome = data
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'protein',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
-
+            
 
         # GenomeSet
         #
@@ -3865,25 +3522,39 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        elif many_type_name == 'Genome':
-            input_many_genome = data
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'nucleotide',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -5029,25 +4700,39 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        elif many_type_name == 'Genome':
-            input_many_genome = data
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'nucleotide',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -5897,28 +5582,40 @@ class kb_blast:
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
 
 
-        # Genome
+        # Genome and GenomeAnnotation
         #
-        elif many_type_name == 'Genome':
-            input_many_genome = data
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
-            many_forward_reads_file_path = self.KB_SDK_data2file_Genome2Fasta (
-                genome_object = input_many_genome,
-                file          = many_forward_reads_file,
-                dir           = many_forward_reads_file_dir,
-                console       = console,
-                invalid_msgs  = invalid_msgs,
-                residue_type  = 'protein',
-                feature_type  = 'CDS',
-                record_id_pattern = '%%feature_id%%',
-                record_desc_pattern = '[%%genome_id%%]',
-                case='upper',
-                linewrap=50)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeAnnotationToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
+            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
             protein_sequence_found_in_many_input = True  # FIX LATER
-
+            
 
         # GenomeSet
         #
