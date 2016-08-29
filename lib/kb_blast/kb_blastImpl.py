@@ -1517,8 +1517,38 @@ class kb_blast:
         #
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids = FeatureSetToFASTA_retVal['feature_ids']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
+
+            '''
             genome2Features = {}
             features = input_many_featureSet['elements']
             for fId in features.keys():
@@ -1556,7 +1586,7 @@ class kb_blast:
                                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
                                 records.append(record)
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
-
+            '''
 
         # Genome and GenomeAnnotation
         #
@@ -1596,6 +1626,39 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+            protein_sequence_found_in_many_input = True  # FIX LATER
+
+            '''
             input_many_genomeSet = data
 
             # export features to FASTA file
@@ -1661,6 +1724,7 @@ class kb_blast:
                     raise ValueError('genome '+genome_name+' missing')
 
             SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            '''
             
         # Missing proper input_many_type
         #
