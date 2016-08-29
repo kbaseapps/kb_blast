@@ -2099,42 +2099,21 @@ class kb_blast:
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            for genomeRef in feature_ids_by_genome_id.keys():
+                for feature_id in feature_ids_by_genome_id['genomeRef']:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genomeRef+self.genome_id_feature_id_delim+feature['id']]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            #in_filtered_set = hit_seq_ids[feature['id']]
-                            in_filtered_set = hit_seq_ids[genomeRef+self.genome_id_feature_id_delim+feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            #output_featureSet['element_ordering'].append(feature['id'])
-                            try:
-                                this_genome_ref_list = output_featureSet['elements'][feature['id']]
-                            except:
-                                output_featureSet['elements'][feature['id']] = []
-                            output_featureSet['elements'][feature['id']].append(genomeRef)
+                            this_genome_ref_list = output_featureSet['elements'][feature['id']]
                         except:
-                            pass
-
-                '''
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
-                '''
+                            output_featureSet['elements'][feature['id']] = []
+                        output_featureSet['elements'][feature['id']].append(genomeRef)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
