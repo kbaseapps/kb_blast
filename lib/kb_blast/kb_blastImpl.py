@@ -69,6 +69,8 @@ class kb_blast:
     tBLASTx       = '/kb/module/blast/bin/tblastx'
     psiBLAST      = '/kb/module/blast/bin/psiblast'
 
+    genome_id_feature_id_delim = '.f:'
+
     # target is a list for collecting log messages
     def log(self, target, message):
         # we should do something better here...
@@ -1639,7 +1641,7 @@ class kb_blast:
                 'invalid_msgs':        invalid_msgs,
                 'residue_type':        'protein',
                 'feature_type':        'CDS',
-                'record_id_pattern':   '%%feature_id%%',
+                'record_id_pattern':   '%%genome_id%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
                 'linewrap':            50,
@@ -2016,27 +2018,23 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - BLASTp_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTp_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genomeRef in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genomeRef+self.genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genomeRef)
                     except:
                         pass
 
@@ -2051,14 +2049,14 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTp_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for feature in input_many_genome['features']:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[feature['id']]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
+                    #output_featureSet['element_ordering'].append(feature['id'])
                     output_featureSet['elements'][feature['id']] = [input_many_ref]
                 except:
                     pass
@@ -2076,14 +2074,14 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = "BLASTp_Search filtered"
             output_featureSet['description'] = "BLASTp_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[fid]
                     #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(fid)
+                    #output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
@@ -2098,7 +2096,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - BLASTp_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTp_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             for genome_name in input_many_genomeSet['elements'].keys():
@@ -2109,13 +2107,19 @@ class kb_blast:
                     for feature in genome['features']:
                         seq_total += 1
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
+                            #in_filtered_set = hit_seq_ids[feature['id']]
+                            in_filtered_set = hit_seq_ids[genomeRef+self.genome_id_feature_id_delim+feature['id']]
                             #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            #output_featureSet['element_ordering'].append(feature['id'])
+                            try:
+                                this_genome_ref_list = output_featureSet['elements'][feature['id']]
+                            except:
+                                output_featureSet['elements'][feature['id']] = []
+                            output_featureSet['elements'][feature['id']].append(genomeRef)
                         except:
                             pass
 
+                '''
                 elif 'data' in input_many_genomeSet['elements'][genome_name] and \
                         input_many_genomeSet['elements'][genome_name]['data'] != None:
 #                    genome = input_many_genomeSet['elements'][genome_name]['data']
@@ -2130,6 +2134,7 @@ class kb_blast:
 #                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
 #                        except:
 #                            pass
+                '''
 
 
         # load the method provenance from the context object
