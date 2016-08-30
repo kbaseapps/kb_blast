@@ -2039,7 +2039,7 @@ class kb_blast:
                 self.log(console,"READING HITS FOR GENOME "+genomeRef)  # DEBUG
                 for feature_id in feature_ids_by_genome_id[genomeRef]:
                     if (seq_total % 1000) == 0:
-                        self.log(console,"checking feature_id "+genome_id_feature_id)  # DEBUG
+                        self.log(console,"checking feature_id "+feature_id)  # DEBUG
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
