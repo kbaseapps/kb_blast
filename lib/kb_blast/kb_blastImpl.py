@@ -1520,6 +1520,8 @@ class kb_blast:
         #
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
+            input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
@@ -1533,17 +1535,18 @@ class kb_blast:
                 'invalid_msgs':        invalid_msgs,
                 'residue_type':        'protein',
                 'feature_type':        'CDS',
-                'record_id_pattern':   '%%feature_id%%',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
-                'linewrap':            50
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
-            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            feature_ids = FeatureSetToFASTA_retVal['feature_ids']
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = FeatureSetToFASTA_retVal['feature_ids_by_genome_id']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1551,45 +1554,6 @@ class kb_blast:
 
             protein_sequence_found_in_many_input = True  # FIX LATER
 
-            '''
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
-
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-
-                            # BLASTp is prot-prot
-                            if feature['type'] != 'CDS':
-                                self.log(console,"skipping non-CDS feature "+feature['id'])
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            '''
 
         # Genome and GenomeAnnotation
         #
