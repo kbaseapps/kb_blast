@@ -2034,12 +2034,17 @@ class kb_blast:
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
             for genomeRef in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genomeRef)  # DEBUG
                 for feature_id in feature_ids_by_genome_id[genomeRef]:
+                    if (seq_total % 1000) == 0:
+                        self.log(console,"checking feature_id "+genome_id_feature_id)  # DEBUG
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
                         in_filtered_set = hit_seq_ids[genomeRef+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         try:
