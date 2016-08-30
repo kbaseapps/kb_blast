@@ -424,12 +424,13 @@ class kb_blast:
 
             self.log(console, 'done')
 
+
         #### Get the input_one object
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-            data = objects[0]['data']
+            input_one_data = objects[0]['data']
             info = objects[0]['info']
             # Object Info Contents
             # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -461,10 +462,10 @@ class kb_blast:
         #
         if one_type_name == 'SingleEndLibrary':
             try:
-                if 'lib' in data:
-                    one_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    one_forward_reads = data['handle']
+                if 'lib' in input_one_data:
+                    one_forward_reads = input_one_data['lib']['file']
+                elif 'handle' in input_one_data:
+                    one_forward_reads = input_one_data['handle']
                 else:
                     self.log(console,"bad structure for 'one_forward_reads'")
                     raise ValueError("bad structure for 'one_forward_reads'")
@@ -535,7 +536,7 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = data
+            input_one_featureSet = input_one_data
             
             genome2Features = {}
             features = input_one_featureSet['elements']
@@ -563,7 +564,7 @@ class kb_blast:
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
-            feature = data
+            feature = input_one_data
             one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTn is nuc-nuc
@@ -582,7 +583,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -590,16 +591,16 @@ class kb_blast:
             if many_type_name == 'SingleEndLibrary':
                 many_type_namespace = info[2].split('.')[0]
                 if many_type_namespace == 'KBaseAssembly':
-                    file_name = data['handle']['file_name']
+                    file_name = input_many_data['handle']['file_name']
                 elif many_type_namespace == 'KBaseFile':
-                    file_name = data['lib']['file']['file_name']
+                    file_name = input_many_data['lib']['file']['file_name']
                 else:
                     raise ValueError('bad data type namespace: '+many_type_namespace)
                 #self.log(console, 'INPUT_MANY_FILENAME: '+file_name)  # DEBUG
                 if file_name[-3:] == ".gz":
                     many_forward_reads_file_compression = 'gz'
-                if 'sequencing_tech' in data:
-                    sequencing_tech = data['sequencing_tech']
+                if 'sequencing_tech' in input_many_data:
+                    sequencing_tech = input_many_data['sequencing_tech']
 
         except Exception as e:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
@@ -614,10 +615,10 @@ class kb_blast:
             #    self.log(console,"SingleEndLibrary ["+k+"]: "+str(data[k]))
 
             try:
-                if 'lib' in data:
-                    many_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    many_forward_reads = data['handle']
+                if 'lib' in input_many_data:
+                    many_forward_reads = input_many_data['lib']['file']
+                elif 'handle' in input_many_data:
+                    many_forward_reads = input_many_data['handle']
                 else:
                     self.log(console,"bad structure for 'many_forward_reads'")
                     raise ValueError("bad structure for 'many_forward_reads'")
@@ -699,7 +700,7 @@ class kb_blast:
         #
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            input_many_featureSet = input_many_data
 
             genome2Features = {}
             features = input_many_featureSet['elements']
@@ -767,7 +768,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -1410,7 +1411,7 @@ class kb_blast:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
                 objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-                data = objects[0]['data']
+                input_one_data = objects[0]['data']
                 info = objects[0]['info']
                 # Object Info Contents
                 # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -1435,7 +1436,7 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = data
+                input_one_featureSet = input_one_data
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
@@ -1479,7 +1480,7 @@ class kb_blast:
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
-                feature = data
+                feature = input_one_data
                 one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 # BLASTp is prot-prot
@@ -1506,7 +1507,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -1628,6 +1629,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
+            input_many_genomeSet = input_many_data
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = params['input_many_name']+".fasta"
 
@@ -1661,7 +1663,7 @@ class kb_blast:
             protein_sequence_found_in_many_input = True  # FIX LATER
 
             '''
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -2405,12 +2407,13 @@ class kb_blast:
 
             self.log(console, 'done')
 
+
         #### Get the input_one object
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-            data = objects[0]['data']
+            input_one_data = objects[0]['data']
             info = objects[0]['info']
             # Object Info Contents
             # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -2442,10 +2445,10 @@ class kb_blast:
         #
         if one_type_name == 'SingleEndLibrary':
             try:
-                if 'lib' in data:
-                    one_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    one_forward_reads = data['handle']
+                if 'lib' in input_one_data:
+                    one_forward_reads = input_one_data['lib']['file']
+                elif 'handle' in input_one_data:
+                    one_forward_reads = input_one_data['handle']
                 else:
                     self.log(console,"bad structure for 'one_forward_reads'")
                     raise ValueError("bad structure for 'one_forward_reads'")
@@ -2516,7 +2519,7 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = data
+            input_one_featureSet = input_one_data
             
             genome2Features = {}
             features = input_one_featureSet['elements']
@@ -2559,7 +2562,7 @@ class kb_blast:
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
-            feature = data
+            feature = input_one_data
             one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTx is nuc-prot
@@ -2582,7 +2585,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -2595,7 +2598,7 @@ class kb_blast:
         #
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            input_many_featureSet = input_many_data
 
             genome2Features = {}
             features = input_many_featureSet['elements']
@@ -2674,7 +2677,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -3315,7 +3318,7 @@ class kb_blast:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
                 objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-                data = objects[0]['data']
+                input_one_data = objects[0]['data']
                 info = objects[0]['info']
                 # Object Info Contents
                 # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -3340,7 +3343,7 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = data
+                input_one_featureSet = input_one_data
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
@@ -3384,7 +3387,7 @@ class kb_blast:
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
-                feature = data
+                feature = input_one_data
                 one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 # tBLASTn is prot-nuc
@@ -3413,7 +3416,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -3421,16 +3424,16 @@ class kb_blast:
             if many_type_name == 'SingleEndLibrary':
                 many_type_namespace = info[2].split('.')[0]
                 if many_type_namespace == 'KBaseAssembly':
-                    file_name = data['handle']['file_name']
+                    file_name = input_many_data['handle']['file_name']
                 elif many_type_namespace == 'KBaseFile':
-                    file_name = data['lib']['file']['file_name']
+                    file_name = input_many_data['lib']['file']['file_name']
                 else:
                     raise ValueError('bad data type namespace: '+many_type_namespace)
                 #self.log(console, 'INPUT_MANY_FILENAME: '+file_name)  # DEBUG
                 if file_name[-3:] == ".gz":
                     many_forward_reads_file_compression = 'gz'
-                if 'sequencing_tech' in data:
-                    sequencing_tech = data['sequencing_tech']
+                if 'sequencing_tech' in input_many_data:
+                    sequencing_tech = input_many_data['sequencing_tech']
 
         except Exception as e:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
@@ -3445,10 +3448,10 @@ class kb_blast:
             #    self.log(console,"SingleEndLibrary ["+k+"]: "+str(data[k]))
 
             try:
-                if 'lib' in data:
-                    many_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    many_forward_reads = data['handle']
+                if 'lib' in input_many_data:
+                    many_forward_reads = input_many_data['lib']['file']
+                elif 'handle' in input_many_data:
+                    many_forward_reads = input_many_data['handle']
                 else:
                     self.log(console,"bad structure for 'many_forward_reads'")
                     raise ValueError("bad structure for 'many_forward_reads'")
@@ -3530,7 +3533,7 @@ class kb_blast:
         #
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            input_many_featureSet = input_many_data
 
             genome2Features = {}
             features = input_many_featureSet['elements']
@@ -3608,7 +3611,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -4413,12 +4416,13 @@ class kb_blast:
 
             self.log(console, 'done')
 
+
         #### Get the input_one object
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-            data = objects[0]['data']
+            input_one_data = objects[0]['data']
             info = objects[0]['info']
             # Object Info Contents
             # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -4449,10 +4453,10 @@ class kb_blast:
         #
         if one_type_name == 'SingleEndLibrary':
             try:
-                if 'lib' in data:
-                    one_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    one_forward_reads = data['handle']
+                if 'lib' in input_one_data:
+                    one_forward_reads = input_one_data['lib']['file']
+                elif 'handle' in input_one_data:
+                    one_forward_reads = input_one_data['handle']
                 else:
                     self.log(console,"bad structure for 'one_forward_reads'")
                     raise ValueError("bad structure for 'one_forward_reads'")
@@ -4523,7 +4527,7 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = data
+            input_one_featureSet = input_one_data
             
             genome2Features = {}
             features = input_one_featureSet['elements']
@@ -4566,7 +4570,7 @@ class kb_blast:
 
         elif one_type_name == 'Feature':
             # export feature to FASTA file
-            feature = data
+            feature = input_one_data
             one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTx is nuc-nuc (translated)
@@ -4591,7 +4595,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -4599,16 +4603,16 @@ class kb_blast:
             if many_type_name == 'SingleEndLibrary':
                 many_type_namespace = info[2].split('.')[0]
                 if many_type_namespace == 'KBaseAssembly':
-                    file_name = data['handle']['file_name']
+                    file_name = input_many_data['handle']['file_name']
                 elif many_type_namespace == 'KBaseFile':
-                    file_name = data['lib']['file']['file_name']
+                    file_name = input_many_data['lib']['file']['file_name']
                 else:
                     raise ValueError('bad data type namespace: '+many_type_namespace)
                 #self.log(console, 'INPUT_MANY_FILENAME: '+file_name)  # DEBUG
                 if file_name[-3:] == ".gz":
                     many_forward_reads_file_compression = 'gz'
-                if 'sequencing_tech' in data:
-                    sequencing_tech = data['sequencing_tech']
+                if 'sequencing_tech' in input_many_data:
+                    sequencing_tech = input_many_data['sequencing_tech']
 
         except Exception as e:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
@@ -4623,10 +4627,10 @@ class kb_blast:
             #    self.log(console,"SingleEndLibrary ["+k+"]: "+str(data[k]))
 
             try:
-                if 'lib' in data:
-                    many_forward_reads = data['lib']['file']
-                elif 'handle' in data:
-                    many_forward_reads = data['handle']
+                if 'lib' in input_many_data:
+                    many_forward_reads = input_many_data['lib']['file']
+                elif 'handle' in input_many_data:
+                    many_forward_reads = input_many_data['handle']
                 else:
                     self.log(console,"bad structure for 'many_forward_reads'")
                     raise ValueError("bad structure for 'many_forward_reads'")
@@ -4708,7 +4712,7 @@ class kb_blast:
         #
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            input_many_featureSet = input_many_data
 
             genome2Features = {}
             features = input_many_featureSet['elements']
@@ -4786,7 +4790,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
@@ -5396,7 +5400,7 @@ class kb_blast:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
                 objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
-                data = objects[0]['data']
+                input_one_data = objects[0]['data']
                 info = objects[0]['info']
                 # Object Info Contents
                 # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
@@ -5421,7 +5425,7 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = data
+                input_one_featureSet = input_one_data
             
                 genome2Features = {}
                 features = input_one_featureSet['elements']
@@ -5466,7 +5470,7 @@ class kb_blast:
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
-                feature = data
+                feature = input_one_data
                 input_one_feature_id = feature['id']
                 one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
@@ -5497,7 +5501,7 @@ class kb_blast:
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_msa_name']}])
-            data = objects[0]['data']
+            input_msa_data = objects[0]['data']
             info = objects[0]['info']
             input_msa_type = info[2].split('.')[1].split('-')[0]
 
@@ -5506,7 +5510,7 @@ class kb_blast:
             #to get the full stack trace: traceback.format_exc()
 
         if input_msa_type == 'MSA':
-            MSA_in = data
+            MSA_in = input_msa_data
             row_order = []
             default_row_labels = dict()
             if 'row_order' in MSA_in.keys():
@@ -5571,12 +5575,13 @@ class kb_blast:
         else:
             raise ValueError('Cannot yet handle input_name type of: '+type_name)
 
+
         #### Get the input_many object
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
-            data = objects[0]['data']
+            input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             many_type_name = info[2].split('.')[1].split('-')[0]
@@ -5589,7 +5594,7 @@ class kb_blast:
         #
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_many_featureSet = data
+            input_many_featureSet = input_many_data
 
             genome2Features = {}
             features = input_many_featureSet['elements']
@@ -5668,7 +5673,7 @@ class kb_blast:
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = data
+            input_many_genomeSet = input_many_data
 
             # export features to FASTA file
             many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
