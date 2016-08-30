@@ -1534,7 +1534,7 @@ class kb_blast:
                 'residue_type':        'protein',
                 'feature_type':        'CDS',
                 'record_id_pattern':   '%%feature_id%%',
-                'record_desc_pattern': '[%%genome_id%%]',
+                'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50
                 }
@@ -1608,7 +1608,7 @@ class kb_blast:
                 'residue_type':        'protein',
                 'feature_type':        'CDS',
                 'record_id_pattern':   '%%feature_id%%',
-                'record_desc_pattern': '[%%genome_id%%]',
+                'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50
                 }
@@ -2044,7 +2044,7 @@ class kb_blast:
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
-                        in_filtered_set = hit_seq_ids[genome_id+genome_id_feature_id_delim+feature_id]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
                         #in_filtered_set = hit_seq_ids[feature_id]
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
