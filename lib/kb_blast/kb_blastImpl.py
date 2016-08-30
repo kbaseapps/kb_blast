@@ -2039,14 +2039,14 @@ class kb_blast:
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
-                        in_filtered_set = hit_seq_ids[genomeRef+genome_id_feature_id_delim+feature['id']]
+                        in_filtered_set = hit_seq_ids[genomeRef+genome_id_feature_id_delim+feature_id]
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            this_genome_ref_list = output_featureSet['elements'][feature['id']]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            output_featureSet['elements'][feature['id']] = []
-                        output_featureSet['elements'][feature['id']].append(genomeRef)
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genomeRef)
                     except:
                         pass
 
