@@ -445,6 +445,7 @@ class kb_blast:
             # 8 - string chsum
             # 9 - int size 
             # 10 - usermeta meta
+            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -1426,6 +1427,7 @@ class kb_blast:
                 # 8 - string chsum
                 # 9 - int size 
                 # 10 - usermeta meta
+                input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
                 one_type_name = info[2].split('.')[1].split('-')[0]
             except Exception as e:
                 raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -2428,6 +2430,7 @@ class kb_blast:
             # 8 - string chsum
             # 9 - int size 
             # 10 - usermeta meta
+            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -3333,6 +3336,7 @@ class kb_blast:
                 # 8 - string chsum
                 # 9 - int size 
                 # 10 - usermeta meta
+                input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
                 one_type_name = info[2].split('.')[1].split('-')[0]
             except Exception as e:
                 raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -4437,6 +4441,7 @@ class kb_blast:
             # 8 - string chsum
             # 9 - int size 
             # 10 - usermeta meta
+            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -5415,6 +5420,7 @@ class kb_blast:
                 # 8 - string chsum
                 # 9 - int size 
                 # 10 - usermeta meta
+                input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
                 one_type_name = info[2].split('.')[1].split('-')[0]
             except Exception as e:
                 raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
