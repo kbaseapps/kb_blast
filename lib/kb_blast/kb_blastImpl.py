@@ -1542,8 +1542,6 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
-
 
         # Genome and GenomeAnnotation
         #
@@ -1577,8 +1575,6 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
-            
 
         # GenomeSet
         #
@@ -1615,20 +1611,11 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
 
         # Missing proper input_many_type
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
-
-        # check for failed input file creation
-        #
-        if params['input_one_name'] != None:
-            if not protein_sequence_found_in_one_input:
-                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
-        if not protein_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
 
         # input data failed validation.  Need to return
