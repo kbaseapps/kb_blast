@@ -1436,47 +1436,37 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = input_one_data
-            
-                genome2Features = {}
-                features = input_one_featureSet['elements']
+                #input_one_featureSet = input_one_data
+                genome_id_feature_id_delim = '.f:'
+                one_forward_reads_file_dir = self.scratch
+                one_forward_reads_file = params['input_one_name']+".fasta"
 
-                if len(features.keys()) == 0:
-                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                if len(features.keys()) > 1:
-                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                # DEBUG
+                #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                FeatureSetToFASTA_params = {
+                    'featureSet_ref':      input_one_ref,
+                    'file':                one_forward_reads_file,
+                    'dir':                 one_forward_reads_file_dir,
+                    'console':             console,
+                    'invalid_msgs':        invalid_msgs,
+                    'residue_type':        'protein',
+                    'feature_type':        'CDS',
+                    'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                    'record_desc_pattern': '[%%genome_ref%%]',
+                    'case':                'upper',
+                    'linewrap':            50,
+                    'merge_fasta_files':   'TRUE'
+                    }
 
-                for fId in features.keys():
-                    genomeRef = features[fId][0]
-                    if genomeRef not in genome2Features:
-                        genome2Features[genomeRef] = []
-                    genome2Features[genomeRef].append(fId)
+                #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+                DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+                FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+                one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+                #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                # export features to FASTA file
-                one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-                self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-                records = []
-                for genomeRef in genome2Features:
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    these_genomeFeatureIds = genome2Features[genomeRef]
-                    for feature in genome['features']:
-                        if feature['id'] in these_genomeFeatureIds:
-                            # BLASTp is prot-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_one_name']+" feature type must be CDS")
-                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                            else:
-                                protein_sequence_found_in_one_input = True
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                                records.append(record)
-                                SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                                break  # only want first record
+                # DEBUG
+                #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
@@ -1577,7 +1567,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
