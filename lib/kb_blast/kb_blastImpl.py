@@ -1546,7 +1546,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path_list'][0]
-            feature_ids_by_genome_id = FeatureSetToFASTA_retVal['feature_ids_by_genome_id']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
