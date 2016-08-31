@@ -1545,7 +1545,7 @@ class kb_blast:
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
-            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path_list'][0]
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
             # DEBUG
