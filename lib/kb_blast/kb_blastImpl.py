@@ -1923,47 +1923,23 @@ class kb_blast:
             fId_list = input_many_featureSet['elements'].keys()
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
-                for genomeRef in input_many_featureSet['elements'][fId]:
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
                         #in_filtered_set = hit_seq_ids[fId]
-                        in_filtered_set = hit_seq_ids[genomeRef+genome_id_feature_id_delim+fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['elements'][fId].append(genomeRef)
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
-
-        # Parse Genome hits into FeatureSet
-        #
-        #elif many_type_name == 'Genome':
-        elif many_type_name == 'PlaBukaBow':
-            seq_total = 0
-
-            output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
-            else:
-                output_featureSet['description'] = "BLASTp_Search filtered"
-            #output_featureSet['element_ordering'] = []
-            output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
-                seq_total += 1
-                try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    #output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
-                except:
-                    pass
 
 
         # Parse GenomeAnnotation hits into FeatureSet
         #
-        #elif many_type_name == 'GenomeAnnotation':
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
 # HERE
