@@ -535,32 +535,41 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = input_one_data
-            
-            genome2Features = {}
-            features = input_one_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            #input_one_featureSet = input_one_data
+            genome_id_feature_id_delim = '.f:'
+            one_forward_reads_file_dir = self.scratch
+            one_forward_reads_file = params['input_one_name']+".fasta"
 
-            # export features to FASTA file
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-            self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-            records = []
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_one_ref,
+                'file':                one_forward_reads_file,
+                'dir':                 one_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-                        # BLASTn is nuc-nuc
-                        record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                        records.append(record)
-                        SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                        break  # just want one record
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # Feature
+        #
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
@@ -700,35 +709,36 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                            # BLASTn is nuc-nuc
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # Genome and GenomeAnnotation
@@ -753,7 +763,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
@@ -768,47 +778,38 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            records = []
-            feature_written = dict()
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                            # BLASTn is nuc-nuc
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
 
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-                    genome = input_many_genomeSet['elements'][genome_name]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                            # BLASTn is nuc-nuc
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                            records.append(record)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-                else:
-                    raise ValueError('genome '+genome_name+' missing')
 
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            
         # Missing proper input_many_type
         #
         else:
@@ -1095,7 +1096,6 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
@@ -1103,50 +1103,44 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - BLASTn_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
 
-
-        # Parse Genome hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTn_Search filtered"
-            else:
-                output_featureSet['description'] = "BLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTn_Search filtered"
+#            else:
+#                output_featureSet['description'] = "BLASTn_Search filtered"
+            output_featureSet['description'] = "BLASTn_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    in_filtered_set = hit_seq_ids[fid]
+                    #output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
@@ -1160,38 +1154,28 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - BLASTn_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in feature_ids_by_genome_id[genome_id]:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            pass
-
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
@@ -1292,6 +1276,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def BLASTp_Search(self, ctx, params):
         """
@@ -1467,7 +1452,12 @@ class kb_blast:
                 # DEBUG
                 #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
                 #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+                if len(invalid_msgs) == 0:
+                    protein_sequence_found_in_one_input = True
 
+
+            # Feature
+            #
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
                 feature = input_one_data
@@ -1541,6 +1531,8 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -1574,6 +1566,8 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
 
         # GenomeSet
@@ -1610,12 +1604,22 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+
+
+        # check for failed input file creation
+        #
+        if not protein_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if not protein_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
 
         # input data failed validation.  Need to return
@@ -1886,7 +1890,6 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         if many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
@@ -1914,12 +1917,10 @@ class kb_blast:
                     except:
                         pass
 
-
-        # Parse GenomeAnnotation hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-# HERE
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
 #                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTp_Search filtered"
@@ -1932,7 +1933,6 @@ class kb_blast:
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[fid]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
                 except:
@@ -1956,8 +1956,6 @@ class kb_blast:
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
-                    if (seq_total % 1000) == 0:
-                        self.log(console,"checking feature_id "+feature_id)  # DEBUG
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
@@ -2059,6 +2057,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def BLASTx_Search(self, ctx, params):
         """
@@ -2376,47 +2375,41 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = input_one_data
+            #input_one_featureSet = input_one_data
+            genome_id_feature_id_delim = '.f:'
+            one_forward_reads_file_dir = self.scratch
+            one_forward_reads_file = params['input_one_name']+".fasta"
             
-            genome2Features = {}
-            features = input_one_featureSet['elements']
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_one_ref,
+                'file':                one_forward_reads_file,
+                'dir':                 one_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            if len(features.keys()) == 0:
-                self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-            if len(features.keys()) > 1:
-                self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-            # export features to FASTA file
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-            self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-            records = []
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        # BLASTx is nuc-prot
-                        if feature['type'] != 'CDS':
-                            self.log(console,params['input_one_name']+" feature type must be CDS")
-                            self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
-                        #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                        #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                        else:
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            records.append(record)
-                            SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                            break  # only want first record
 
+        # Feature
+        #
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
@@ -2456,44 +2449,38 @@ class kb_blast:
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                            # BLASTx is nuc-prot
-                            if feature['type'] != 'CDS':
-                                self.log(console,"skipping non-CDS feature "+feature['id'])
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -2518,7 +2505,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
@@ -2527,71 +2514,48 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
-            
 
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            records = []
-            feature_written = dict()
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
 
-                            # BLASTx is nuc-prot
-                            if feature['type'] != 'CDS':
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-                    genome = input_many_genomeSet['elements'][genome_name]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
 
-                            # BLASTx is nuc-prot
-                            if feature['type'] != 'CDS':
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-
-                else:
-                    raise ValueError('genome '+genome_name+' missing')
-
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            
         # Missing proper input_many_type
         #
         else:
@@ -2873,7 +2837,6 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         if many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
@@ -2881,49 +2844,44 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - BLASTx_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
 
-        # Parse Genome hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTx_Search filtered"
-            else:
-                output_featureSet['description'] = "BLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - BLASTx_Search filtered"
+#            else:
+#                output_featureSet['description'] = "BLASTx_Search filtered"
+            output_featureSet['description'] = "BLASTx_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    in_filtered_set = hit_seq_ids[fid]
+                    #output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
@@ -2937,38 +2895,28 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - BLASTx_Search filtered"
             else:
                 output_featureSet['description'] = "BLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in feature_ids_by_genome_id[genome_id]:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            pass
-
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
@@ -3056,6 +3004,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def tBLASTn_Search(self, ctx, params):
         """
@@ -3201,48 +3150,43 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = input_one_data
+                #input_one_featureSet = input_one_data
+                genome_id_feature_id_delim = '.f:'
+                one_forward_reads_file_dir = self.scratch
+                one_forward_reads_file = params['input_one_name']+".fasta"
             
-                genome2Features = {}
-                features = input_one_featureSet['elements']
+                # DEBUG
+                #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                FeatureSetToFASTA_params = {
+                    'featureSet_ref':      input_one_ref,
+                    'file':                one_forward_reads_file,
+                    'dir':                 one_forward_reads_file_dir,
+                    'console':             console,
+                    'invalid_msgs':        invalid_msgs,
+                    'residue_type':        'protein',
+                    'feature_type':        'CDS',
+                    'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                    'record_desc_pattern': '[%%genome_ref%%]',
+                    'case':                'upper',
+                    'linewrap':            50,
+                    'merge_fasta_files':   'TRUE'
+                    }
 
-                if len(features.keys()) == 0:
-                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                if len(features.keys()) > 1:
-                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+                DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+                FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+                one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+                #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                for fId in features.keys():
-                    genomeRef = features[fId][0]
-                    if genomeRef not in genome2Features:
-                        genome2Features[genomeRef] = []
-                    genome2Features[genomeRef].append(fId)
+                # DEBUG
+                #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+                if len(invalid_msgs) == 0:
+                    protein_sequence_found_in_one_input = True
 
-                # export features to FASTA file
-                one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-                self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-                records = []
-                for genomeRef in genome2Features:
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    these_genomeFeatureIds = genome2Features[genomeRef]
-                    for feature in genome['features']:
-                        if feature['id'] in these_genomeFeatureIds:
-                            # tBLASTn is prot-nuc
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_one_name']+" feature type must be CDS")
-                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                            else:
-                                protein_sequence_found_in_one_input = True
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                                records.append(record)
-                                SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                                break  # only want first record
 
+            # Feature
+            #
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
                 feature = input_one_data
@@ -3392,43 +3336,36 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                            # tBLASTn is prot-nuc
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # Genome and GenomeAnnotation
@@ -3453,7 +3390,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
@@ -3470,63 +3407,38 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            records = []
-            feature_written = dict()
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
 
-                            # tBLASTn is prot-nuc
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-                    genome = input_many_genomeSet['elements'][genome_name]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
 
-                            # tBLASTn is prot-nuc
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-
-                else:
-                    raise ValueError('genome '+genome_name+' missing')
-
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            
         # Missing proper input_many_type
         #
         else:
@@ -3876,7 +3788,6 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
@@ -3884,49 +3795,44 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - tBLASTn_Search filtered"
             else:
                 output_featureSet['description'] = "tBLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
 
-        # Parse Genome hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - tBLASTn_Search filtered"
-            else:
-                output_featureSet['description'] = "tBLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - tBLASTn_Search filtered"
+#            else:
+#                output_featureSet['description'] = "tBLASTn_Search filtered"
+            output_featureSet['description'] = "tBLASTn_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    in_filtered_set = hit_seq_ids[fid]
+                    #output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
@@ -3940,38 +3846,28 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - tBLASTn_Search filtered"
             else:
                 output_featureSet['description'] = "tBLASTn_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in feature_ids_by_genome_id[genome_id]:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            pass
-
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
@@ -4072,6 +3968,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def tBLASTx_Search(self, ctx, params):
         """
@@ -4386,47 +4283,41 @@ class kb_blast:
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
-            input_one_featureSet = input_one_data
-            
-            genome2Features = {}
-            features = input_one_featureSet['elements']
+            #input_one_featureSet = input_one_data
+            genome_id_feature_id_delim = '.f:'
+            one_forward_reads_file_dir = self.scratch
+            one_forward_reads_file = params['input_one_name']+".fasta"
 
-            if len(features.keys()) == 0:
-                self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-            if len(features.keys()) > 1:
-                self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_one_ref,
+                'file':                one_forward_reads_file,
+                'dir':                 one_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-            # export features to FASTA file
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-            self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-            records = []
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        # tBLASTx is nuc-nuc (translated)
-                        if feature['type'] != 'CDS':
-                            self.log(console,params['input_one_name']+" feature type must be CDS")
-                            self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
-                        #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                        #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                        #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                        else:
-                            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            records.append(record)
-                            SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                            break  # just want one record
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
+
+        # Feature
+        #
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
@@ -4572,43 +4463,36 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                            # tBLASTx is nuc-nuc (translated)
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # Genome and GenomeAnnotation
@@ -4633,7 +4517,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
@@ -4650,63 +4534,38 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            records = []
-            feature_written = dict()
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
 
-                            # tBLASTx is nuc-nuc (translated)
-                            if feature['type'] != 'CDS':
-                                #self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-                    genome = input_many_genomeSet['elements'][genome_name]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
 
-                            # tBLASTx is nuc-nuc (translated)
-                            if feature['type'] != 'CDS':
-                                #self.log(console,params['input_many_name']+" features must all be CDS type")
-                                continue
-                            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                            #    self.log(console,"bad CDS feature "+feature['id'])
-                            #    raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-
-                else:
-                    raise ValueError('genome '+genome_name+' missing')
-
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            
         # Missing proper input_many_type
         #
         else:
@@ -5003,7 +4862,6 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
@@ -5011,49 +4869,44 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - tBLASTx_Search filtered"
             else:
                 output_featureSet['description'] = "tBLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
 
-        # Parse Genome hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - tBLASTx_Search filtered"
-            else:
-                output_featureSet['description'] = "tBLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - tBLASTx_Search filtered"
+#            else:
+#                output_featureSet['description'] = "tBLASTx_Search filtered"
+            output_featureSet['description'] = "tBLASTx_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    in_filtered_set = hit_seq_ids[fid]
+                    #output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
@@ -5067,38 +4920,28 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - tBLASTx_Search filtered"
             else:
                 output_featureSet['description'] = "tBLASTx_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in feature_ids_by_genome_id[genome_id]:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            pass
-
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
@@ -5200,6 +5043,7 @@ class kb_blast:
         # return the results
         return [returnVal]
 
+
     def psiBLAST_msa_start_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -5285,49 +5129,43 @@ class kb_blast:
             #
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
-                input_one_featureSet = input_one_data
-            
-                genome2Features = {}
-                features = input_one_featureSet['elements']
+                #input_one_featureSet = input_one_data
+                genome_id_feature_id_delim = '.f:'
+                one_forward_reads_file_dir = self.scratch
+                one_forward_reads_file = params['input_one_name']+".fasta"
 
-                if len(features.keys()) == 0:
-                    self.log(console,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"No features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                if len(features.keys()) > 1:
-                    self.log(console,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
-                    self.log(invalid_msgs,"Too many features in "+params['input_one_name']+" feature set.  Should one have 1 instead of "+len(features.keys()))
+                # DEBUG
+                #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                FeatureSetToFASTA_params = {
+                    'featureSet_ref':      input_one_ref,
+                    'file':                one_forward_reads_file,
+                    'dir':                 one_forward_reads_file_dir,
+                    'console':             console,
+                    'invalid_msgs':        invalid_msgs,
+                    'residue_type':        'protein',
+                    'feature_type':        'CDS',
+                    'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                    'record_desc_pattern': '[%%genome_ref%%]',
+                    'case':                'upper',
+                    'linewrap':            50,
+                    'merge_fasta_files':   'TRUE'
+                    }
 
-                for fId in features.keys():
-                    input_one_feature_id = fId
-                    genomeRef = features[fId][0]
-                    if genomeRef not in genome2Features:
-                        genome2Features[genomeRef] = []
-                    genome2Features[genomeRef].append(fId)
+                #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+                DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+                FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+                one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+                #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                # export features to FASTA file
-                one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
-                self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-                records = []
-                for genomeRef in genome2Features:
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    these_genomeFeatureIds = genome2Features[genomeRef]
-                    for feature in genome['features']:
-                        if feature['id'] in these_genomeFeatureIds:
-                            # psiBLAST is prot-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                            if feature['type'] != 'CDS':
-                                self.log(console,params['input_one_name']+" feature type must be CDS")
-                                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                            else:
-                                protein_sequence_found_in_one_input = True
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
-                                records.append(record)
-                                SeqIO.write(records, one_forward_reads_file_path, "fasta")
-                                break  # only want first record
+                # DEBUG
+                #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+                #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+                if len(invalid_msgs) == 0:
+                    protein_sequence_found_in_one_input = True
 
+
+            # Feature
+            #
             elif one_type_name == 'Feature':
                 # export feature to FASTA file
                 feature = input_one_data
@@ -5455,44 +5293,38 @@ class kb_blast:
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            genome2Features = {}
-            features = input_many_featureSet['elements']
-            for fId in features.keys():
-                genomeRef = features[fId][0]
-                if genomeRef not in genome2Features:
-                    genome2Features[genomeRef] = []
-                genome2Features[genomeRef].append(fId)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
-            records = []
-            feature_written = dict()
-            for genomeRef in genome2Features:
-                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                these_genomeFeatureIds = genome2Features[genomeRef]
-                for feature in genome['features']:
-                    if feature['id'] in these_genomeFeatureIds:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
 
-                            # psiBLAST is prot-prot
-                            if feature['type'] != 'CDS':
-                                self.log(console,"skipping non-CDS feature "+feature['id'])
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -5517,7 +5349,7 @@ class kb_blast:
                 'linewrap':            50
                 }
 
-            self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
@@ -5526,70 +5358,48 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-
-            protein_sequence_found_in_many_input = True  # FIX LATER
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
             
 
         # GenomeSet
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
+            genome_id_feature_id_delim = '.f:'
+            many_forward_reads_file_dir = self.scratch
+            many_forward_reads_file = params['input_many_name']+".fasta"
 
-            # export features to FASTA file
-            many_forward_reads_file_path = os.path.join(self.scratch, params['input_many_name']+".fasta")
-            self.log(console, 'writing fasta file: '+many_forward_reads_file_path)
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                many_forward_reads_file,
+                'dir':                 many_forward_reads_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'protein',
+                'feature_type':        'CDS',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
 
-            records = []
-            feature_written = dict()
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                         input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genome = ws.get_objects([{'ref': input_many_genomeSet['elements'][genome_name]['ref']}])[0]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                            # psiBLAST is prot-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            if feature['type'] != 'CDS':
-                                #self.log(console,"skipping non-CDS feature "+feature['id'])  # too much chatter for a Genome
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
 
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-                    genome = input_many_genomeSet['elements'][genome_name]['data']
-                    for feature in genome['features']:
-                        try:
-                            f_written = feature_written[feature['id']]
-                        except:
-                            feature_written[feature['id']] = True
-                            #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-                            # psiBLAST is prot-prot
-                            #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome['id'])
-                            if feature['type'] != 'CDS':
-                                continue
-                            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                                self.log(console,"bad CDS feature "+feature['id'])
-                                raise ValueError("bad CDS feature "+feature['id'])
-                            else:
-                                protein_sequence_found_in_many_input = True
-                                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome['id'])
-                                records.append(record)
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            if len(invalid_msgs) == 0:
+                protein_sequence_found_in_many_input = True
 
-                else:
-                    raise ValueError('genome '+genome_name+' missing')
 
-            SeqIO.write(records, many_forward_reads_file_path, "fasta")
-            
         # Missing proper input_many_type
         #
         else:
@@ -5598,9 +5408,8 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if params['input_one_name'] != None:
-            if not protein_sequence_found_in_one_input:
-                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+        if not protein_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
         if not protein_sequence_found_in_MSA_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_msa_name']+"'")
         if not protein_sequence_found_in_many_input:
@@ -5883,57 +5692,51 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         if many_type_name == 'FeatureSet':
-
             seq_total = len(input_many_featureSet['elements'].keys())
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - psiBLAST_msa_start_Search filtered"
             else:
-                output_featureSet['description'] = "psiBLAST_msa_start_Search filtered"
-            output_featureSet['element_ordering'] = []
+                output_featureSet['description'] = "psi_msa_start_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            if 'element_ordering' in input_many_featureSet and input_many_featureSet['element_ordering'] != None:
-                for fId in input_many_featureSet['element_ordering']:
-                    try:
-                        in_filtered_set = hit_seq_ids[fId]
-                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
-                    except:
-                        pass
-            else:
-                fId_list = input_many_featureSet['elements'].keys()
-                self.log(console,"ADDING FEATURES TO FEATURESET")
-                for fId in sorted(fId_list):
+
+            fId_list = input_many_featureSet['elements'].keys()
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
                     try:
                         #self.log(console,"checking '"+fId+"'")
-                        in_filtered_set = hit_seq_ids[fId]
+                        #in_filtered_set = hit_seq_ids[fId]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        output_featureSet['element_ordering'].append(fId)
-                        output_featureSet['elements'][fId] = input_many_featureSet['elements'][fId]
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                        output_featureSet['elements'][fId].append(genome_ref)
                     except:
                         pass
 
-        # Parse Genome hits into FeatureSet
+        # Parse Genome and GenomeAnnotation hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             seq_total = 0
-
             output_featureSet = dict()
-            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
-                output_featureSet['description'] = input_many_genome['scientific_name'] + " - psiBLAST_msa_start_Search filtered"
-            else:
-                output_featureSet['description'] = "psiBLAST_msa_start_Search filtered"
-            output_featureSet['element_ordering'] = []
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - psiBLAST_msa_start_Search filtered"
+#            else:
+#                output_featureSet['description'] = "psiBLAST_msa_start_Search filtered"
+            output_featureSet['description'] = "psiBLAST_msa_start_Search filtered"
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
-            for feature in input_many_genome['features']:
+            for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[feature['id']]
-                    #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                    output_featureSet['element_ordering'].append(feature['id'])
-                    output_featureSet['elements'][feature['id']] = [input_many_ref]
+                    in_filtered_set = hit_seq_ids[fid]
+                    #output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [input_many_ref]
                 except:
                     pass
 
@@ -5947,38 +5750,28 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - psiBLAST_msa_start_Search filtered"
             else:
                 output_featureSet['description'] = "psiBLAST_msa_start_Search filtered"
-            output_featureSet['element_ordering'] = []
+            #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            for genome_name in input_many_genomeSet['elements'].keys():
-                if 'ref' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['ref'] != None:
-                    genomeRef = input_many_genomeSet['elements'][genome_name]['ref']
-                    genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-                    for feature in genome['features']:
-                        seq_total += 1
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in feature_ids_by_genome_id.keys():
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in feature_ids_by_genome_id[genome_id]:
+                    seq_total += 1
+                    try:
+                        #in_filtered_set = hit_seq_ids[feature['id']]
+                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        #in_filtered_set = hit_seq_ids[feature_id]
+                        #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
+                        #output_featureSet['element_ordering'].append(feature['id'])
                         try:
-                            in_filtered_set = hit_seq_ids[feature['id']]
-                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-                            output_featureSet['element_ordering'].append(feature['id'])
-                            output_featureSet['elements'][feature['id']] = [genomeRef]
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
-                            pass
-
-                elif 'data' in input_many_genomeSet['elements'][genome_name] and \
-                        input_many_genomeSet['elements'][genome_name]['data'] != None:
-#                    genome = input_many_genomeSet['elements'][genome_name]['data']
-#                    for feature in genome['features']:
-#                        #self.log(console,"kbase_id: '"+feature['id']+"'")  # DEBUG
-#                        seq_total += 1
-#                        try:
-#                            in_filtered_set = hit_seq_ids[feature['id']]
-#                            #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
-#                            output_featureSet['element_ordering'].append(feature['id'])
-                    raise ValueError ("FAILURE: unable to address genome object that is stored within 'data' field of genomeSet object")
-#                            output_featureSet['elements'][feature['id']] = [genomeRef_is_inside_data_within_genomeSet_object_and_that_cant_be_addressed]
-#                        except:
-#                            pass
+                            output_featureSet['elements'][feature_id] = []
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+                    except:
+                        pass
 
 
         # load the method provenance from the context object
@@ -6067,6 +5860,7 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
 
     def status(self, ctx):
         #BEGIN_STATUS
