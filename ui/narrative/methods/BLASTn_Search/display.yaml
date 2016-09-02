@@ -31,26 +31,26 @@ parameters :
         ui-name : |
             Query Sequence
         short-hint : |
-            Single DNA sequence to use for the search.  If you enter something here, Query Object will be created with this sequence as a SingleEndLibrary.
+            Single DNA sequence to use for the search.  If you enter something here, Query Object will be created with this sequence as a SequenceSet with one element.
         placeholder : |
             Optionally enter DNA sequence...
     input_one_name:
         ui-name : |
             Query Object
         short-hint : |
-            Query with single DNA sequence to use as query (created if sequence entered above).  Data types may be Feature, SingleEndLibrary (with one sequence), or FeatureSet (with one sequence).
+            Query with single DNA sequence to use as query (created if sequence entered above).  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
         placeholder : |
             ...or select DNA Query Object
     input_many_name:
         ui-name : |
             Targets Object
         short-hint : |
-            DNA Targets object to be searched.  Data types may be SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
+            DNA Targets object to be searched.  Data types may be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet.
     output_filtered_name:
         ui-name : |
             Output Object
         short-hint : |
-            Object containing matches.  Output will be SingleEndLibrary for SingleEndLibrary Targets, otherwise will be FeatureSet.
+            Object containing matches.  Output will be SequenceSet for SequenceSet Targets, SingleEndLibrary for SingleEndLibrary Targets, otherwise will be FeatureSet.
     ident_thresh:
         ui-name : |
             Identity Threshold
