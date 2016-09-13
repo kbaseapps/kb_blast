@@ -58,9 +58,9 @@ module kb_blast {
     /*  Methods for BLAST of various flavors of one sequence against many sequences 
     **
     **    overloading as follows:
-    **        input_one_id: SingleEndLibrary, Feature, FeatureSet
-    **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
-    **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+    **        input_one_type: SequenceSet, Feature, FeatureSet
+    **        input_many_type: SequenceSet, SingleEndLibrary, FeatureSet, Genome, GenomeSet
+    **        output_type: SequenceSet (if input_many is SS), SingleEndLibrary (if input_many is SELib), (else) FeatureSet
     */
     funcdef BLASTn_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
     funcdef BLASTp_Search (BLAST_Params params)  returns (BLAST_Output) authentication required;
