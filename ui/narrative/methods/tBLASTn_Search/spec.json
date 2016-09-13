@@ -24,13 +24,13 @@
         },
         {
             "id": "input_one_name",
-            "optional": true,
+            "optional": false,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
+                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
             }
         },
         {
@@ -41,7 +41,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseGenomeAnnotations.GenomeAnnotation","KBaseSearch.GenomeSet" ]
+                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseGenomeAnnotations.GenomeAnnotation","KBaseSearch.GenomeSet" ]
             }
         },
         {
@@ -52,7 +52,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet" ],
+                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet" ],
 		"is_output_name": true		  
             }
         },

@@ -31,26 +31,26 @@ parameters :
         ui-name : |
             Query Sequence
         short-hint : |
-            Single PROTEIN sequence to use for the search.  If you enter something here, Query Object will be ignored.
+            Single PROTEIN sequence to use for the search.  If you enter something here, Query Object will be created with this sequence as a SequenceSet with one element.
         placeholder : |
             Optionally enter PROTEIN sequence...
     input_one_name:
         ui-name : |
             Query Object
         short-hint : |
-            Query with single PROTEIN sequence to use as query.  Data types may be Feature, or FeatureSet (with one sequence).
+            Query with single PROTEIN sequence to use as query (created if sequence entered above).  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
         placeholder : |
             ...or select PROTEIN Query Object
     input_many_name:
         ui-name : |
             Targets Object
         short-hint : |
-            PROTEIN Targets object to be searched.  Data types may be FeatureSet, Genome, or GenomeSet.
+            PROTEIN Targets object to be searched.  Data types may be SequenceSet, FeatureSet, Genome, or GenomeSet.
     output_filtered_name:
         ui-name : |
             Output Object
         short-hint : |
-            Object containing matches.  Output will be will be FeatureSet.
+            Object containing matches.  Output will be SequenceSet for SequenceSet Targets, otherwise will be FeatureSet.
     ident_thresh:
         ui-name : |
             Identity Threshold
