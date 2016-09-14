@@ -270,15 +270,19 @@ class kb_blast:
             raise ValueError('output_filtered_name parameter is required')
 
 
-        # Write the input_one_sequence to a SingleEndLibrary object
+        # Write the input_one_sequence to a SequenceSet object
         #
         if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
             input_one_file_name = params['input_one_name']
-            one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
-            self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
+            header_id = 'query_id'
+            header_desc = 'query_desc'
+            sequence_str_buf = ''
+
+            #one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
+            #one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            #self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
 
 #            input_sequence_buf = params['input_one_sequence'].split("\n")
 #            one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
@@ -294,10 +298,10 @@ class kb_blast:
 
             fastq_format = False
             input_sequence_buf = params['input_one_sequence']
+            input_sequence_buf = input_sequence_buf.strip()
             if input_sequence_buf.startswith('@'):
                 fastq_format = True
                 #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
-            input_sequence_buf = input_sequence_buf.strip()
             input_sequence_buf = re.sub ('&apos;', "'", input_sequence_buf)
             input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
 #        input_sequence_buf = re.sub ('&#39;',  "'", input_sequence_buf)
@@ -323,16 +327,18 @@ class kb_blast:
 
             # no header rows, just sequence
             if not input_sequence_buf.startswith('>') and not input_sequence_buf.startswith('@'):
-                one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
+                #one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
                 for line in split_input_sequence_buf:
                     if not space_pattern.match(line):
                         line = re.sub (" ","",line)
                         line = re.sub ("\t","",line)
+                        line = re.sub ("\r","",line)
                         if not DNA_pattern.match(line):
                             self.log(invalid_msgs,"BAD record:\n"+line+"\n")
                             continue
-                        one_forward_reads_file_handle.write(line.lower()+"\n")
-                one_forward_reads_file_handle.close()
+                        sequence_str_buf += line
+                        #one_forward_reads_file_handle.write(line.lower()+"\n")
+                #one_forward_reads_file_handle.close()
 
             else:
                 # format checks
@@ -369,29 +375,55 @@ class kb_blast:
                 #forward_reads_file_handle.write(input_sequence_buf)        input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
                 for i,line in enumerate(split_input_sequence_buf):
                     if line.startswith('>'):
-                        record_buf = []
-                        record_buf.append(line)
+                        #record_buf = []
+                        #record_buf.append(line)
+                        if line.find(" ") < 0 and line.find("\t") < 0:
+                            header_id = line
+                        elif line.find(" ") < 0:
+                            (header_id, header_desc) = line.split("\t", 1)
+                        elif line.find("\t") < 0:
+                            (header_id, header_desc) = line.split(" ", 1)
+                        elif line.find(" ") < line.find("\t"):
+                            (header_id, header_desc) = line.split(" ", 1)
+                        else:
+                            (header_id, header_desc) = line.split("\t", 1)
+
                         for j in range(i+1,len(split_input_sequence_buf)):
                             if split_input_sequence_buf[j].startswith('>'):
                                 break
                             seq_line = re.sub (" ","",split_input_sequence_buf[j])
                             seq_line = re.sub ("\t","",seq_line)
+                            seq_line = re.sub ("\r","",seq_line)
                             seq_line = seq_line.lower()
-                            record_buf.append(seq_line)
-                        record = "\n".join(record_buf)+"\n"
-                        one_forward_reads_file_handle.write(record)
+                            #record_buf.append(seq_line)
+                            sequence_str_buf += seq_line
+                        #record = "\n".join(record_buf)+"\n"
+                        #one_forward_reads_file_handle.write(record)
                         break  # only want first record
                     elif line.startswith('@'):
+                        if line.find(" ") < 0 and line.find("\t") < 0:
+                            header_id = line
+                        elif line.find(" ") < 0:
+                            (header_id, header_desc) = line.split("\t", 1)
+                        elif line.find("\t") < 0:
+                            (header_id, header_desc) = line.split(" ", 1)
+                        elif line.find(" ") < line.find("\t"):
+                            (header_id, header_desc) = line.split(" ", 1)
+                        else:
+                            (header_id, header_desc) = line.split("\t", 1)
+
                         seq_line = re.sub (" ","",split_input_sequence_buf[i+1])
                         seq_line = re.sub ("\t","",seq_line)
+                        seq_line = re.sub ("\r","",seq_line)
                         seq_line = seq_line.lower()
-                        qual_line = re.sub (" ","",split_input_sequence_buf[i+3])
-                        qual_line = re.sub ("\t","",qual_line)
-                        record = "\n".join([line, seq_line, split_input_sequence_buf[i+2], qual_line])+"\n"
-                        one_forward_reads_file_handle.write(record)
+                        #qual_line = re.sub (" ","",split_input_sequence_buf[i+3])
+                        #qual_line = re.sub ("\t","",qual_line)
+                        #record = "\n".join([line, seq_line, split_input_sequence_buf[i+2], qual_line])+"\n"
+                        sequence_str_buf += seq_line
+                        #one_forward_reads_file_handle.write(record)
                         break  # only want first record
 
-                one_forward_reads_file_handle.close()
+                #one_forward_reads_file_handle.close()
 
 
             # load the method provenance from the context object
@@ -404,21 +436,38 @@ class kb_blast:
                 provenance[0]['input_ws_objects'] = []
                 provenance[0]['service'] = 'kb_blast'
                 provenance[0]['method'] = 'BLASTn_Search'
-
                 
                 # Upload results
                 #
                 self.log(console,"UPLOADING QUERY OBJECT")  # DEBUG
 
-                sequencing_tech = 'N/A'
-                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
-                                                      console,  # DEBUG
-                                                      params['workspace_name'],
-                                                      params['input_one_name'],
-                                                      one_forward_reads_file_path,
-                                                      provenance,
-                                                      sequencing_tech
-                                                      )
+                header_id = re.sub('^@','',header_id)
+                header_id = re.sub('^>','',header_id)
+
+                input_one_sequenceSet = { 'sequence_set_id': header_id,  
+                                          'description': header_desc,
+                                          'sequences': [ { 'sequence_id': header_id,
+                                                           'description': header_desc,
+                                                           'sequence': sequence_str_buf
+                                                         }
+                                                       ] 
+                                        }
+
+                try:
+                    ws = workspaceService(self.workspaceURL, token=ctx['token'])
+                    new_obj_info = ws.save_objects({
+                            'workspace': params['workspace_name'],
+                            'objects':[{
+                                    'type': 'KBaseSequences.SequenceSet',
+                                    'data': input_one_sequenceSet,
+                                    'name': params['input_one_name'],
+                                    'meta': {},
+                                    'provenance': provenance
+                                    }]
+                            })
+                except Exception as e:
+                    raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+                    #to get the full stack trace: traceback.format_exc()
 
             self.log(console, 'done')
 
@@ -426,7 +475,6 @@ class kb_blast:
         #### Get the input_one object
         ##
         try:
-            ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
             input_one_data = objects[0]['data']
             info = objects[0]['info']
@@ -452,86 +500,30 @@ class kb_blast:
         if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
-                and one_type_name != 'SingleEndLibrary':
+                and one_type_name != 'SequenceSet':
 
-            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SingleEndLibrary instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SequenceSet instead of: "+one_type_name)
 
 
-        # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
+        # Handle overloading (input_one can be Feature, SequenceSet, or FeatureSet)
         #
-        if one_type_name == 'SingleEndLibrary':
+        if one_type_name == 'SequenceSet':
             try:
-                if 'lib' in input_one_data:
-                    one_forward_reads = input_one_data['lib']['file']
-                elif 'handle' in input_one_data:
-                    one_forward_reads = input_one_data['handle']
-                else:
-                    self.log(console,"bad structure for 'one_forward_reads'")
-                    raise ValueError("bad structure for 'one_forward_reads'")
-
-                ### NOTE: this section is what could be replaced by the transform services
-                one_forward_reads_file_path = os.path.join(self.scratch,one_forward_reads['file_name'])
-                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
-                self.log(console, 'downloading reads file: '+str(one_forward_reads_file_path))
-                headers = {'Authorization': 'OAuth '+ctx['token']}
-                r = requests.get(one_forward_reads['url']+'/node/'+one_forward_reads['id']+'?download', stream=True, headers=headers)
-                for chunk in r.iter_content(1024):
-                    one_forward_reads_file_handle.write(chunk)
-                one_forward_reads_file_handle.close();
-                self.log(console, 'done')
-                ### END NOTE
-
-
-                # remove carriage returns
-                new_file_path = one_forward_reads_file_path+"-CRfree"
-                new_file_handle = open(new_file_path, 'w', 0)
-                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
-                for line in one_forward_reads_file_handle:
-                    line = re.sub("\r","",line)
-                    new_file_handle.write(line)
-                one_forward_reads_file_handle.close();
-                new_file_handle.close()
-                one_forward_reads_file_path = new_file_path
-
-
-                # convert FASTQ to FASTA (if necessary)
-                new_file_path = one_forward_reads_file_path+".fna"
-                new_file_handle = open(new_file_path, 'w', 0)
-                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
-                header = None
-                last_header = None
-                last_seq_buf = None
-                last_line_was_header = False
-                was_fastq = False
-                for line in one_forward_reads_file_handle:
-                    if line.startswith('>'):
-                        break
-                    elif line.startswith('@'):
-                        was_fastq = True
-                        header = line[1:]
-                        if last_header != None:
-                            new_file_handle.write('>'+last_header)
-                            new_file_handle.write(last_seq_buf)
-                        last_seq_buf = None
-                        last_header = header
-                        last_line_was_header = True
-                    elif last_line_was_header:
-                        last_seq_buf = line
-                        last_line_was_header = False
-                    else:
-                        continue
-                if last_header != None:
-                    new_file_handle.write('>'+last_header)
-                    new_file_handle.write(last_seq_buf)
-
-                new_file_handle.close()
-                one_forward_reads_file_handle.close()
-                if was_fastq:
-                    one_forward_reads_file_path = new_file_path
-
+                input_one_sequenceSet = input_one_data
             except Exception as e:
                 print(traceback.format_exc())
-                raise ValueError('Unable to download single-end read library files: ' + str(e))
+                raise ValueError('Unable to get sequenceSet object: ' + str(e))
+
+            header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
+            sequence_str = input_one_data['sequences'][0]['sequence']
+
+            one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
+            one_forward_reads_file_handle.write('>'+header_id+"\n")
+            one_forward_reads_file_handle.write(sequence_str+"\n")
+            one_forward_reads_file_handle.close();
+            self.log(console, 'done')
 
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
@@ -614,9 +606,31 @@ class kb_blast:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
-        # Handle overloading (input_many can be SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
+        # Handle overloading (input_many can be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
         #
-        if many_type_name == 'SingleEndLibrary':
+        if many_type_name == 'SequenceSet':
+            try:
+                input_many_sequenceSet = input_many_data
+            except Exception as e:
+                print(traceback.format_exc())
+                raise ValueError('Unable to get SequenceSet: ' + str(e))
+
+            header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
+            many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
+
+            for seq_obj in input_many_sequenceSet['sequences']:
+                header_id = seq_obj['sequence_id']
+                sequence_str = seq_obj['sequence']
+
+                many_forward_reads_file_handle.write('>'+header_id+"\n")
+                many_forward_reads_file_handle.write(sequence_str+"\n")
+            many_forward_reads_file_handle.close();
+            self.log(console, 'done')
+
+
+        elif many_type_name == 'SingleEndLibrary':
 
             # DEBUG
             #for k in data:
