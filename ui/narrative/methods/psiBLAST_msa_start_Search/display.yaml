@@ -3,7 +3,7 @@
 #
 name: psiBLAST MSA start prot-prot Search
 tooltip: |
-    Search for matches of a single sequence within identity threshold using a Multiple Sequence Alignment (MSA) for a profile search.
+    Search for matches to a Multiple Sequence Alignment (MSA)
 screenshots: []
 
 icon: blast-cyan.png

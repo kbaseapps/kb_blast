@@ -3,7 +3,7 @@
 #
 name: tBLASTx nuc-nuc (translated) Search
 tooltip: |
-    Search for matches of a single sequence within identity threshold
+    Search for matches to a sequence
 screenshots: []
 
 icon: blast-cyan.png
