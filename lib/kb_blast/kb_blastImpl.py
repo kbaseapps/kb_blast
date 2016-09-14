@@ -475,6 +475,7 @@ class kb_blast:
         #### Get the input_one object
         ##
         try:
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
             input_one_data = objects[0]['data']
             info = objects[0]['info']
