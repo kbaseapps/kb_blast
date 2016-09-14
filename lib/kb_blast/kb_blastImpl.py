@@ -517,6 +517,10 @@ class kb_blast:
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
             sequence_str = input_one_data['sequences'][0]['sequence']
 
+            DNA_pattern = re.compile("^[acgtuACGTU ]+$")
+            if not DNA_pattern.match(sequence_str):
+                self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
@@ -606,6 +610,7 @@ class kb_blast:
             raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
+
         # Handle overloading (input_many can be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
         #
         if many_type_name == 'SequenceSet':
@@ -623,6 +628,10 @@ class kb_blast:
             for seq_obj in input_many_sequenceSet['sequences']:
                 header_id = seq_obj['sequence_id']
                 sequence_str = seq_obj['sequence']
+
+                DNA_pattern = re.compile("^[acgtuACGTU ]+$")
+                if not DNA_pattern.match(sequence_str):
+                    self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
 
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
@@ -1041,9 +1050,42 @@ class kb_blast:
         self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
 
 
+        # SequenceSet input -> SequenceSet output
+        #
+        if many_type_name == 'SequenceSet':
+            seq_total = len(input_many_sequenceSet['sequences'])
+
+            output_sequenceSet = dict()
+
+            if 'sequence_set_id' in input_many_sequenceSet and input_many_sequenceSet['sequence_set_id'] != None:
+                output_sequenceSet['sequence_set_id'] = input_many_sequenceSet['sequence_set_id'] + ".BLASTn_Search_filtered"
+            else:
+                output_sequenceSet['sequence_set_id'] = "BLASTn_Search_filtered"
+            if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] != None:
+                output_sequenceSet['description'] = input_many_sequenceSet['description'] + " - BLASTn_Search filtered"
+            else:
+                output_sequenceSet['description'] = "BLASTn_Search filtered"
+
+            self.log(console,"ADDING SEQUENCES TO SEQUENCESET")
+            output_sequenceSet['sequences'] = []
+
+            for seq_obj in input_many_sequenceSet['sequences']:
+                header_id = seq_obj['sequence_id']
+                #header_desc = seq_obj['description']
+                #sequence_str = seq_obj['sequence']
+
+                try:
+                    #self.log(console,"checking '"+header_id+"'")
+                    in_filtered_set = hit_seq_ids[header_id]
+                    #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
+                    output_sequenceSet['sequences'].append(seq_obj)
+                except:
+                    pass
+
+
         # SingleEndLibrary input -> SingleEndLibrary output
         #
-        if many_type_name == 'SingleEndLibrary':
+        elif many_type_name == 'SingleEndLibrary':
 
             #  Note: don't use SeqIO.parse because loads everything into memory
             #
