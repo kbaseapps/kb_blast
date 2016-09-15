@@ -184,9 +184,9 @@ public class KbBlastClient {
      * Methods for BLAST of various flavors of one sequence against many sequences 
      * **
      * **    overloading as follows:
-     * **        input_one_id: SingleEndLibrary, Feature, FeatureSet
-     * **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
-     * **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+     * **        input_one_type: SequenceSet, Feature, FeatureSet
+     * **        input_many_type: SequenceSet, SingleEndLibrary, FeatureSet, Genome, GenomeSet
+     * **        output_type: SequenceSet (if input_many is SS), SingleEndLibrary (if input_many is SELib), (else) FeatureSet
      * </pre>
      * @param   params   instance of type {@link us.kbase.kbblast.BLASTParams BLASTParams} (original type "BLAST_Params")
      * @return   instance of type {@link us.kbase.kbblast.BLASTOutput BLASTOutput} (original type "BLAST_Output")

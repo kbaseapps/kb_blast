@@ -51,8 +51,8 @@ class kb_blast:
     # the latter method is running.
     #########################################
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/dcchivian/kb_blast.git"
-    GIT_COMMIT_HASH = "18713a0bdb13040171676d2ac51d4e23d2e46da8"
+    GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
+    GIT_COMMIT_HASH = "d465b71b938d30266e857e80c42faab5e0b004e5"
     
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -214,15 +214,37 @@ class kb_blast:
 
     #END_CLASS_HEADER
 
+    # config contains contents of config file in a hash or None if it couldn't
+    # be found
+    def __init__(self, config):
+        #BEGIN_CONSTRUCTOR
+        self.workspaceURL = config['workspace-url']
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
+
+#        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'
+        self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
+        if self.callbackURL == None:
+            raise ValueError ("SDK_CALLBACK_URL not set in environment")
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if self.scratch == None:
+            self.scratch = os.path.join('/kb','module','local_scratch')
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+
+        #END_CONSTRUCTOR
+        pass
+    
 
     def BLASTn_Search(self, ctx, params):
         """
         Methods for BLAST of various flavors of one sequence against many sequences 
         **
         **    overloading as follows:
-        **        input_one_id: SingleEndLibrary, Feature, FeatureSet
-        **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
-        **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+        **        input_one_type: SequenceSet, Feature, FeatureSet
+        **        input_many_type: SequenceSet, SingleEndLibrary, FeatureSet, Genome, GenomeSet
+        **        output_type: SequenceSet (if input_many is SS), SingleEndLibrary (if input_many is SELib), (else) FeatureSet
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
            -> structure: parameter "workspace_name" of type "workspace_name"
            (** The workspace object refs are of form: ** **    objects =
@@ -236,6 +258,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -1334,7 +1357,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTp_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -1350,6 +1372,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -2115,7 +2138,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def BLASTx_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -2131,6 +2153,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -3062,7 +3085,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def tBLASTn_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -3078,6 +3100,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -4026,7 +4049,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def tBLASTx_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -4042,6 +4064,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -5100,7 +5123,6 @@ class kb_blast:
         # return the results
         return [returnVal]
 
-
     def psiBLAST_msa_start_Search(self, ctx, params):
         """
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
@@ -5116,6 +5138,7 @@ class kb_blast:
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -5917,7 +5940,6 @@ class kb_blast:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
 
     def status(self, ctx):
         #BEGIN_STATUS

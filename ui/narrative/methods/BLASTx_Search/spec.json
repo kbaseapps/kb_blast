@@ -24,13 +24,25 @@
         },
         {
             "id": "input_one_name",
-            "optional": false,
+            "optional": true,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
                 "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseCollections.FeatureSet","KBaseGenomes.Feature" ]
+            }
+        },
+        {
+            "id": "output_one_name",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseSequences.SequenceSet" ],
+		"is_output_name": true
             }
         },
         {
@@ -134,6 +146,10 @@
                 {
                     "input_parameter": "input_one_name",
                     "target_property": "input_one_name"
+                },
+                {
+                    "input_parameter": "output_one_name",
+                    "target_property": "output_one_name"
                 },
                 {
                     "input_parameter": "input_many_name",

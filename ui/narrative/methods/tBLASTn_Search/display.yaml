@@ -29,18 +29,23 @@ suggestions:
 parameters :
     input_one_sequence:
         ui-name : |
-            Query Sequence
+            Optional Query Sequence
         short-hint : |
-            Single PROTEIN sequence to use for the search.  If you enter something here, Query Object will be created with this sequence as a SequenceSet with one element.
+            Single PROTEIN sequence to use for the search.  If you enter something here, Output Query Object will be created with this sequence as a SequenceSet with one element.
         placeholder : |
             Optionally enter PROTEIN sequence...
     input_one_name:
         ui-name : |
-            Query Object
+            Optional Query Object
         short-hint : |
-            Query with single PROTEIN sequence to use as query (created if sequence entered above).  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
+            Query with single PROTEIN sequence to use as query.  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
         placeholder : |
             ...or select PROTEIN Query Object
+    output_one_name:
+        ui-name : |
+            Output Query Object
+        short-hint : |
+            Created if sequence entered above.  Data type is SequenceSet (with one sequence).
     input_many_name:
         ui-name : |
             Targets Object

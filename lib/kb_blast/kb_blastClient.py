@@ -38,9 +38,9 @@ class kb_blast(object):
         Methods for BLAST of various flavors of one sequence against many sequences 
         **
         **    overloading as follows:
-        **        input_one_id: SingleEndLibrary, Feature, FeatureSet
-        **        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
-        **        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+        **        input_one_type: SequenceSet, Feature, FeatureSet
+        **        input_many_type: SequenceSet, SingleEndLibrary, FeatureSet, Genome, GenomeSet
+        **        output_type: SequenceSet (if input_many is SS), SingleEndLibrary (if input_many is SELib), (else) FeatureSet
         :param params: instance of type "BLAST_Params" (BLAST Input Params)
            -> structure: parameter "workspace_name" of type "workspace_name"
            (** The workspace object refs are of form: ** **    objects =
@@ -54,6 +54,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -81,6 +82,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -108,6 +110,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -135,6 +138,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -162,6 +166,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,
@@ -189,6 +194,7 @@ class kb_blast(object):
            "input_one_name" of type "data_obj_name", parameter
            "input_many_name" of type "data_obj_name", parameter
            "input_msa_name" of type "data_obj_name", parameter
+           "output_one_name" of type "data_obj_name", parameter
            "output_filtered_name" of type "data_obj_name", parameter
            "ident_thresh" of Double, parameter "e_value" of Double, parameter
            "bitscore" of Double, parameter "overlap_fraction" of Double,

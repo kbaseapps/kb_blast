@@ -30,6 +30,7 @@ module kb_blast {
 	data_obj_name  input_one_name;
 	data_obj_name  input_many_name;
 	data_obj_name  input_msa_name;  /* for psiBLAST_msa_start */
+	data_obj_name  output_one_name;
         data_obj_name  output_filtered_name;
 
 	float ident_thresh;

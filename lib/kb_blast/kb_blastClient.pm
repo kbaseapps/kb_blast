@@ -131,6 +131,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -160,6 +161,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -183,9 +185,9 @@ data_obj_ref is a string
 Methods for BLAST of various flavors of one sequence against many sequences 
 **
 **    overloading as follows:
-**        input_one_id: SingleEndLibrary, Feature, FeatureSet
-**        input_many_id: SingleEndLibrary, FeatureSet, Genome, GenomeSet
-**        output_id: SingleEndLibrary (if input_many is SELib), (else) FeatureSet
+**        input_one_type: SequenceSet, Feature, FeatureSet
+**        input_many_type: SequenceSet, SingleEndLibrary, FeatureSet, Genome, GenomeSet
+**        output_type: SequenceSet (if input_many is SS), SingleEndLibrary (if input_many is SELib), (else) FeatureSet
 
 =back
 
@@ -258,6 +260,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -287,6 +290,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -380,6 +384,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -409,6 +414,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -502,6 +508,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -531,6 +538,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -624,6 +632,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -653,6 +662,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -746,6 +756,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -775,6 +786,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	input_one_name has a value which is a kb_blast.data_obj_name
 	input_many_name has a value which is a kb_blast.data_obj_name
 	input_msa_name has a value which is a kb_blast.data_obj_name
+	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
 	e_value has a value which is a float
@@ -1073,6 +1085,7 @@ input_one_sequence has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 input_msa_name has a value which is a kb_blast.data_obj_name
+output_one_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
 ident_thresh has a value which is a float
 e_value has a value which is a float
@@ -1093,6 +1106,7 @@ input_one_sequence has a value which is a kb_blast.sequence
 input_one_name has a value which is a kb_blast.data_obj_name
 input_many_name has a value which is a kb_blast.data_obj_name
 input_msa_name has a value which is a kb_blast.data_obj_name
+output_one_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
 ident_thresh has a value which is a float
 e_value has a value which is a float
