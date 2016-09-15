@@ -283,10 +283,17 @@ class kb_blast:
         #
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-#        if 'input_one_name' not in params and 'input_one_sequence' not in params:
-#            raise ValueError('input_one_sequence or input_one_name parameter is required')
-        if 'input_one_name' not in params:
-            raise ValueError('input_one_name parameter is required')
+        if ('output_one_name' not in params or params['output_one_name'] == None)
+                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+            raise ValueError('output_one_name parameter required if input_one_sequence parameter is provided')
+        if ('input_one_name' in params and params['input_one_name'] != None) \
+                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
+        if ('input_one_name' not in params or params['input_one_name'] == None) \
+                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+            raise ValueError('input_one_sequence or input_one_name parameter is required')
+#        if 'input_one_name' not in params:
+#            raise ValueError('input_one_name parameter is required')
         if 'input_many_name' not in params:
             raise ValueError('input_many_name parameter is required')
         if 'output_filtered_name' not in params:
@@ -298,155 +305,18 @@ class kb_blast:
         if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
-            input_one_file_name = params['input_one_name']
-            header_id = 'query_id'
-            header_desc = 'query_desc'
-            sequence_str_buf = ''
 
-            #one_forward_reads_file_path = os.path.join(self.scratch,input_one_file_name)
-            #one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
-            #self.log(console, 'writing query reads file: '+str(one_forward_reads_file_path))
-
-#            input_sequence_buf = params['input_one_sequence'].split("\n")
-#            one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
-#            query_line_seen = False
-#            for line in input_sequence_buf:
-#                if not line.startswith('>'):
-#                    one_forward_reads_file_handle.write(line+"\n")
-#                else:
-#                    if query_line_seen:
-#                        break
-#                    query_line_seen = True
-#            one_forward_reads_file_handle.close();
-
-            fastq_format = False
-            input_sequence_buf = params['input_one_sequence']
-            input_sequence_buf = input_sequence_buf.strip()
-            if input_sequence_buf.startswith('@'):
-                fastq_format = True
-                #self.log(console,"INPUT_SEQ BEFORE: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
-            input_sequence_buf = re.sub ('&apos;', "'", input_sequence_buf)
-            input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#39;',  "'", input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#34;',  '"', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&lt;;',  '<', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#60;',  '<', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&gt;',   '>', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#62;',  '>', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#36;',  '$', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#37;',  '%', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#47;',  '/', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#63;',  '?', input_sequence_buf)
-##        input_sequence_buf = re.sub ('&#92;',  chr(92), input_sequence_buf)  # FIX LATER
-#        input_sequence_buf = re.sub ('&#96;',  '`', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#124;', '|', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&amp;', '&', input_sequence_buf)
-#        input_sequence_buf = re.sub ('&#38;', '&', input_sequence_buf)
-#        self.log(console,"INPUT_SEQ AFTER: '''\n"+input_sequence_buf+"\n'''")  # DEBUG
-
-            DNA_pattern = re.compile("^[acgtuACGTU ]+$")
-            space_pattern = re.compile("^[ \t]*$")
-            split_input_sequence_buf = input_sequence_buf.split("\n")
-
-            # no header rows, just sequence
-            if not input_sequence_buf.startswith('>') and not input_sequence_buf.startswith('@'):
-                #one_forward_reads_file_handle.write('>'+params['input_one_name']+"\n")
-                for line in split_input_sequence_buf:
-                    if not space_pattern.match(line):
-                        line = re.sub (" ","",line)
-                        line = re.sub ("\t","",line)
-                        line = re.sub ("\r","",line)
-                        if not DNA_pattern.match(line):
-                            self.log(invalid_msgs,"BAD record:\n"+line+"\n")
-                            continue
-                        sequence_str_buf += line
-                        #one_forward_reads_file_handle.write(line.lower()+"\n")
-                #one_forward_reads_file_handle.close()
-
-            else:
-                # format checks
-                for i,line in enumerate(split_input_sequence_buf):
-                    if line.startswith('>') or line.startswith('@'):
-                        if not DNA_pattern.match(split_input_sequence_buf[i+1]):
-                            if fastq_format:
-                                bad_record = "\n".join([split_input_sequence_buf[i],
-                                                        split_input_sequence_buf[i+1],
-                                                        split_input_sequence_buf[i+2],
-                                                        split_input_sequence_buf[i+3]])
-                            else:
-                                bad_record = "\n".join([split_input_sequence_buf[i],
-                                                    split_input_sequence_buf[i+1]])
-                            self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
-                        if fastq_format and line.startswith('@'):
-                            format_ok = True
-                            seq_len = len(split_input_sequence_buf[i+1])
-                            if not seq_len > 0:
-                                format_ok = False
-                            if not split_input_sequence_buf[i+2].startswith('+'):
-                                format_ok = False
-                            if not seq_len == len(split_input_sequence_buf[i+3]):
-                                format_ok = False
-                            if not format_ok:
-                                bad_record = "\n".join([split_input_sequence_buf[i],
-                                                    split_input_sequence_buf[i+1],
-                                                    split_input_sequence_buf[i+2],
-                                                    split_input_sequence_buf[i+3]])
-                                self.log(invalid_msgs,"BAD record:\n"+bad_record+"\n")
-
-                # write that sucker, removing spaces
-                #
-                #forward_reads_file_handle.write(input_sequence_buf)        input_sequence_buf = re.sub ('&quot;', '"', input_sequence_buf)
-                for i,line in enumerate(split_input_sequence_buf):
-                    if line.startswith('>'):
-                        #record_buf = []
-                        #record_buf.append(line)
-                        if line.find(" ") < 0 and line.find("\t") < 0:
-                            header_id = line
-                        elif line.find(" ") < 0:
-                            (header_id, header_desc) = line.split("\t", 1)
-                        elif line.find("\t") < 0:
-                            (header_id, header_desc) = line.split(" ", 1)
-                        elif line.find(" ") < line.find("\t"):
-                            (header_id, header_desc) = line.split(" ", 1)
-                        else:
-                            (header_id, header_desc) = line.split("\t", 1)
-
-                        for j in range(i+1,len(split_input_sequence_buf)):
-                            if split_input_sequence_buf[j].startswith('>'):
-                                break
-                            seq_line = re.sub (" ","",split_input_sequence_buf[j])
-                            seq_line = re.sub ("\t","",seq_line)
-                            seq_line = re.sub ("\r","",seq_line)
-                            seq_line = seq_line.lower()
-                            #record_buf.append(seq_line)
-                            sequence_str_buf += seq_line
-                        #record = "\n".join(record_buf)+"\n"
-                        #one_forward_reads_file_handle.write(record)
-                        break  # only want first record
-                    elif line.startswith('@'):
-                        if line.find(" ") < 0 and line.find("\t") < 0:
-                            header_id = line
-                        elif line.find(" ") < 0:
-                            (header_id, header_desc) = line.split("\t", 1)
-                        elif line.find("\t") < 0:
-                            (header_id, header_desc) = line.split(" ", 1)
-                        elif line.find(" ") < line.find("\t"):
-                            (header_id, header_desc) = line.split(" ", 1)
-                        else:
-                            (header_id, header_desc) = line.split("\t", 1)
-
-                        seq_line = re.sub (" ","",split_input_sequence_buf[i+1])
-                        seq_line = re.sub ("\t","",seq_line)
-                        seq_line = re.sub ("\r","",seq_line)
-                        seq_line = seq_line.lower()
-                        #qual_line = re.sub (" ","",split_input_sequence_buf[i+3])
-                        #qual_line = re.sub ("\t","",qual_line)
-                        #record = "\n".join([line, seq_line, split_input_sequence_buf[i+2], qual_line])+"\n"
-                        sequence_str_buf += seq_line
-                        #one_forward_reads_file_handle.write(record)
-                        break  # only want first record
-
-                #one_forward_reads_file_handle.close()
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
+            ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
+                'fasta_str':     params['input_one_sequence'],
+                'residue_type': 'NUC',
+                'case':         'UPPER',
+                'console':      console,
+                'invalid_msgs': invalid_msgs
+                })
+            header_id        = ParseFastaStr_retVal['id']
+            header_desc      = ParseFastaStr_retVal['desc']
+            sequence_str_buf = ParseFastaStr_retVal['seq']
 
 
             # load the method provenance from the context object
@@ -462,19 +332,16 @@ class kb_blast:
                 
                 # Upload results
                 #
-                self.log(console,"UPLOADING QUERY OBJECT")  # DEBUG
+                self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
-                header_id = re.sub('^@','',header_id)
-                header_id = re.sub('^>','',header_id)
-
-                input_one_sequenceSet = { 'sequence_set_id': header_id,  
-                                          'description': header_desc,
-                                          'sequences': [ { 'sequence_id': header_id,
-                                                           'description': header_desc,
-                                                           'sequence': sequence_str_buf
-                                                         }
-                                                       ] 
-                                        }
+                output_one_sequenceSet = { 'sequence_set_id': header_id,  
+                                           'description': header_desc,
+                                           'sequences': [ { 'sequence_id': header_id,
+                                                            'description': header_desc,
+                                                            'sequence': sequence_str_buf
+                                                          }
+                                                        ] 
+                                         }
 
                 try:
                     ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -482,8 +349,8 @@ class kb_blast:
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseSequences.SequenceSet',
-                                    'data': input_one_sequenceSet,
-                                    'name': params['input_one_name'],
+                                    'data': output_one_sequenceSet,
+                                    'name': params['output_one_name'],
                                     'meta': {},
                                     'provenance': provenance
                                     }]
@@ -497,24 +364,16 @@ class kb_blast:
 
         #### Get the input_one object
         ##
+        if 'output_one_name' in params and params['output_one_name'] != None:
+            input_one_name = params['output_one_name']
+        else:
+            input_one_name = params['input_one_name']
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
+            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
             input_one_data = objects[0]['data']
             info = objects[0]['info']
-            # Object Info Contents
-            # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
-            # 0 - obj_id objid
-            # 1 - obj_name name
-            # 2 - type_string type
-            # 3 - timestamp save_date
-            # 4 - int version
-            # 5 - username saved_by
-            # 6 - ws_id wsid
-            # 7 - ws_name workspace
-            # 8 - string chsum
-            # 9 - int size 
-            # 10 - usermeta meta
+
             input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
@@ -559,7 +418,7 @@ class kb_blast:
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = params['input_one_name']+".fasta"
-
+ 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             FeatureSetToFASTA_params = {
