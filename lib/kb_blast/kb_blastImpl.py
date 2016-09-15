@@ -283,7 +283,7 @@ class kb_blast:
         #
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-        if ('output_one_name' not in params or params['output_one_name'] == None)
+        if ('output_one_name' not in params or params['output_one_name'] == None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
             raise ValueError('output_one_name parameter required if input_one_sequence parameter is provided')
         if ('input_one_name' in params and params['input_one_name'] != None) \
