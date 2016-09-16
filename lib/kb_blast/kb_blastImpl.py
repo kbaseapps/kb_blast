@@ -875,12 +875,12 @@ class kb_blast:
         # DEBUG
         one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
-        self.log(console, "\n".join(one_forward_reads_file_handle.readlines()))
+        self.log(console, "".join(one_forward_reads_file_handle.readlines()))
         one_forward_reads_file_handle.close();
 
         many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
-        self.log(console, "\n".join(many_forward_reads_file_handle.readlines()))
+        self.log(console, "".join(many_forward_reads_file_handle.readlines()))
         many_forward_reads_file_handle.close();
 
 
@@ -905,6 +905,7 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
+            self.log("HIT_LINE: '"+line+"'")  # DEBUG
             if line.startswith('#'):
                 if not header_done:
                     hit_buf.append(line)
