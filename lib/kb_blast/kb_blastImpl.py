@@ -826,7 +826,8 @@ class kb_blast:
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
         blast_cmd.append('-outfmt')
-        blast_cmd.append('7')
+        #blast_cmd.append('7')
+        blast_cmd.append('0')  # DEBUG
         blast_cmd.append('-evalue')
         blast_cmd.append(str(params['e_value']))
 
@@ -905,7 +906,7 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            self.log("HIT_LINE: '"+line+"'")  # DEBUG
+            self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
             if line.startswith('#'):
                 if not header_done:
                     hit_buf.append(line)
