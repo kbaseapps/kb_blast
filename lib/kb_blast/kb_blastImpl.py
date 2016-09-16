@@ -343,7 +343,6 @@ class kb_blast:
             # Upload results
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
-            self.log(console,"YEE HAH!")  # DEBUG
 
             output_one_sequenceSet = { 'sequence_set_id': header_id,  
                                        'description': header_desc,
@@ -872,6 +871,7 @@ class kb_blast:
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        self.log(console,"YEE HAH!")  # DEBUG
         if not os.path.isfile(output_aln_file_path):
             raise ValueError("failed to create BLAST output: "+output_aln_file_path)
         elif not os.path.getsize(output_aln_file_path) > 0:
