@@ -400,6 +400,9 @@ class kb_blast:
 
         # Handle overloading (input_one can be Feature, SequenceSet, or FeatureSet)
         #
+
+        # SequenceSet
+        #
         if one_type_name == 'SequenceSet':
             try:
                 input_one_sequenceSet = input_one_data
@@ -422,6 +425,8 @@ class kb_blast:
             one_forward_reads_file_handle.close();
             self.log(console, 'done')
 
+        # FeatureSet
+        #
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
@@ -455,7 +460,6 @@ class kb_blast:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-
 
         # Feature
         #
@@ -868,10 +872,22 @@ class kb_blast:
                 query_len += len(re.sub(r" ","", line.rstrip())) 
         
 
+        # DEBUG
+        one_forward_read_file_handle = open(one_forward_reads_file_path, 'r', 0)
+        self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
+        self.log(console, "\n".join(one_forward_reads_file_handle.readlines()))
+        one_forward_reads_file_handle.close();
+
+        many_forward_read_file_handle = open(many_forward_reads_file_path, 'r', 0)
+        self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
+        self.log(console, "\n".join(many_forward_reads_file_handle.readlines()))
+        many_forward_reads_file_handle.close();
+
+
+
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
-        self.log(console,"YEE HAH!")  # DEBUG
         if not os.path.isfile(output_aln_file_path):
             raise ValueError("failed to create BLAST output: "+output_aln_file_path)
         elif not os.path.getsize(output_aln_file_path) > 0:
