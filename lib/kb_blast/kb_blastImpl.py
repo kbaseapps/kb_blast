@@ -217,6 +217,7 @@ class kb_blast:
 
     #END_CLASS_HEADER
 
+    """
     # config contains contents of config file in a hash or None if it couldn't
     # be found
     def __init__(self, config):
@@ -238,7 +239,7 @@ class kb_blast:
 
         #END_CONSTRUCTOR
         pass
-    
+    """
 
     def BLASTn_Search(self, ctx, params):
         """
