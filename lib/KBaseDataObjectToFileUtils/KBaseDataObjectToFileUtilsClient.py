@@ -71,6 +71,34 @@ class KBaseDataObjectToFileUtils(object):
             if job_state['finished']:
                 return job_state['result'][0]
 
+    def _ParseFastaStr_submit(self, params, context=None):
+        return self._client._submit_job(
+             'KBaseDataObjectToFileUtils.ParseFastaStr', [params],
+             self._service_ver, context)
+
+    def ParseFastaStr(self, params, context=None):
+        """
+        :param params: instance of type "ParseFastaStr_Params"
+           (ParseFastaStr() Params) -> structure: parameter "fasta_str" of
+           String, parameter "residue_type" of String, parameter "case" of
+           String, parameter "console" of type "log_msg", parameter
+           "invalid_msgs" of type "log_msg"
+        :returns: instance of type "ParseFastaStr_Output" (ParseFastaStr()
+           Output) -> structure: parameter "id" of String, parameter "desc"
+           of String, parameter "seq" of String
+        """
+        job_id = self._ParseFastaStr_submit(params, context)
+        async_job_check_time = self._client.async_job_check_time
+        while True:
+            time.sleep(async_job_check_time)
+            async_job_check_time = (async_job_check_time *
+                self._client.async_job_check_time_scale_percent / 100.0)
+            if async_job_check_time > self._client.async_job_check_max_time:
+                async_job_check_time = self._client.async_job_check_max_time
+            job_state = self._check_job(job_id)
+            if job_state['finished']:
+                return job_state['result'][0]
+
     def _GenomeToFASTA_submit(self, params, context=None):
         return self._client._submit_job(
              'KBaseDataObjectToFileUtils.GenomeToFASTA', [params],
