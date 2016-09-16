@@ -906,7 +906,10 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
+
             self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
+            continue
+
             if line.startswith('#'):
                 if not header_done:
                     hit_buf.append(line)
