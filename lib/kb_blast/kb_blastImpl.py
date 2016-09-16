@@ -873,12 +873,12 @@ class kb_blast:
         
 
         # DEBUG
-        one_forward_read_file_handle = open(one_forward_reads_file_path, 'r', 0)
+        one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
         self.log(console, "\n".join(one_forward_reads_file_handle.readlines()))
         one_forward_reads_file_handle.close();
 
-        many_forward_read_file_handle = open(many_forward_reads_file_path, 'r', 0)
+        many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
         self.log(console, "\n".join(many_forward_reads_file_handle.readlines()))
         many_forward_reads_file_handle.close();
