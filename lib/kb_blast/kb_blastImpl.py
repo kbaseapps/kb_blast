@@ -883,13 +883,14 @@ class kb_blast:
         hit_order = []
         hit_buf = []
         header_done = False
+        self.log(console,'OK BOSS: ')  # DEBUG
         for line in output_aln_buf:
+            self.log(console,'HIT LINE: '+line)  # DEBUG
             if line.startswith('#'):
                 if not header_done:
                     hit_buf.append(line)
                 continue
             header_done = True
-            self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
             hit_ident      = float(hit_info[2]) / 100.0
@@ -920,6 +921,7 @@ class kb_blast:
                 high_bitscore_alnlen[hit_seq_id] = hit_aln_len
                 high_bitscore_line[hit_seq_id] = line
 
+        self.log(console,'DAMN SKIPPY ')  # DEBUG
         for hit_seq_id in hit_order:
             hit_buf.append(high_bitscore_line[hit_seq_id])
 
