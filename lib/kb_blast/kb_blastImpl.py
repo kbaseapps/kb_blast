@@ -87,8 +87,8 @@ class kb_blast:
         self.handleURL = config['handle-service-url']
 
         # DEBUG
-        for env_k in os.environ.keys():
-            print ("ENV['"+env_k+"'] = "+os.environ[env_k]+"\n")
+        print ("ENV:\n")
+        print (os.environ)
 
         #self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'  # DEBUG
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
