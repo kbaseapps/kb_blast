@@ -343,6 +343,7 @@ class kb_blast:
             # Upload results
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
+            self.log(console,"YEE HAH!")  # DEBUG
 
             output_one_sequenceSet = { 'sequence_set_id': header_id,  
                                        'description': header_desc,
