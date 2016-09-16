@@ -90,7 +90,7 @@ class kb_blast:
         for env_k in os.environ.keys():
             print ("ENV['"+env_k+"'] = "+os.environ[env_k]+"\n")
 
-        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'  # DEBUG
+        #self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'  # DEBUG
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
         if self.callbackURL == None:
             raise ValueError ("SDK_CALLBACK_URL not set in environment")
