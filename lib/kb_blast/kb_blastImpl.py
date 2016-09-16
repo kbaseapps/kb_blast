@@ -326,26 +326,26 @@ class kb_blast:
             if 'provenance' in ctx:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
-                provenance[0]['input_ws_objects'] = []
-                provenance[0]['service'] = 'kb_blast'
-                provenance[0]['method'] = 'BLASTn_Search'
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = 'BLASTn_Search'
                 
-                # Upload results
-                #
-                self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
+            # Upload results
+            #
+            self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
-                output_one_sequenceSet = { 'sequence_set_id': header_id,  
-                                           'description': header_desc,
-                                           'sequences': [ { 'sequence_id': header_id,
-                                                            'description': header_desc,
-                                                            'sequence': sequence_str_buf
-                                                          }
-                                                        ] 
-                                         }
+            output_one_sequenceSet = { 'sequence_set_id': header_id,  
+                                       'description': header_desc,
+                                       'sequences': [ { 'sequence_id': header_id,
+                                                        'description': header_desc,
+                                                        'sequence': sequence_str_buf
+                                                        }
+                                                      ] 
+                                       }
 
-                try:
-                    ws = workspaceService(self.workspaceURL, token=ctx['token'])
-                    new_obj_info = ws.save_objects({
+            try:
+                ws = workspaceService(self.workspaceURL, token=ctx['token'])
+                new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseSequences.SequenceSet',
@@ -355,9 +355,9 @@ class kb_blast:
                                     'provenance': provenance
                                     }]
                             })
-                except Exception as e:
-                    raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
-                    #to get the full stack trace: traceback.format_exc()
+            except Exception as e:
+                raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+                #to get the full stack trace: traceback.format_exc()
 
             self.log(console, 'done')
 
