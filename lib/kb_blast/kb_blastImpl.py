@@ -521,7 +521,7 @@ class kb_blast:
                 DNA_pattern = re.compile("^[acgtuACGTU ]+$")
                 if not DNA_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
-
+                    continue
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -871,17 +871,11 @@ class kb_blast:
             raise ValueError("failed to create BLAST output: "+output_aln_file_path)
         elif not os.path.getsize(output_aln_file_path) > 0:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
-        self.log(console,'HEY MAN A')  # DEBUG
         hit_seq_ids = dict()
-        self.log(console,'HEY MAN B')  # DEBUG
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
-        self.log(console,'HEY MAN C')  # DEBUG
         output_aln_buf = output_aln_file_handle.readlines()
-        self.log(console,'HEY MAN D')  # DEBUG
         output_aln_file_handle.close()
-        self.log(console,'HEY MAN E')  # DEBUG
         hit_total = 0
-        self.log(console,'HEY MAN F')  # DEBUG
         high_bitscore_line = dict()
         high_bitscore_score = dict()
         high_bitscore_ident = dict()
@@ -889,9 +883,7 @@ class kb_blast:
         hit_order = []
         hit_buf = []
         header_done = False
-        self.log(console,'OK BOSS: ')  # DEBUG
         for line in output_aln_buf:
-            self.log(console,'HIT LINE: '+line)  # DEBUG
             if line.startswith('#'):
                 if not header_done:
                     hit_buf.append(line)
@@ -927,7 +919,6 @@ class kb_blast:
                 high_bitscore_alnlen[hit_seq_id] = hit_aln_len
                 high_bitscore_line[hit_seq_id] = line
 
-        self.log(console,'DAMN SKIPPY ')  # DEBUG
         for hit_seq_id in hit_order:
             hit_buf.append(high_bitscore_line[hit_seq_id])
 
@@ -944,7 +935,7 @@ class kb_blast:
         
 
         self.log(console, 'EXTRACTING HITS FROM INPUT')
-        self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
+        #self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
 
 
         # SequenceSet input -> SequenceSet output
