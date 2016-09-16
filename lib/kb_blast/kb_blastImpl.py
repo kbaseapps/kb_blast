@@ -871,11 +871,17 @@ class kb_blast:
             raise ValueError("failed to create BLAST output: "+output_aln_file_path)
         elif not os.path.getsize(output_aln_file_path) > 0:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
+        self.log(console,'HEY MAN A')  # DEBUG
         hit_seq_ids = dict()
+        self.log(console,'HEY MAN B')  # DEBUG
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        self.log(console,'HEY MAN C')  # DEBUG
         output_aln_buf = output_aln_file_handle.readlines()
+        self.log(console,'HEY MAN D')  # DEBUG
         output_aln_file_handle.close()
+        self.log(console,'HEY MAN E')  # DEBUG
         hit_total = 0
+        self.log(console,'HEY MAN F')  # DEBUG
         high_bitscore_line = dict()
         high_bitscore_score = dict()
         high_bitscore_ident = dict()
