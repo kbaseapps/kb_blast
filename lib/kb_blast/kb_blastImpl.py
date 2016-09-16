@@ -286,9 +286,15 @@ class kb_blast:
         if ('output_one_name' not in params or params['output_one_name'] == None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
             raise ValueError('output_one_name parameter required if input_one_sequence parameter is provided')
+        if ('output_one_name' in params and params['output_one_name'] != None) \
+                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+            raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
         if ('input_one_name' in params and params['input_one_name'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
             raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
+        if ('input_one_name' in params and params['input_one_name'] != None) \
+                and ('output_one_name' in params and params['output_one_name'] != None):
+            raise ValueError('cannot have both input_one_name and output_one_name parameter')
         if ('input_one_name' not in params or params['input_one_name'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence or input_one_name parameter is required')
@@ -883,7 +889,7 @@ class kb_blast:
                     hit_buf.append(line)
                 continue
             header_done = True
-            #self.log(console,'HIT LINE: '+line)  # DEBUG
+            self.log(console,'HIT LINE: '+line)  # DEBUG
             hit_info = line.split("\t")
             hit_seq_id     = hit_info[1]
             hit_ident      = float(hit_info[2]) / 100.0
