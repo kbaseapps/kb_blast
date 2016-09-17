@@ -886,14 +886,14 @@ class kb_blast:
         for line in many_forward_reads_file_handle.readlines():
             if line.startswith('>'+'WP_053463618.1'):
                 in_target = True
-                print (line)
+                self.log(console, line)
                 continue
             elif line.startswith('>'):
                 if in_target:
                     in_target = False
                 continue
             elif in_target:
-                print (line)
+                self.log(console, line)
         many_forward_reads_file_handle.close();
 
 
