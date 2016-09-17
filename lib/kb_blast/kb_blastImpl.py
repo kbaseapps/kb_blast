@@ -87,7 +87,7 @@ class kb_blast:
         self.handleURL = config['handle-service-url']
 
         # DEBUG
-        raise ValueError ("ENV:\n"+str(os.environ))
+        #raise ValueError ("ENV:\n"+str(os.environ))
 
         #self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'  # DEBUG
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
@@ -826,8 +826,8 @@ class kb_blast:
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
         blast_cmd.append('-outfmt')
-        #blast_cmd.append('7')
-        blast_cmd.append('0')  # DEBUG
+        blast_cmd.append('7')
+        #blast_cmd.append('0')  # DEBUG
         blast_cmd.append('-evalue')
         blast_cmd.append(str(params['e_value']))
 
@@ -870,20 +870,31 @@ class kb_blast:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
-                query_len += len(re.sub(r" ","", line.rstrip())) 
+                query_len += len(re.sub(" ","", line.rstrip())) 
         
 
         # DEBUG
-        one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
-        self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
-        self.log(console, "".join(one_forward_reads_file_handle.readlines()))
-        one_forward_reads_file_handle.close();
+        #one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
+        #self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
+        #self.log(console, "".join(one_forward_reads_file_handle.readlines()))
+        #one_forward_reads_file_handle.close();
 
         many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
-        self.log(console, "".join(many_forward_reads_file_handle.readlines()))
+        #self.log(console, "".join(many_forward_reads_file_handle.readlines()))
+        in_target = False
+        for line in many_forward_reads_file_handle.readlines():
+            if line.startswith('>'+'WP_053463618.1'):
+                in_target = True
+                print (line)
+                continue
+            elif line.startswith('>'):
+                if in_target:
+                    in_target = False
+                continue
+            elif in_target:
+                print (line)
         many_forward_reads_file_handle.close();
-
 
 
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
@@ -906,9 +917,7 @@ class kb_blast:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-
-            self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
-            continue
+            #self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
 
             if line.startswith('#'):
                 if not header_done:
