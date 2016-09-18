@@ -881,19 +881,19 @@ class kb_blast:
 
         many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
         self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
-        #self.log(console, "".join(many_forward_reads_file_handle.readlines()))
-        in_target = False
-        for line in many_forward_reads_file_handle.readlines():
-            if line.startswith('>'+'WP_053463618.1'):
-                in_target = True
-                self.log(console, line)
-                continue
-            elif line.startswith('>'):
-                if in_target:
-                    in_target = False
-                continue
-            elif in_target:
-                self.log(console, line)
+        self.log(console, "".join(many_forward_reads_file_handle.readlines()))
+        #in_target = False
+        #for line in many_forward_reads_file_handle.readlines():
+        #    if line.startswith('>'+'WP_053463618.1'):
+        #        in_target = True
+        #        self.log(console, line)
+        #        continue
+        #    elif line.startswith('>'):
+        #        if in_target:
+        #            in_target = False
+        #        continue
+        #    elif in_target:
+        #        self.log(console, line)
         many_forward_reads_file_handle.close();
 
 
