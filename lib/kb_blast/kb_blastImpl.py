@@ -3065,7 +3065,7 @@ class kb_blast:
         returnVal = { 'report_name': reportName,
                       'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
                       }
-        self.log(console,search_tool_name"_Search DONE")
+        self.log(console,search_tool_name+"_Search DONE")
         #END BLASTx_Search
 
         # At some point might do deeper type checking...
@@ -5034,7 +5034,7 @@ d of: "+one_type_name)
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
 #                output_featureSet['description'] = input_many_genome['scientific_name'] + " - "+search_tool_name+"_Search filtered"
 #            else:
-#                output_featureSet['description'] = search_tool_name"_Search filtered"
+#                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
