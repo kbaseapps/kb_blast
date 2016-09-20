@@ -282,6 +282,8 @@ class kb_blast:
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
+        appropriate_sequence_found_in_one_input = False
+        appropriate_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -421,6 +423,8 @@ class kb_blast:
             DNA_pattern  = re.compile("^[acgtuACGTUnryNRY ]+$")   
             if not DNA_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+            else:
+                appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
@@ -428,6 +432,7 @@ class kb_blast:
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
             one_forward_reads_file_handle.close();
+
             self.log(console, 'done')
 
         # FeatureSet
@@ -460,7 +465,9 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                appropriate_sequence_found_in_one_input = True
+
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -474,10 +481,11 @@ class kb_blast:
             one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTn is nuc-nuc
-            record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
+            if feature['dna_sequence'] != None:
+                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
             #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            SeqIO.write([record], one_forward_reads_file_path, "fasta")
-
+                SeqIO.write([record], one_forward_reads_file_path, "fasta")
+                appropriate_sequence_found_in_one_input = True
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)
 
@@ -741,6 +749,66 @@ class kb_blast:
         #
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)
+
+
+        # check for failed input file creation
+        #
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
+        #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = search_tool_name+'_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,search_tool_name+"_Search DONE")
+            return [returnVal]
 
 
         # FORMAT DB
@@ -1312,8 +1380,8 @@ class kb_blast:
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
-        protein_sequence_found_in_one_input = False
-        protein_sequence_found_in_many_input = False
+        appropriate_sequence_found_in_one_input = False
+        appropriate_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -1450,6 +1518,8 @@ class kb_blast:
             #DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")
             if not PROT_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+            else:
+                appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
@@ -1489,13 +1559,12 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                appropriate_sequence_found_in_one_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                protein_sequence_found_in_one_input = True
 
 
         # Feature
@@ -1514,10 +1583,10 @@ class kb_blast:
                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 raise ValueError("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             else:
-                protein_sequence_found_in_one_input = True
+                appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
-
+                appropriate_sequence_found_in_one_input = True
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
 
@@ -1602,7 +1671,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -1637,7 +1706,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # GenomeSet
@@ -1675,7 +1744,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
@@ -1686,9 +1755,9 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not protein_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
-        if not protein_sequence_found_in_many_input:
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
 
@@ -1704,8 +1773,7 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            if 'input_one_name' in params and params['input_one_name'] != None:
-                provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
@@ -2210,8 +2278,8 @@ class kb_blast:
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
-        #protein_sequence_found_in_one_input = False
-        protein_sequence_found_in_many_input = False
+        #appropriate_sequence_found_in_one_input = False
+        appropriate_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -2351,6 +2419,8 @@ class kb_blast:
             DNA_pattern   = re.compile("^[acgtuACGTUnryNRY ]+$")
             if not DNA_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+            else:
+                appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
@@ -2390,11 +2460,13 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                appropriate_sequence_found_in_one_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
 
         # Feature
         #
@@ -2414,7 +2486,7 @@ class kb_blast:
                 record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
-
+                appropriate_sequence_found_in_one_input = True
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
 
@@ -2504,7 +2576,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -2539,7 +2611,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # GenomeSet
@@ -2577,7 +2649,7 @@ class kb_blast:
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
@@ -2587,9 +2659,9 @@ class kb_blast:
 
         # check for failed input file creation
         #
-#        if not protein_sequence_found_in_one_input:
-#            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
-        if not protein_sequence_found_in_many_input:
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
 
@@ -2605,7 +2677,7 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
@@ -3110,8 +3182,8 @@ class kb_blast:
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
-        protein_sequence_found_in_one_input = False
-        #protein_sequence_found_in_many_input = False
+        appropriate_sequence_found_in_one_input = False
+        #appropriate_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -3251,6 +3323,8 @@ d of: "+one_type_name)
             #DNA_pattern  = re.compile("^[acgtuACGTUnryNRY ]+$")
             if not PROT_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+            else:
+                appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
@@ -3290,13 +3364,12 @@ d of: "+one_type_name)
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                appropriate_sequence_found_in_one_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                protein_sequence_found_in_one_input = True
 
 
         # Feature
@@ -3315,10 +3388,10 @@ d of: "+one_type_name)
                 self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             else:
-                protein_sequence_found_in_one_input = True
+                appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
-                
+                appropriate_sequence_found_in_one_input = True                
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
 
@@ -3541,7 +3614,7 @@ d of: "+one_type_name)
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
+            appropriate_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -3587,11 +3660,10 @@ d of: "+one_type_name)
 
         # check for failed input file creation
         #
-        if params['input_one_name'] != None:
-            if not protein_sequence_found_in_one_input:
-                self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
-#        if not protein_sequence_found_in_many_input:
-#            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
 
 
         # input data failed validation.  Need to return
@@ -3606,8 +3678,7 @@ d of: "+one_type_name)
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            if 'input_one_name' in params and params['input_one_name'] != None:
-                provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
             provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
@@ -4344,6 +4415,8 @@ d of: "+one_type_name)
             DNA_pattern  = re.compile("^[acgtuACGTUnryNRY ]+$")   
             if not DNA_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+            else:
+                appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
             one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
@@ -4383,7 +4456,8 @@ d of: "+one_type_name)
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                appropriate_sequence_found_in_one_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4408,7 +4482,7 @@ d of: "+one_type_name)
                 record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
-
+                appropriate_sequence_found_in_one_input = True
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
 
@@ -4631,7 +4705,7 @@ d of: "+one_type_name)
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
 
-            protein_sequence_found_in_many_input = True  # FIX LATER
+            appropriate_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -4675,9 +4749,65 @@ d of: "+one_type_name)
         else:
             raise ValueError('Cannot yet handle input_many type of: '+type_name)            
 
+
+        # check for failed input file creation
         #
-        # no input validation because query and db are both nuc
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
+
+
+        # input data failed validation.  Need to return
         #
+        if len(invalid_msgs) > 0:
+
+            # load the method provenance from the context object
+            #
+            self.log(console,"SETTING PROVENANCE")  # DEBUG
+            provenance = [{}]
+            if 'provenance' in ctx:
+                provenance = ctx['provenance']
+            # add additional info to provenance here, in this case the input data object reference
+            provenance[0]['input_ws_objects'] = []
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['service'] = 'kb_blast'
+            provenance[0]['method'] = search_tool_name+'_Search'
+
+
+            # build output report object
+            #
+            self.log(console,"BUILDING REPORT")  # DEBUG
+            report += "FAILURE:\n\n"+"\n".join(invalid_msgs)+"\n"
+            reportObj = {
+                'objects_created':[],
+                'text_message':report
+                }
+
+            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            report_obj_info = ws.save_objects({
+                    #'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance  # DEBUG
+                        }
+                        ]
+                    })[0]
+
+            self.log(console,"BUILDING RETURN OBJECT")
+            returnVal = { 'report_name': reportName,
+                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+                      }
+            self.log(console,search_tool_name+"_Search DONE")
+            return [returnVal]
 
 
         # FORMAT DB
@@ -5229,9 +5359,9 @@ d of: "+one_type_name)
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
-        protein_sequence_found_in_one_input = False
-        protein_sequence_found_in_MSA_input = False
-        protein_sequence_found_in_many_input = False
+        appropriate_sequence_found_in_one_input = False
+        appropriate_sequence_found_in_MSA_input = False
+        appropriate_sequence_found_in_many_input = False
 
 
         #### do some basic checks
@@ -5307,13 +5437,12 @@ d of: "+one_type_name)
                 DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
                 FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
                 one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-                #feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+                if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+                    appropriate_sequence_found_in_one_input = True
 
                 # DEBUG
                 #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
                 #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-                if len(invalid_msgs) == 0:
-                    protein_sequence_found_in_one_input = True
 
 
             # Feature
@@ -5333,10 +5462,10 @@ d of: "+one_type_name)
                     self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                     raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 else:
-                    protein_sequence_found_in_one_input = True
+                    appropriate_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                     SeqIO.write([record], one_forward_reads_file_path, "fasta")
-
+                    appropriate_sequence_found_in_one_input = True
             else:
                 raise ValueError('Cannot yet handle input_one type of: '+type_name)            
         else:
@@ -5418,7 +5547,7 @@ d of: "+one_type_name)
                     all_seqs_nuc = False
                     break
                 else:
-                    protein_sequence_found_in_MSA_input = True
+                    appropriate_sequence_found_in_MSA_input = True
 
         # Missing proper input_type
         #
@@ -5506,7 +5635,7 @@ d of: "+one_type_name)
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -5541,7 +5670,7 @@ d of: "+one_type_name)
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
             
 
         # GenomeSet
@@ -5579,7 +5708,7 @@ d of: "+one_type_name)
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
             if len(invalid_msgs) == 0:
-                protein_sequence_found_in_many_input = True
+                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
@@ -5590,11 +5719,11 @@ d of: "+one_type_name)
 
         # check for failed input file creation
         #
-        if not protein_sequence_found_in_one_input:
+        if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
-        if not protein_sequence_found_in_MSA_input:
+        if not appropriate_sequence_found_in_MSA_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_msa_name']+"'")
-        if not protein_sequence_found_in_many_input:
+        if not appropriate_sequence_found_in_many_input:
             self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
 
 
