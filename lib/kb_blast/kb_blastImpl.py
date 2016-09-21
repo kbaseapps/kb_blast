@@ -544,6 +544,7 @@ class kb_blast:
                 if not DNA_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -579,6 +580,7 @@ class kb_blast:
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
                 for chunk in r.iter_content(1024):
+                    appropriate_sequence_found_in_many_input = True
                     many_forward_reads_file_handle.write(chunk)
                 many_forward_reads_file_handle.close();
                 self.log(console, 'done')
@@ -670,6 +672,8 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -703,6 +707,8 @@ class kb_blast:
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -739,6 +745,8 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1590,7 +1598,6 @@ class kb_blast:
         else:
             raise ValueError('Cannot yet handle input_one type of: '+type_name)            
 
-
         #### Get the input_many object
         ##
         try:
@@ -1629,6 +1636,7 @@ class kb_blast:
                 if not PROT_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -1666,12 +1674,12 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -1701,12 +1709,12 @@ class kb_blast:
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # GenomeSet
@@ -1739,12 +1747,12 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
@@ -2534,6 +2542,7 @@ class kb_blast:
                 if not PROT_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -2571,12 +2580,12 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -2606,12 +2615,12 @@ class kb_blast:
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # GenomeSet
@@ -2644,12 +2653,12 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
@@ -3450,6 +3459,7 @@ d of: "+one_type_name)
                 if not DNA_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -3485,6 +3495,7 @@ d of: "+one_type_name)
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
                 for chunk in r.iter_content(1024):
+                    appropriate_sequence_found_in_many_input = True
                     many_forward_reads_file_handle.write(chunk)
                 many_forward_reads_file_handle.close();
                 self.log(console, 'done')
@@ -3576,6 +3587,8 @@ d of: "+one_type_name)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -3609,12 +3622,12 @@ d of: "+one_type_name)
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-
-            appropriate_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -3647,6 +3660,8 @@ d of: "+one_type_name)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4541,6 +4556,7 @@ d of: "+one_type_name)
                 if not DNA_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -4576,6 +4592,7 @@ d of: "+one_type_name)
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
                 for chunk in r.iter_content(1024):
+                    appropriate_sequence_found_in_many_input = True
                     many_forward_reads_file_handle.write(chunk)
                 many_forward_reads_file_handle.close();
                 self.log(console, 'done')
@@ -4667,6 +4684,8 @@ d of: "+one_type_name)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4700,12 +4719,12 @@ d of: "+one_type_name)
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-
-            appropriate_sequence_found_in_many_input = True  # FIX LATER
 
 
         # GenomeSet
@@ -4738,6 +4757,8 @@ d of: "+one_type_name)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -5593,6 +5614,7 @@ d of: "+one_type_name)
                 if not PROT_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
+                appropriate_sequence_found_in_many_input = True
                 many_forward_reads_file_handle.write('>'+header_id+"\n")
                 many_forward_reads_file_handle.write(sequence_str+"\n")
             many_forward_reads_file_handle.close();
@@ -5630,12 +5652,12 @@ d of: "+one_type_name)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(feature_ids_by_genome_ref.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Genome and GenomeAnnotation
@@ -5665,12 +5687,12 @@ d of: "+one_type_name)
             GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
             many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
             feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
             
 
         # GenomeSet
@@ -5703,12 +5725,12 @@ d of: "+one_type_name)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(feature_ids_by_genome_id.keys()) > 0:
+                appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-            if len(invalid_msgs) == 0:
-                appropriate_sequence_found_in_many_input = True
 
 
         # Missing proper input_many_type
