@@ -794,7 +794,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -1319,7 +1319,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -1796,7 +1796,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -2217,7 +2217,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -2701,7 +2701,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -3122,7 +3122,7 @@ class kb_blast:
                 'text_message':report
                 }
             
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -3708,7 +3708,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -4211,7 +4211,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -4806,7 +4806,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -5311,7 +5311,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
@@ -5777,7 +5777,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-            reportName = 'blast_report_'+str(hex(uuid.getnode()))
+            reportName = 'blast_report_'+str(uuid.uuid4())
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             report_obj_info = ws.save_objects({
                     #'id':info[6],
@@ -6207,7 +6207,7 @@ d of: "+one_type_name)
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(hex(uuid.getnode()))
+        reportName = 'blast_report_'+str(uuid.uuid4())
         report_obj_info = ws.save_objects({
 #                'id':info[6],
                 'workspace':params['workspace_name'],
