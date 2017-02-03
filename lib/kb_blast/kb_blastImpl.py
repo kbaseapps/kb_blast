@@ -52,7 +52,7 @@ class kb_blast:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
-    GIT_COMMIT_HASH = "9b4da7f2cf5851de75d9e2562d586f037c62d06f"
+    GIT_COMMIT_HASH = "61986b5a6a7510eb85f6bfa7015d12414a54f8f1"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
