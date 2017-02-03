@@ -27,9 +27,9 @@ module kb_blast {
     typedef structure {
         workspace_name workspace_name;
 	sequence       input_one_sequence;
-	data_obj_name  input_one_name;
-	data_obj_name  input_many_name;
-	data_obj_name  input_msa_name;  /* for psiBLAST_msa_start */
+	data_obj_ref   input_one_ref;
+	data_obj_ref   input_many_ref;
+	data_obj_ref   input_msa_ref;  /* for psiBLAST_msa_start */
 	data_obj_name  output_one_name;
         data_obj_name  output_filtered_name;
 
