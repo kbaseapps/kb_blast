@@ -23,7 +23,7 @@
             }
         },
         {
-            "id": "input_one_name",
+            "id": "input_one_ref",
             "optional": true,
             "advanced": false,
             "allow_multiple": false,
@@ -46,7 +46,7 @@
             }
         },
         {
-            "id": "input_many_name",
+            "id": "input_many_ref",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -144,16 +144,18 @@
                     "target_property": "input_one_sequence"
                 },
                 {
-                    "input_parameter": "input_one_name",
-                    "target_property": "input_one_name"
+                    "input_parameter": "input_one_ref",
+                    "target_property": "input_one_ref",
+		    "target_type_transform": "resolved-ref"
                 },
                 {
                     "input_parameter": "output_one_name",
                     "target_property": "output_one_name"
                 },
                 {
-                    "input_parameter": "input_many_name",
-                    "target_property": "input_many_name"
+                    "input_parameter": "input_many_ref",
+                    "target_property": "input_many_ref",
+		    "target_type_transform": "resolved-ref"
                 },
                 {
                     "input_parameter": "output_filtered_name",
