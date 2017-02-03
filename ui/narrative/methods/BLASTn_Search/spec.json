@@ -53,7 +53,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseGenomeAnnotations.GenomeAnnotation","KBaseSearch.GenomeSet" ]
+                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseFile.SingleEndLibrary","KBaseAssembly.SingleEndLibrary","KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseSearch.GenomeSet" ]
             }
         },
         {
