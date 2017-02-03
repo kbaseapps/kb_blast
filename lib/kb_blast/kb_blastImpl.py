@@ -1592,12 +1592,14 @@ class kb_blast:
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTp is prot-prot
             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            if feature['type'] != 'CDS':
+            #if feature['type'] != 'CDS':
+            #    self.log(console,params['input_one_ref']+" feature type must be CDS")
+            #    self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
+            if 'protein_translation' not in feature or feature['protein_translation'] == None:
+                #self.log(console,"bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
+                #raise ValueError("bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
                 self.log(console,params['input_one_ref']+" feature type must be CDS")
                 self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
-            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                self.log(console,"bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
-                raise ValueError("bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
             else:
                 appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
@@ -2496,12 +2498,14 @@ class kb_blast:
             one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTx is nuc-prot
-            if feature['type'] != 'CDS':
+            #if feature['type'] != 'CDS':
+            #    self.log(console,params['input_one_ref']+" feature type must be CDS")
+            #    self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
+            if 'protein_translation' not in feature or feature['protein_translation'] == None:
+                #self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                #raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 self.log(console,params['input_one_ref']+" feature type must be CDS")
                 self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
-            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-            #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-            #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             else:
                 record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
@@ -3405,12 +3409,14 @@ class kb_blast:
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTn is prot-nuc
             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-            if feature['type'] != 'CDS':
+            #if feature['type'] != 'CDS':
+            #    self.log(console,input_one_name+" feature type must be CDS")
+            #    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
+            if 'protein_translation' not in feature or feature['protein_translation'] == None:
+                #self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
+                #raise ValueError ("bad CDS Feature "+input_one_name+": no protein_translation found")
                 self.log(console,input_one_name+" feature type must be CDS")
                 self.log(invalid_msgs,input_one_name+" feature type must be CDS")
-            elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
-                raise ValueError ("bad CDS Feature "+input_one_name+": no protein_translation found")
             else:
                 appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
@@ -4494,12 +4500,14 @@ class kb_blast:
             one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTx is nuc-nuc (translated)
-            if feature['type'] != 'CDS':
+            #if feature['type'] != 'CDS':
+            #    self.log(console,input_one_name+" feature type must be CDS")
+            #    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
+            if 'protein_translation' not in feature or feature['protein_translation'] == None:
+                #self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                #raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
                 self.log(console,input_one_name+" feature type must be CDS")
                 self.log(invalid_msgs,input_one_name+" feature type must be CDS")
-            #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-            #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-            #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             else:
                 record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
@@ -5476,12 +5484,14 @@ class kb_blast:
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 # psiBLAST is prot-prot
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-                if feature['type'] != 'CDS':
+                #if feature['type'] != 'CDS':
+                #    self.log(console,input_one_name+" feature type must be CDS")
+                #    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
+                if 'protein_translation' not in feature or feature['protein_translation'] == None:
+                    #self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
+                    #raise ValueError ("bad CDS Feature "input_one_name+": no protein_translation found")
                     self.log(console,input_one_name+" feature type must be CDS")
                     self.log(invalid_msgs,input_one_name+" feature type must be CDS")
-                elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                    self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
-                    raise ValueError ("bad CDS Feature "input_one_name+": no protein_translation found")
                 else:
                     appropriate_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
