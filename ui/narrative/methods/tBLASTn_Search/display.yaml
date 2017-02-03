@@ -34,7 +34,7 @@ parameters :
             Single PROTEIN sequence to use for the search.  If you enter something here, Output Query Object will be created with this sequence as a SequenceSet with one element.
         placeholder : |
             Optionally enter PROTEIN sequence...
-    input_one_name:
+    input_one_ref:
         ui-name : |
             Query Object (optional)
         short-hint : |
@@ -46,7 +46,7 @@ parameters :
             Output Query Object (if Query Seq)
         short-hint : |
             Created if sequence entered above.  Data type is SequenceSet (with one sequence).
-    input_many_name:
+    input_many_ref:
         ui-name : |
             Targets Object
         short-hint : |

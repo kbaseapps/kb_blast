@@ -27,17 +27,17 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    input_one_name:
+    input_one_ref:
         ui-name : |
             Query Object
         short-hint : |
             Query with single PROTEIN sequence to use as query.  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
-    input_msa_name:
+    input_msa_ref:
         ui-name : |
             Query MSA
         short-hint : |
             Multiple PROTEIN sequence alignment that includes the Query sequence with the same ID as the Query Object.
-    input_many_name:
+    input_many_ref:
         ui-name : |
             Targets Object
         short-hint : |

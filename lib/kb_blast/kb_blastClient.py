@@ -51,14 +51,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -79,14 +79,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -107,14 +107,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -135,14 +135,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -163,14 +163,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -191,14 +191,14 @@ class kb_blast(object):
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_name" of type "data_obj_name", parameter
-           "input_many_name" of type "data_obj_name", parameter
-           "input_msa_name" of type "data_obj_name", parameter
-           "output_one_name" of type "data_obj_name", parameter
-           "output_filtered_name" of type "data_obj_name", parameter
-           "ident_thresh" of Double, parameter "e_value" of Double, parameter
-           "bitscore" of Double, parameter "overlap_fraction" of Double,
-           parameter "maxaccepts" of Double, parameter "rounds" of Double
+           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
+           of type "data_obj_ref", parameter "input_msa_ref" of type
+           "data_obj_ref", parameter "output_one_name" of type
+           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_name", parameter "ident_thresh" of Double, parameter
+           "e_value" of Double, parameter "bitscore" of Double, parameter
+           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -209,4 +209,4 @@ class kb_blast(object):
 
     def status(self, context=None):
         return self._client.call_method('kb_blast.status',
-            [], self._service_ver, context)
+                                        [], self._service_ver, context)

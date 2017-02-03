@@ -128,9 +128,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -141,11 +141,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -158,9 +158,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -171,11 +171,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -257,9 +257,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -270,11 +270,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -287,9 +287,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -300,11 +300,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -381,9 +381,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -394,11 +394,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -411,9 +411,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -424,11 +424,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -505,9 +505,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -518,11 +518,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -535,9 +535,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -548,11 +548,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -629,9 +629,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -642,11 +642,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -659,9 +659,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -672,11 +672,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -753,9 +753,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -766,11 +766,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 </pre>
 
@@ -783,9 +783,9 @@ $return is a kb_blast.BLAST_Output
 BLAST_Params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_blast.workspace_name
 	input_one_sequence has a value which is a kb_blast.sequence
-	input_one_name has a value which is a kb_blast.data_obj_name
-	input_many_name has a value which is a kb_blast.data_obj_name
-	input_msa_name has a value which is a kb_blast.data_obj_name
+	input_one_ref has a value which is a kb_blast.data_obj_ref
+	input_many_ref has a value which is a kb_blast.data_obj_ref
+	input_msa_ref has a value which is a kb_blast.data_obj_ref
 	output_one_name has a value which is a kb_blast.data_obj_name
 	output_filtered_name has a value which is a kb_blast.data_obj_name
 	ident_thresh has a value which is a float
@@ -796,11 +796,11 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
+data_obj_ref is a string
 data_obj_name is a string
 BLAST_Output is a reference to a hash where the following keys are defined:
 	report_name has a value which is a kb_blast.data_obj_name
 	report_ref has a value which is a kb_blast.data_obj_ref
-data_obj_ref is a string
 
 
 =end text
@@ -1082,9 +1082,9 @@ BLAST Input Params
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_blast.workspace_name
 input_one_sequence has a value which is a kb_blast.sequence
-input_one_name has a value which is a kb_blast.data_obj_name
-input_many_name has a value which is a kb_blast.data_obj_name
-input_msa_name has a value which is a kb_blast.data_obj_name
+input_one_ref has a value which is a kb_blast.data_obj_ref
+input_many_ref has a value which is a kb_blast.data_obj_ref
+input_msa_ref has a value which is a kb_blast.data_obj_ref
 output_one_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
 ident_thresh has a value which is a float
@@ -1103,9 +1103,9 @@ rounds has a value which is a float
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_blast.workspace_name
 input_one_sequence has a value which is a kb_blast.sequence
-input_one_name has a value which is a kb_blast.data_obj_name
-input_many_name has a value which is a kb_blast.data_obj_name
-input_msa_name has a value which is a kb_blast.data_obj_name
+input_one_ref has a value which is a kb_blast.data_obj_ref
+input_many_ref has a value which is a kb_blast.data_obj_ref
+input_msa_ref has a value which is a kb_blast.data_obj_ref
 output_one_name has a value which is a kb_blast.data_obj_name
 output_filtered_name has a value which is a kb_blast.data_obj_name
 ident_thresh has a value which is a float
