@@ -295,24 +295,28 @@ class kb_blast:
         if ('output_one_name' in params and params['output_one_name'] != None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
-            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+            raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('output_one_name' in params and params['output_one_name'] != None):
-            raise ValueError('cannot have both input_one_name and output_one_name parameter')
-        if ('input_one_name' not in params or params['input_one_name'] == None) \
+            raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+        if ('input_one_ref' not in params or params['input_one_ref'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
-            raise ValueError('input_one_sequence or input_one_name parameter is required')
+            raise ValueError('input_one_sequence or input_one_ref parameter is required')
 #        if 'input_one_sequence' not in params:
 #            raise ValueError('input_one_sequence parameter is required')
-#        if 'input_one_name' not in params:
-#            raise ValueError('input_one_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+#        if 'input_one_ref' not in params:
+#            raise ValueError('input_one_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
 
+
+        # set local names
+        input_many_ref = params['input_many_ref']
+        
 
         # Write the input_one_sequence to a SequenceSet object
         #
@@ -369,6 +373,7 @@ class kb_blast:
                                     'provenance': provenance
                                     }]
                             })
+                output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
                 #to get the full stack trace: traceback.format_exc()
@@ -378,21 +383,21 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and params['output_one_name'] != None:
-            input_one_name = params['output_one_name']
+        if 'output_one_name' in params and output_one_ref != None:
+            input_one_ref = output_one_ref
         else:
-            input_one_name = params['input_one_name']
+            input_one_ref = params['input_one_ref']
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
+            objects = ws.get_objects([{'ref': input_one_ref}])
             input_one_data = objects[0]['data']
+            input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
-
-            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+                                                             
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
-            raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+            raise ValueError('Unable to fetch input_one_ref object from workspace: ' + str(e))
         #to get the full stack trace: traceback.format_exc()
 
         if 'input_one_sequence' in params \
@@ -400,7 +405,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SequenceSet':
 
-            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SequenceSet instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+input_one_ref+" should be SequenceSet instead of: "+one_type_name)
 
 
         # Handle overloading (input_one can be Feature, SequenceSet, or FeatureSet)
@@ -441,7 +446,7 @@ class kb_blast:
             #input_one_featureSet = input_one_data
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = params['input_one_name']+".fasta"
+            one_forward_reads_file = input_one_name+".fasta"
  
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -477,7 +482,7 @@ class kb_blast:
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTn is nuc-nuc
             if feature['dna_sequence'] != None:
@@ -495,10 +500,10 @@ class kb_blast:
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -647,7 +652,7 @@ class kb_blast:
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -683,7 +688,7 @@ class kb_blast:
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -720,7 +725,7 @@ class kb_blast:
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -763,7 +768,7 @@ class kb_blast:
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no dna sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -778,8 +783,8 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -1247,9 +1252,8 @@ class kb_blast:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -1401,24 +1405,28 @@ class kb_blast:
         if ('output_one_name' in params and params['output_one_name'] != None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
-            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+            raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('output_one_name' in params and params['output_one_name'] != None):
-            raise ValueError('cannot have both input_one_name and output_one_name parameter')
-        if ('input_one_name' not in params or params['input_one_name'] == None) \
+            raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+        if ('input_one_ref' not in params or params['input_one_ref'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
-            raise ValueError('input_one_sequence or input_one_name parameter is required')
+            raise ValueError('input_one_sequence or input_one_ref parameter is required')
 #        if 'input_one_sequence' not in params:
 #            raise ValueError('input_one_sequence parameter is required')
-#        if 'input_one_name' not in params:
-#            raise ValueError('input_one_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+#        if 'input_one_ref' not in params:
+#            raise ValueError('input_one_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
 
+
+        # set local names
+        input_many_ref = params['input_many_ref']
+        
 
         # Write the input_one_sequence to file
         #
@@ -1475,6 +1483,7 @@ class kb_blast:
                                     'provenance': provenance
                                     }]
                             })
+                output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
                 #to get the full stack trace: traceback.format_exc()
@@ -1484,21 +1493,21 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and params['output_one_name'] != None:
-            input_one_name = params['output_one_name']
+        if 'output_one_name' in params and output_one_ref != None:
+            input_one_ref = output_one_ref
         else:
-            input_one_name = params['input_one_name']
+            input_one_ref = params['input_one_ref']
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
+            objects = ws.get_objects([{'ref': input_one_ref}])
             input_one_data = objects[0]['data']
+            input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
             
-            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
-            raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+            raise ValueError('Unable to fetch input_one_ref object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
         if 'input_one_sequence' in params \
@@ -1506,7 +1515,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter PROTEIN sequence..." \
                 and one_type_name != 'SequenceSet':
 
-            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SequenceSet instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+input_one_ref+" should be SequenceSet instead of: "+one_type_name)
 
 
         # Handle overloading (input_one can be SequenceSet, Feature, or FeatureSet)
@@ -1543,7 +1552,7 @@ class kb_blast:
             #input_one_featureSet = input_one_data
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = params['input_one_name']+".fasta"
+            one_forward_reads_file = input_one_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1579,16 +1588,16 @@ class kb_blast:
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTp is prot-prot
             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
             if feature['type'] != 'CDS':
-                self.log(console,params['input_one_name']+" feature type must be CDS")
-                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
+                self.log(console,params['input_one_ref']+" feature type must be CDS")
+                self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                raise ValueError("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                self.log(console,"bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
+                raise ValueError("bad CDS Feature "+params['input_one_ref']+": no protein_translation found")
             else:
                 appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
@@ -1601,10 +1610,10 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -1649,7 +1658,7 @@ class kb_blast:
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1685,7 +1694,7 @@ class kb_blast:
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1722,7 +1731,7 @@ class kb_blast:
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -1765,7 +1774,7 @@ class kb_blast:
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -1780,8 +1789,8 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -2158,9 +2167,8 @@ class kb_blast:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -2299,23 +2307,27 @@ class kb_blast:
         if ('output_one_name' in params and params['output_one_name'] != None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
-            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+            raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('output_one_name' in params and params['output_one_name'] != None):
-            raise ValueError('cannot have both input_one_name and output_one_name parameter')
-        if ('input_one_name' not in params or params['input_one_name'] == None) \
+            raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+        if ('input_one_ref' not in params or params['input_one_ref'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
-            raise ValueError('input_one_sequence or input_one_name parameter is required')
+            raise ValueError('input_one_sequence or input_one_ref parameter is required')
 #        if 'input_one_sequence' not in params:
 #            raise ValueError('input_one_sequence parameter is required')
-#        if 'input_one_name' not in params:
-#            raise ValueError('input_one_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+#        if 'input_one_ref' not in params:
+#            raise ValueError('input_one_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
+
+
+        # set local names
+        input_many_ref = params['input_many_ref']
 
 
         # Write the input_one_sequence to a SingleEndLibrary object
@@ -2373,6 +2385,7 @@ class kb_blast:
                                     'provenance': provenance
                                     }]
                             })
+                output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
                 #to get the full stack trace: traceback.format_exc()
@@ -2382,21 +2395,21 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and params['output_one_name'] != None:
-            input_one_name = params['output_one_name']
+        if 'output_one_name' in params and output_one_ref != None:
+            input_one_ref = output_one_ref
         else:
-            input_one_name = params['input_one_name']
+            input_one_ref = params['input_one_ref']
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
+            objects = ws.get_objects([{'ref': input_one_ref}])
             input_one_data = objects[0]['data']
+            input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
 
-            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
-            raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
+            raise ValueError('Unable to fetch input_one_ref object from workspace: ' + str(e))
         #to get the full stack trace: traceback.format_exc()
 
         if 'input_one_sequence' in params \
@@ -2404,7 +2417,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SequenceSet':
 
-            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SequenceSet instead of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+input_one_ref+" should be SequenceSet instead of: "+one_type_name)
 
 
         # Handle overloading (input_one can be Feature, SingleEndLibrary, or FeatureSet)
@@ -2444,7 +2457,7 @@ class kb_blast:
             #input_one_featureSet = input_one_data
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = params['input_one_name']+".fasta"
+            one_forward_reads_file = input_one_name+".fasta"
             
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -2480,12 +2493,12 @@ class kb_blast:
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # BLASTx is nuc-prot
             if feature['type'] != 'CDS':
-                self.log(console,params['input_one_name']+" feature type must be CDS")
-                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
+                self.log(console,params['input_one_ref']+" feature type must be CDS")
+                self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
             #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
             #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -2502,10 +2515,10 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -2555,7 +2568,7 @@ class kb_blast:
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -2591,7 +2604,7 @@ class kb_blast:
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -2628,7 +2641,7 @@ class kb_blast:
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -2670,7 +2683,7 @@ class kb_blast:
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -2685,8 +2698,8 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -3063,9 +3076,8 @@ class kb_blast:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -3204,23 +3216,27 @@ class kb_blast:
         if ('output_one_name' in params and params['output_one_name'] != None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
-            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+            raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('output_one_name' in params and params['output_one_name'] != None):
-            raise ValueError('cannot have both input_one_name and output_one_name parameter')
-        if ('input_one_name' not in params or params['input_one_name'] == None) \
+            raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+        if ('input_one_ref' not in params or params['input_one_ref'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
-            raise ValueError('input_one_sequence or input_one_name parameter is required')
+            raise ValueError('input_one_sequence or input_one_ref parameter is required')
 #        if 'input_one_sequence' not in params:
 #            raise ValueError('input_one_sequence parameter is required')
-#        if 'input_one_name' not in params:
-#            raise ValueError('input_one_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+#        if 'input_one_ref' not in params:
+#            raise ValueError('input_one_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
+
+        
+        # set local names
+        input_many_ref = params['input_many_ref']
 
 
         # Write the input_one_sequence to file
@@ -3278,6 +3294,7 @@ class kb_blast:
                                     'provenance': provenance
                                     }]
                             })
+                output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
                 #to get the full stack trace: traceback.format_exc()
@@ -3287,18 +3304,18 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and params['output_one_name'] != None:
-            input_one_name = params['output_one_name']
+        if 'output_one_name' in params and output_one_ref != None:
+            input_one_ref = output_one_ref
         else:
-            input_one_name = params['input_one_name']
+            input_one_ref = params['input_one_ref']
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
+            objects = ws.get_objects([{'ref': input_one_ref}])
             input_one_data = objects[0]['data']
+            input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
 
-            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -3309,8 +3326,7 @@ class kb_blast:
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and one_type_name != 'SequenceSet':
 
-            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_name']+" should be SequenceSet instea\
-d of: "+one_type_name)
+            self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+params['input_one_ref']+" should be SequenceSet instead of: "+one_type_name)
 
         # Handle overloading (input_one can be Feature, or FeatureSet)
         #
@@ -3349,7 +3365,7 @@ d of: "+one_type_name)
             #input_one_featureSet = input_one_data
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = params['input_one_name']+".fasta"
+            one_forward_reads_file = input_one_name+".fasta"
             
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -3385,16 +3401,16 @@ d of: "+one_type_name)
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTn is prot-nuc
             #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
             if feature['type'] != 'CDS':
-                self.log(console,params['input_one_name']+" feature type must be CDS")
-                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
+                self.log(console,input_one_name+" feature type must be CDS")
+                self.log(invalid_msgs,input_one_name+" feature type must be CDS")
             elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
+                raise ValueError ("bad CDS Feature "+input_one_name+": no protein_translation found")
             else:
                 appropriate_sequence_found_in_one_input = True
                 record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
@@ -3410,10 +3426,10 @@ d of: "+one_type_name)
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -3562,7 +3578,7 @@ d of: "+one_type_name)
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -3598,7 +3614,7 @@ d of: "+one_type_name)
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -3635,7 +3651,7 @@ d of: "+one_type_name)
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -3677,7 +3693,7 @@ d of: "+one_type_name)
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no dna sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -3692,8 +3708,8 @@ d of: "+one_type_name)
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -4137,9 +4153,8 @@ d of: "+one_type_name)
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -4291,23 +4306,27 @@ d of: "+one_type_name)
         if ('output_one_name' in params and params['output_one_name'] != None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
             raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('input_one_sequence' in params and params['input_one_sequence'] != None):
-            raise ValueError('cannot have both input_one_sequence and input_one_name parameter')
-        if ('input_one_name' in params and params['input_one_name'] != None) \
+            raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+        if ('input_one_ref' in params and params['input_one_ref'] != None) \
                 and ('output_one_name' in params and params['output_one_name'] != None):
-            raise ValueError('cannot have both input_one_name and output_one_name parameter')
-        if ('input_one_name' not in params or params['input_one_name'] == None) \
+            raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+        if ('input_one_ref' not in params or params['input_one_ref'] == None) \
                 and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
-            raise ValueError('input_one_sequence or input_one_name parameter is required')
+            raise ValueError('input_one_sequence or input_one_ref parameter is required')
 #        if 'input_one_sequence' not in params:
 #            raise ValueError('input_one_sequence parameter is required')
-#        if 'input_one_name' not in params:
-#            raise ValueError('input_one_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+#        if 'input_one_ref' not in params:
+#            raise ValueError('input_one_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
+
+
+        # set local names
+        input_many_ref = params['input_many_ref']
 
 
         # Write the input_one_sequence to a SingleEndLibrary object
@@ -4365,6 +4384,7 @@ d of: "+one_type_name)
                                     'provenance': provenance
                                     }]
                             })
+                output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
                 #to get the full stack trace: traceback.format_exc()
@@ -4374,30 +4394,18 @@ d of: "+one_type_name)
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and params['output_one_name'] != None:
-            input_one_name = params['output_one_name']
+        if 'output_one_name' in params and output_one_ref != None:
+            input_one_ref = output_one_ref
         else:
-            input_one_name = params['input_one_name']
+            input_one_ref = params['input_one_ref']
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+input_one_name}])
+            objects = ws.get_objects([{'ref': input_one_ref}])
             input_one_data = objects[0]['data']
+            input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
-            # Object Info Contents
-            # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
-            # 0 - obj_id objid
-            # 1 - obj_name name
-            # 2 - type_string type
-            # 3 - timestamp save_date
-            # 4 - int version
-            # 5 - username saved_by
-            # 6 - ws_id wsid
-            # 7 - ws_name workspace
-            # 8 - string chsum
-            # 9 - int size 
-            # 10 - usermeta meta
-            input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+
             one_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -4447,7 +4455,7 @@ d of: "+one_type_name)
             #input_one_featureSet = input_one_data
             genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = params['input_one_name']+".fasta"
+            one_forward_reads_file = input_one_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4483,12 +4491,12 @@ d of: "+one_type_name)
         elif one_type_name == 'Feature':
             # export feature to FASTA file
             feature = input_one_data
-            one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
             self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
             # tBLASTx is nuc-nuc (translated)
             if feature['type'] != 'CDS':
-                self.log(console,params['input_one_name']+" feature type must be CDS")
-                self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
+                self.log(console,input_one_name+" feature type must be CDS")
+                self.log(invalid_msgs,input_one_name+" feature type must be CDS")
             #elif 'protein_translation' not in feature or feature['protein_translation'] == None:
             #    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
             #    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
@@ -4507,10 +4515,10 @@ d of: "+one_type_name)
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
             if many_type_name == 'SingleEndLibrary':
@@ -4659,7 +4667,7 @@ d of: "+one_type_name)
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4695,7 +4703,7 @@ d of: "+one_type_name)
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4732,7 +4740,7 @@ d of: "+one_type_name)
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -4775,7 +4783,7 @@ d of: "+one_type_name)
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no dna sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no dna sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -4790,8 +4798,8 @@ d of: "+one_type_name)
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+input_one_name)
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -5239,9 +5247,8 @@ d of: "+one_type_name)
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -5388,39 +5395,33 @@ d of: "+one_type_name)
         #
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-        if 'input_one_name' not in params:
-            raise ValueError('input_one_name parameter is required')
-        if 'input_msa_name' not in params:
-            raise ValueError('input_msa_name parameter is required')
-        if 'input_many_name' not in params:
-            raise ValueError('input_many_name parameter is required')
+        if 'input_one_ref' not in params:
+            raise ValueError('input_one_ref parameter is required')
+        if 'input_msa_ref' not in params:
+            raise ValueError('input_msa_ref parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
 
 
+        # set local names
+        input_one_ref = params['input_one_ref']
+        input_msa_ref = params['input_msa_ref']
+        input_many_ref = params['input_many_ref']
+        
+
         #### Get the input_one object
         ##
         input_one_id = None
-        if 'input_one_name' in params and params['input_one_name'] != None:
+        if 'input_one_ref' in params and params['input_one_ref'] != None:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
-                objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_one_name']}])
+                objects = ws.get_objects([{'ref': params['input_one_ref']}])
                 input_one_data = objects[0]['data']
+                input_one_name = str(objects[0]['info'][1])
                 info = objects[0]['info']
-                # Object Info Contents
-                # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
-                # 0 - obj_id objid
-                # 1 - obj_name name
-                # 2 - type_string type
-                # 3 - timestamp save_date
-                # 4 - int version
-                # 5 - username saved_by
-                # 6 - ws_id wsid
-                # 7 - ws_name workspace
-                # 8 - string chsum
-                # 9 - int size 
-                # 10 - usermeta meta
-                input_one_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+
                 one_type_name = info[2].split('.')[1].split('-')[0]
             except Exception as e:
                 raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
@@ -5434,7 +5435,7 @@ d of: "+one_type_name)
                 #input_one_featureSet = input_one_data
                 genome_id_feature_id_delim = '.f:'
                 one_forward_reads_file_dir = self.scratch
-                one_forward_reads_file = params['input_one_name']+".fasta"
+                one_forward_reads_file = input_one_name+".fasta"
 
                 # DEBUG
                 #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -5471,16 +5472,16 @@ d of: "+one_type_name)
                 # export feature to FASTA file
                 feature = input_one_data
                 input_one_feature_id = feature['id']
-                one_forward_reads_file_path = os.path.join(self.scratch, params['input_one_name']+".fasta")
+                one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
                 self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
                 # psiBLAST is prot-prot
                 #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
                 if feature['type'] != 'CDS':
-                    self.log(console,params['input_one_name']+" feature type must be CDS")
-                    self.log(invalid_msgs,params['input_one_name']+" feature type must be CDS")
+                    self.log(console,input_one_name+" feature type must be CDS")
+                    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
                 elif 'protein_translation' not in feature or feature['protein_translation'] == None:
-                    self.log(console,"bad CDS Feature "+params['input_one_name']+": no protein_translation found")
-                    raise ValueError ("bad CDS Feature "+params['input_one_name']+": no protein_translation found")
+                    self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
+                    raise ValueError ("bad CDS Feature "input_one_name+": no protein_translation found")
                 else:
                     appropriate_sequence_found_in_one_input = True
                     record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
@@ -5495,13 +5496,14 @@ d of: "+one_type_name)
         #### Get the input_msa object
         ##
         if input_one_feature_id == None:
-            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+params['input_one_name'])
+            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+input_one_name)
         master_row_idx = 0
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_msa_name']}])
+            objects = ws.get_objects([{'ref': input_msa_ref}])
             input_msa_data = objects[0]['data']
             info = objects[0]['info']
+            input_msa_name = str(info[1])
             input_msa_type = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -5529,11 +5531,11 @@ d of: "+one_type_name)
                 if row_id == input_one_feature_id:
                     break
             if master_row_idx == 0:
-                self.log(invalid_msgs,"Failed to find query id "+input_one_feature_id+" from Query Object "+params['input_one_name']+" within MSA: "+params['input_msa_name'])
+                self.log(invalid_msgs,"Failed to find query id "+input_one_feature_id+" from Query Object "+input_one_name+" within MSA: "+input_msa_name)
 
             
             # export features to Clustal-esque file that PSI-BLAST likes
-            input_MSA_file_path = os.path.join(self.scratch, params['input_msa_name']+".fasta")
+            input_MSA_file_path = os.path.join(self.scratch, input_msa_name+".fasta")
             self.log(console, 'writing MSA file: '+input_MSA_file_path)
             records = []
             longest_row_id_len = 0
@@ -5579,10 +5581,10 @@ d of: "+one_type_name)
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['input_many_name']}])
+            objects = ws.get_objects([{'ref': input_many_ref}])
             input_many_data = objects[0]['data']
             info = objects[0]['info']
-            input_many_ref = str(info[6])+'/'+str(info[0])+'/'+str(info[4])
+            input_many_name = str(info[1])
             many_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
@@ -5627,7 +5629,7 @@ d of: "+one_type_name)
             input_many_featureSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -5663,7 +5665,7 @@ d of: "+one_type_name)
         #
         elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -5700,7 +5702,7 @@ d of: "+one_type_name)
             input_many_genomeSet = input_many_data
             genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = params['input_many_name']+".fasta"
+            many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -5741,11 +5743,11 @@ d of: "+one_type_name)
         # check for failed input file creation
         #
         if not appropriate_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_one_name']+"'")
+            self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_MSA_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_msa_name']+"'")
+            self.log(invalid_msgs,"no protein sequences found in '"+input_msa_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+params['input_many_name']+"'")
+            self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -5760,9 +5762,9 @@ d of: "+one_type_name)
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_msa_name'])
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+            provenance[0]['input_ws_objects'].append(input_one_ref)
+            provenance[0]['input_ws_objects'].append(input_msa_ref)
+            provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
 
@@ -6147,10 +6149,9 @@ d of: "+one_type_name)
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        if 'input_one_name' in params and params['input_one_name'] != None:
-            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_one_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_msa_name'])
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['input_many_name'])
+        provenance[0]['input_ws_objects'].append(input_one_ref)
+        provenance[0]['input_ws_objects'].append(input_msa_ref)
+        provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
         provenance[0]['method'] = search_tool_name+'_Search'
 
