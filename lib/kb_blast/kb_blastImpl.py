@@ -1897,16 +1897,59 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_html_file_path = os.path.join(output_dir, 'alnout.html');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
-        # this is command for basic search mode
+        # this is command for basic search mode (with html output)
+        blast_cmd.append('-query')
+        blast_cmd.append(one_forward_reads_file_path)
+        blast_cmd.append('-db')
+        blast_cmd.append(many_forward_reads_file_path)
+        blast_cmd.append('-out')
+        blast_cmd.append(output_html_file_path)
+        blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+        blast_cmd.append('-evalue')
+        blast_cmd.append(str(params['e_value']))
+
+        # options
+        if 'maxaccepts' in params:
+            if params['maxaccepts']:
+                blast_cmd.append('-max_target_seqs')
+                blast_cmd.append(str(params['maxaccepts']))
+
+        # Run BLAST, capture output as it happens
+        #
+        self.log(console, 'RUNNING BLAST (FOR HTML):')
+        self.log(console, '    '+' '.join(blast_cmd))
+#        report += "\n"+'running BLAST:'+"\n"
+#        report += '    '+' '.join(blast_cmd)+"\n"
+
+        p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+        while True:
+            line = p.stdout.readline()
+            if not line: break
+            self.log(console, line.replace('\n', ''))
+
+        p.stdout.close()
+        p.wait()
+        self.log(console, 'return code: ' + str(p.returncode))
+        if p.returncode != 0:
+            raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+
+        # this is command for basic search mode (with TAB TXT output)
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
         blast_cmd.append(many_forward_reads_file_path)
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
-        blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
         blast_cmd.append('-outfmt')
         blast_cmd.append('7')
         blast_cmd.append('-evalue')
@@ -1920,7 +1963,7 @@ class kb_blast:
 
         # Run BLAST, capture output as it happens
         #
-        self.log(console, 'RUNNING BLAST:')
+        self.log(console, 'RUNNING BLAST FOR TAB TXT:')
         self.log(console, '    '+' '.join(blast_cmd))
 #        report += "\n"+'running BLAST:'+"\n"
 #        report += '    '+' '.join(blast_cmd)+"\n"
