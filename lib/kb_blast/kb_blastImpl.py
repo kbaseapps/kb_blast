@@ -2099,6 +2099,7 @@ class kb_blast:
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
+                self.log(console, "FID: '"+str(fid)+"'")  # DEBUG
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[fid]
@@ -3012,7 +3013,6 @@ class kb_blast:
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
-                self.log(console, "FID: '"+str(fid)+"'")  # DEBUG
                 seq_total += 1
                 try:
                     in_filtered_set = hit_seq_ids[fid]
