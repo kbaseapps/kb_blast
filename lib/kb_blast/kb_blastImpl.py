@@ -357,7 +357,7 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and output_one_ref != None:
+        if 'output_one_name' in params and output_one_ref:
             input_one_ref = output_one_ref
         else:
             input_one_ref = params['input_one_ref']
@@ -1470,7 +1470,7 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and output_one_ref != None:
+        if 'output_one_name' in params and output_one_ref:
             input_one_ref = output_one_ref
         else:
             input_one_ref = params['input_one_ref']
@@ -2374,7 +2374,7 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and output_one_ref != None:
+        if 'output_one_name' in params and output_one_ref:
             input_one_ref = output_one_ref
         else:
             input_one_ref = params['input_one_ref']
@@ -3285,7 +3285,7 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and output_one_ref != None:
+        if 'output_one_name' in params and output_one_ref:
             input_one_ref = output_one_ref
         else:
             input_one_ref = params['input_one_ref']
@@ -4377,7 +4377,7 @@ class kb_blast:
 
         #### Get the input_one object
         ##
-        if 'output_one_name' in params and output_one_ref != None:
+        if 'output_one_name' in params and output_one_ref:
             input_one_ref = output_one_ref
         else:
             input_one_ref = params['input_one_ref']
