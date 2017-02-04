@@ -1908,6 +1908,8 @@ class kb_blast:
         blast_cmd.append('-out')
         blast_cmd.append(output_html_file_path)
         blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+        blast_cmd.append('-outfmt')
+        blast_cmd.append('0')
         blast_cmd.append('-evalue')
         blast_cmd.append(str(params['e_value']))
 
