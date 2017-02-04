@@ -1065,7 +1065,8 @@ class kb_blast:
 
                 try:
                     #self.log(console,"checking '"+header_id+"'")
-                    in_filtered_set = hit_seq_ids[header_id]
+                    id_trans = re.sub ('|',':',header_id)  # BLAST seems to make this translation now
+                    in_filtered_set = hit_seq_ids[id_trans]
                     #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
                     output_sequenceSet['sequences'].append(seq_obj)
                 except:
@@ -1100,7 +1101,8 @@ class kb_blast:
                     if last_seq_id != None:
                         #self.log(console, 'ID: '+last_seq_id)  # DEBUG
                         try:
-                            in_filtered_set = hit_seq_ids[last_seq_id]
+                            id_trans = re.sub('|',':',last_seq_id)  # BLAST seems to make this translation now
+                            in_filtered_set = hit_seq_ids[id_trans]
                             #self.log(console, 'FOUND HIT '+last_seq_id)  # DEBUG
                             filtered_seq_total += 1
                             output_filtered_fasta_file_handle.write(last_header)
@@ -1117,7 +1119,8 @@ class kb_blast:
             if last_seq_id != None:
                 #self.log(console, 'ID: '+last_seq_id)  # DEBUG
                 try:
-                    in_filtered_set = hit_seq_ids[last_seq_id]
+                    id_trans = re.sub ('|',':',last_seq_id)  # BLAST seems to make this translation now
+                    in_filtered_set = hit_seq_ids[id_trans]
                     #self.log(console, 'FOUND HIT: '+last_seq_id)  # DEBUG
                     filtered_seq_total += 1
                     output_filtered_fasta_file_handle.write(last_header)
@@ -1157,7 +1160,8 @@ class kb_blast:
                     try:
                         #self.log(console,"checking '"+fId+"'")
                         #in_filtered_set = hit_seq_ids[fId]
-                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
+                        id_trans = re.sub ('|',':',genome_ref+genome_id_feature_id_delim+fId)  # BLAST seems to make this translation now
+                        in_filtered_set = hit_seq_ids[id_trans]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
@@ -1182,7 +1186,8 @@ class kb_blast:
             for fid in feature_ids:
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[fid]
+                    id_trans = re.sub ('|',':',fid)  # BLAST seems to make this translation now
+                    in_filtered_set = hit_seq_ids[id_trans]
                     #output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
                 except:
@@ -1209,7 +1214,8 @@ class kb_blast:
                     seq_total += 1
                     try:
                         #in_filtered_set = hit_seq_ids[feature['id']]
-                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+feature_id]
+                        id_trans = re.sub('|',':',genome_ref+genome_id_feature_id_delim+feature_id)
+                        in_filtered_set = hit_seq_ids[id_trans]
                         #in_filtered_set = hit_seq_ids[feature_id]
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
@@ -2049,7 +2055,8 @@ class kb_blast:
 
                 try:
                     #self.log(console,"checking '"+header_id+"'")
-                    in_filtered_set = hit_seq_ids[header_id]
+                    id_trans = re.sub ('|',':',header_id)
+                    in_filtered_set = hit_seq_ids[id_trans]
                     #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
                     output_sequenceSet['sequences'].append(seq_obj)
                 except:
@@ -2076,7 +2083,8 @@ class kb_blast:
                     try:
                         #self.log(console,"checking '"+fId+"'")
                         #in_filtered_set = hit_seq_ids[fId]
-                        in_filtered_set = hit_seq_ids[genome_ref+genome_id_feature_id_delim+fId]
+                        id_trans = re.sub ('|',':',genome_ref+genome_id_feature_id_delim+fId)
+                        in_filtered_set = hit_seq_ids[id_trans]
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
@@ -2102,7 +2110,8 @@ class kb_blast:
                 self.log(console, "FID: '"+str(fid)+"'")  # DEBUG
                 seq_total += 1
                 try:
-                    in_filtered_set = hit_seq_ids[fid]
+                    id_trans = re.sub ('|',':',fid)  # BLAST seems to make this translation now
+                    in_filtered_set = hit_seq_ids[id_trans]
                     #output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
                 except:
