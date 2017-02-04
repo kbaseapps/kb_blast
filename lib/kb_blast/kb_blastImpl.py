@@ -1906,6 +1906,8 @@ class kb_blast:
         blast_cmd.append(many_forward_reads_file_path)
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
+        blast_cmd.append('-html')  # HTML?
+        blast_cmd.append('1')  # IS THIS THE RIGHT FLAG?
         blast_cmd.append('-outfmt')
         blast_cmd.append('7')
         blast_cmd.append('-evalue')
@@ -1941,6 +1943,10 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # DEBUG
+        for outfile in os.listdir(output_dir):
+            self.log(console, "OUTFILE: '"+outfile+"'")
 
 
         # get query_len for filtering later
