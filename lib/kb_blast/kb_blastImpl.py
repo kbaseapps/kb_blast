@@ -1447,6 +1447,9 @@ class kb_blast:
 
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            except:
+                raise ValueError ("can't create workspace client")
+            try:
                 new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
