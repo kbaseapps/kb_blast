@@ -289,6 +289,8 @@ class kb_blast:
 
 
         # set local names
+        input_one_ref  = None
+        output_one_ref = None
         input_many_ref = params['input_many_ref']
         
 
@@ -1399,6 +1401,8 @@ class kb_blast:
 
 
         # set local names
+        input_one_ref  = None
+        output_one_ref = None
         input_many_ref = params['input_many_ref']
         
 
@@ -2306,6 +2310,8 @@ class kb_blast:
 
 
         # set local names
+        input_one_ref  = None
+        output_one_ref = None
         input_many_ref = params['input_many_ref']
 
 
@@ -3217,6 +3223,8 @@ class kb_blast:
 
         
         # set local names
+        input_one_ref  = None
+        output_one_ref = None
         input_many_ref = params['input_many_ref']
 
 
@@ -4309,6 +4317,8 @@ class kb_blast:
 
 
         # set local names
+        input_one_ref  = None
+        output_one_ref = None
         input_many_ref = params['input_many_ref']
 
 
