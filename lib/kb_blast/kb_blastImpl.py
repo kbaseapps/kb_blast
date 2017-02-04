@@ -2271,7 +2271,7 @@ class kb_blast:
                          'report_object_name': reportName
                          }
 
-            reportObj['objects_created'].append({'ref':str(params['workspace_name+'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             reportObj['message'] = report
 
             # add html report
