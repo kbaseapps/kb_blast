@@ -2025,6 +2025,10 @@ class kb_blast:
             self.log(console, "HIT: '"+hit_seq_id+"'")  # DEBUG
         
 
+        # DEBUG
+        for hit_seq_id in hit_seq_ids.keys():
+            self.log (console, "HIT_ID: '"+str(hit_seq_id)+"'")
+
         self.log(console, 'EXTRACTING HITS FROM INPUT')
         self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
 
@@ -2107,13 +2111,16 @@ class kb_blast:
             #output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
-                self.log(console, "FID: '"+str(fid)+"'")  # DEBUG
                 seq_total += 1
                 try:
                     id_trans = re.sub ('|',':',fid)  # BLAST seems to make this translation now
+                    self.log(console, "FID: '"+str(fid)+"'")  # DEBUG
+                    self.log(console, "IDT: '"+str(id_trans)+"'")  # DEBUG
+
                     in_filtered_set = hit_seq_ids[id_trans]
                     #output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
+                    self.log(console, "GOT ONE: '"+str(fid)+"'")  # DEBUG
                 except:
                     pass
 
