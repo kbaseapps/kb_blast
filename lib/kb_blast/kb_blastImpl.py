@@ -2307,7 +2307,7 @@ class kb_blast:
                 'text_message':report
                 }
 
-            report_info = ws.save_objects({
+            report_obj_info = ws.save_objects({
                     #                'id':info[6],
                     'workspace':params['workspace_name'],
                     'objects':[
@@ -2321,14 +2321,17 @@ class kb_blast:
                             }
                         ]
                     })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_info[6]) + '/' + str(report_info[0]) + '/' + str(report_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END BLASTp_Search
