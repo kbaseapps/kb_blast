@@ -1906,8 +1906,7 @@ class kb_blast:
         blast_cmd.append(many_forward_reads_file_path)
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
-        blast_cmd.append('-html')  # HTML?
-        blast_cmd.append('1')  # IS THIS THE RIGHT FLAG?
+        blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
         blast_cmd.append('-outfmt')
         blast_cmd.append('7')
         blast_cmd.append('-evalue')
