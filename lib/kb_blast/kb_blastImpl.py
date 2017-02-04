@@ -1911,11 +1911,11 @@ class kb_blast:
         blast_cmd.append('-evalue')
         blast_cmd.append(str(params['e_value']))
 
-        # options
-        if 'maxaccepts' in params:
-            if params['maxaccepts']:
-                blast_cmd.append('-max_target_seqs')
-                blast_cmd.append(str(params['maxaccepts']))
+        # options (not allowed for format 0)
+        #if 'maxaccepts' in params:
+        #    if params['maxaccepts']:
+        #        blast_cmd.append('-max_target_seqs')
+        #        blast_cmd.append(str(params['maxaccepts']))
 
         # Run BLAST, capture output as it happens
         #
