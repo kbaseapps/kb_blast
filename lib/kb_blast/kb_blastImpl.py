@@ -24,6 +24,7 @@ from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
 # SDK Utils
 from KBaseDataObjectToFileUtils.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+from KBaseReport.KBaseReportClient import KBaseReport
 
 # silence whining
 import requests
@@ -184,7 +185,7 @@ class kb_blast:
                                 'meta':{},
                                 'provenance':provenance
                             }]
-                        })
+                        })[0]
         self.log(console,'SAVED TO WORKSPACE')
 
         return new_obj_info[0]
@@ -348,7 +349,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                     }]
-                            })
+                            })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
@@ -1264,7 +1265,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -1276,7 +1277,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
@@ -1451,9 +1452,6 @@ class kb_blast:
 
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            except:
-                raise ValueError ("can't create workspace client")
-            try:
                 new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
@@ -1463,7 +1461,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                     }]
-                            })
+                            })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
@@ -2173,7 +2171,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -2185,7 +2183,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
@@ -2369,7 +2367,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                     }]
-                            })
+                            })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
@@ -3086,7 +3084,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else: # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -3098,7 +3096,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
@@ -3282,7 +3280,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                     }]
-                            })
+                            })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
@@ -4182,7 +4180,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -4194,7 +4192,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
@@ -4376,7 +4374,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                     }]
-                            })
+                            })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
             except Exception as e:
                 raise ValueError('Unable to store output_one_name SequenceSet object from workspace: ' + str(e))
@@ -5278,7 +5276,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -5290,7 +5288,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
@@ -6170,7 +6168,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
             else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
@@ -6182,7 +6180,7 @@ class kb_blast:
                                     'meta': {},
                                     'provenance': provenance
                                 }]
-                        })
+                        })[0]
 
         # build output report object
         #
