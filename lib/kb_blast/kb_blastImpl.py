@@ -684,15 +684,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -708,15 +708,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -1189,9 +1189,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -1623,7 +1623,7 @@ class kb_blast:
             #to get the full stack trace: traceback.format_exc()
 
 
-        # Handle overloading (input_many can be SequenceSet, FeatureSet, Genome, GenomeAnnotation or GenomeSet)
+        # Handle overloading (input_many can be SequenceSet, FeatureSet, Genome, or GenomeSet)
         #
         if many_type_name == 'SequenceSet':
             try:
@@ -1692,15 +1692,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -1716,15 +1716,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -2106,9 +2106,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -2604,15 +2604,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -2628,15 +2628,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -3017,9 +3017,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -3616,15 +3616,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -3640,15 +3640,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -4096,9 +4096,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -4707,15 +4707,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -4731,15 +4731,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # GenomeSet
@@ -5192,9 +5192,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -5671,15 +5671,15 @@ class kb_blast:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        # Genome and GenomeAnnotation
+        # Genome
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeAnnotationToFASTA_params = {
+            GenomeToFASTA_params = {
                 'genome_ref':          input_many_ref,
                 'file':                many_forward_reads_file,
                 'dir':                 many_forward_reads_file_dir,
@@ -5695,15 +5695,15 @@ class kb_blast:
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeAnnotationToFASTA_retVal = DOTFU.GenomeAnnotationToFASTA (GenomeAnnotationToFASTA_params)
-            many_forward_reads_file_path = GenomeAnnotationToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeAnnotationToFASTA_retVal['feature_ids']
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "GenomeAnnotation2Fasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
             
 
         # GenomeSet
@@ -6096,9 +6096,9 @@ class kb_blast:
                     except:
                         pass
 
-        # Parse Genome and GenomeAnnotation hits into FeatureSet
+        # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome' or many_type_name == 'GenomeAnnotation':
+        elif many_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
