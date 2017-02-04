@@ -1900,6 +1900,7 @@ class kb_blast:
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
         # this is command for basic search mode (with html output)
+        """
         blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
@@ -1943,7 +1944,7 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
-
+        """
 
         # this is command for basic search mode (with TAB TXT output)
         blast_cmd = [blast_bin]
@@ -2277,6 +2278,7 @@ class kb_blast:
             reportObj['message'] = report
 
             # add html report
+            """
             dfu = DFUClient(self.callbackURL)
             try:
                 upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
@@ -2289,7 +2291,7 @@ class kb_blast:
                                         'name': 'blast_search.html',
                                         'label': search_tool_name+' results'}
                                        ]
-
+            """
 
             # save report object
             #
