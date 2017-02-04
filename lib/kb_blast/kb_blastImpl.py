@@ -1877,7 +1877,6 @@ class kb_blast:
         # NEW SYNTAX: blastp -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTp
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -1901,6 +1900,7 @@ class kb_blast:
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
         # this is command for basic search mode (with html output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -1944,6 +1944,7 @@ class kb_blast:
 
 
         # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -1963,7 +1964,7 @@ class kb_blast:
 
         # Run BLAST, capture output as it happens
         #
-        self.log(console, 'RUNNING BLAST FOR TAB TXT:')
+        self.log(console, 'RUNNING BLAST (FOR TAB TXT):')
         self.log(console, '    '+' '.join(blast_cmd))
 #        report += "\n"+'running BLAST:'+"\n"
 #        report += '    '+' '.join(blast_cmd)+"\n"
