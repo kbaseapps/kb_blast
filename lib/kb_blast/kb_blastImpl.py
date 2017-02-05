@@ -2309,6 +2309,8 @@ class kb_blast:
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'%</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'Q_BEG-Q_END:H_BEG-H_END'+'</font></td>']
@@ -2323,12 +2325,12 @@ class kb_blast:
 
                 [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
 
+                aln_len_perc = round (100.0 *float(aln_len)/float(query_len), 1)
+
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
                 #elif many_type_name == 'SequenceSet':
                 if many_type_name == 'SequenceSet':
-                    pass
-                elif many_type_name == 'Genome':
                     pass
                 elif many_type_name == 'Genome' or \
                         many_type_name == 'GenomeSet' or \
@@ -2348,6 +2350,11 @@ class kb_blast:
                                 row_color = reject_row_color
                             fid_lookup = fid
                             break
+                    self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
+                    if fid_lookup == None:
+                        raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
+                    elif fid_lookup not in feature_id_to_function[genome_ref]:
+                        raise ValueError ("unable to find function for fid: '"+str(fid_lookup))
                     func_disp = feature_id_to_function[genome_ref][fid_lookup]
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
@@ -2365,6 +2372,8 @@ class kb_blast:
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
+                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len_perc)+'%</font></td>']
+                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+'</font></td>']
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(q_beg)+'-'+str(q_end)+':'+str(h_beg)+'-'+str(h_end)+'</font></td>']
