@@ -2344,9 +2344,9 @@ class kb_blast:
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
-                        self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
+                        #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
 
-                        if id_untrans == 'hit_fid' or id_trans == 'hit_fid':
+                        if id_untrans == hit_fid or id_trans == hit_fid:
                             self.log (console, "GOT ONE!")  # DEBUG
                             if id_untrans in hit_seq_ids or id_trans in hit_seq_ids:
                                 row_color = accept_row_color
@@ -2354,7 +2354,7 @@ class kb_blast:
                                 row_color = reject_row_color
                             fid_lookup = fid
                             break
-                    self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
+                    #self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
                     if fid_lookup == None:
                         raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
                     elif fid_lookup not in feature_id_to_function[genome_ref]:
