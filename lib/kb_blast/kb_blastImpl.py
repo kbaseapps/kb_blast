@@ -24,6 +24,7 @@ from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
 # SDK Utils
 from KBaseDataObjectToFileUtils.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+from DataFileUtil.DataFileUtilClient import DataFileUtil as DFUClient
 from KBaseReport.KBaseReportClient import KBaseReport
 
 # silence whining
@@ -2347,7 +2348,7 @@ class kb_blast:
                         #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
 
                         if id_untrans == hit_fid or id_trans == hit_fid:
-                            self.log (console, "GOT ONE!")  # DEBUG
+                            #self.log (console, "GOT ONE!")  # DEBUG
                             if id_untrans in hit_seq_ids or id_trans in hit_seq_ids:
                                 row_color = accept_row_color
                             else:
