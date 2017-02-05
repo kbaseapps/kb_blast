@@ -2343,7 +2343,11 @@ class kb_blast:
                     for fid in feature_id_to_function[genome_ref].keys():
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+
+                        self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
+
                         if id_untrans == 'hit_fid' or id_trans == 'hit_fid':
+                            self.log (console, "GOT ONE!")  # DEBUG
                             if id_untrans in hit_seq_ids or id_trans in hit_seq_ids:
                                 row_color = accept_row_color
                             else:
