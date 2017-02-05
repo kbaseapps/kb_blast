@@ -2262,7 +2262,6 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
 
             # text report
@@ -2357,7 +2356,7 @@ class kb_blast:
                     html_report_lines += ['<tr bgcolor=row_color>']
                     # add overlap bar
                     html_report_lines += ['<td>']
-                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0'>]
+                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0>']
                     for i in range (0,bar_width):
                         html_report_lines += ['<td><font color="'+bar_line_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
                     html_report_lines += ['</td>']
@@ -2368,7 +2367,7 @@ class kb_blast:
                     html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
                     html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
-                    html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(q_beg)+'-'str(q_end)+':'+str(h_beg)+'-'+str(h_end)+'</font></td>']
+                    html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(q_beg)+'-'+str(q_end)+':'+str(h_beg)+'-'+str(h_end)+'</font></td>']
                     html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
                     html_report_line += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
                     html_report_line += ['</tr>']
@@ -2394,6 +2393,7 @@ class kb_blast:
 
 
             # create report object
+            reportName = 'blast_report_'+str(uuid.uuid4())
             reportObj = {'objects_created': [],
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
@@ -2408,7 +2408,8 @@ class kb_blast:
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
-
+                                       ]
+                            
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
@@ -2427,6 +2428,7 @@ class kb_blast:
                 'text_message':report
                 }
 
+            reportName = 'blast_report_'+str(uuid.uuid4())
             report_obj_info = ws.save_objects({
                     #                'id':info[6],
                     'workspace':params['workspace_name'],
