@@ -1270,16 +1270,51 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
+        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
             report += 'sequences in many set: '+str(seq_total)+"\n"
             report += 'sequences in hit set:  '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
-            reportObj = {
-                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':search_tool_name+'_Search hits'}],
-                'text_message':report
-                }
+
+            reportObj = {'objects_created': [],
+                         #'text_message': '',  # or is it 'message'?
+                         'message': '',  # or is it 'text_message'?
+                         'direct_html': '',
+                         'direct_html_index': 0,
+                         'file_links': [],
+                         'html_links': [],
+                         'workspace_name': params['workspace_name'],
+                         'report_object_name': reportName
+                         }
+
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['message'] = report
+
+            # add html report
+            """
+            dfu = DFUClient(self.callbackURL)
+            try:
+                upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
+                                                'make_handle': 0,
+                                                'pack': 'zip'})
+            except:
+                raise ValueError ('Logging exception loading html_report to shock')
+
+            reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
+                                        'name': 'blast_search.html',
+                                        'label': search_tool_name+' results'}
+                                       ]
+            """
+
+            # save report object
+            #
+            SERVICE_VER = 'release'
+            reportClient = KBaseReport(self.callbackURL, token=ctx['token'], service_ver=SERVICE_VER)
+            #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
+            report_info = reportClient.create_extended_report(reportObj)
+
         else:
             report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
             reportObj = {
@@ -1287,29 +1322,31 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(uuid.uuid4())
-        report_obj_info = ws.save_objects({
-#                'id':info[6],
-                'workspace':params['workspace_name'],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
+            report_obj_info = ws.save_objects({
+                    #                'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                            'type':'KBaseReport.Report',
+                            'data':reportObj,
+                            'name':reportName,
+                            'meta':{},
+                            'hidden':1,
+                            'provenance':provenance
+                            }
+                        ]
+                    })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END BLASTn_Search
@@ -3165,46 +3202,83 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
+        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
             report += 'sequences in many set: '+str(seq_total)+"\n"
             report += 'sequences in hit set:  '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
-            reportObj = {
-                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':search_tool_name+'_Search hits'}],
-                'text_message':report
-                }
+
+            reportObj = {'objects_created': [],
+                         #'text_message': '',  # or is it 'message'?
+                         'message': '',  # or is it 'text_message'?
+                         'direct_html': '',
+                         'direct_html_index': 0,
+                         'file_links': [],
+                         'html_links': [],
+                         'workspace_name': params['workspace_name'],
+                         'report_object_name': reportName
+                         }
+
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['message'] = report
+
+            # add html report
+            """
+            dfu = DFUClient(self.callbackURL)
+            try:
+                upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
+                                                'make_handle': 0,
+                                                'pack': 'zip'})
+            except:
+                raise ValueError ('Logging exception loading html_report to shock')
+
+            reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
+                                        'name': 'blast_search.html',
+                                        'label': search_tool_name+' results'}
+                                       ]
+            """
+
+            # save report object
+            #
+            SERVICE_VER = 'release'
+            reportClient = KBaseReport(self.callbackURL, token=ctx['token'], service_ver=SERVICE_VER)
+            #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
+            report_info = reportClient.create_extended_report(reportObj)
+
         else:
             report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
             reportObj = {
                 'objects_created':[],
                 'text_message':report
                 }
-            
-        reportName = 'blast_report_'+str(uuid.uuid4())
-        report_obj_info = ws.save_objects({
-#                'id':info[6],
-                'workspace':params['workspace_name'],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
+
+            report_obj_info = ws.save_objects({
+                    #                'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                            'type':'KBaseReport.Report',
+                            'data':reportObj,
+                            'name':reportName,
+                            'meta':{},
+                            'hidden':1,
+                            'provenance':provenance
+                            }
+                        ]
+                    })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END BLASTx_Search
@@ -4249,16 +4323,51 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
+        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
             report += 'sequences in many set: '+str(seq_total)+"\n"
             report += 'sequences in hit set:  '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
-            reportObj = {
-                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':search_tool_name+'_Search hits'}],
-                'text_message':report
-                }
+
+            reportObj = {'objects_created': [],
+                         #'text_message': '',  # or is it 'message'?
+                         'message': '',  # or is it 'text_message'?
+                         'direct_html': '',
+                         'direct_html_index': 0,
+                         'file_links': [],
+                         'html_links': [],
+                         'workspace_name': params['workspace_name'],
+                         'report_object_name': reportName
+                         }
+
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['message'] = report
+
+            # add html report
+            """
+            dfu = DFUClient(self.callbackURL)
+            try:
+                upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
+                                                'make_handle': 0,
+                                                'pack': 'zip'})
+            except:
+                raise ValueError ('Logging exception loading html_report to shock')
+
+            reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
+                                        'name': 'blast_search.html',
+                                        'label': search_tool_name+' results'}
+                                       ]
+            """
+
+            # save report object
+            #
+            SERVICE_VER = 'release'
+            reportClient = KBaseReport(self.callbackURL, token=ctx['token'], service_ver=SERVICE_VER)
+            #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
+            report_info = reportClient.create_extended_report(reportObj)
+
         else:
             report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
             reportObj = {
@@ -4266,29 +4375,31 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(uuid.uuid4())
-        report_obj_info = ws.save_objects({
-#                'id':info[6],
-                'workspace':params['workspace_name'],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
+            report_obj_info = ws.save_objects({
+                    #                'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                            'type':'KBaseReport.Report',
+                            'data':reportObj,
+                            'name':reportName,
+                            'meta':{},
+                            'hidden':1,
+                            'provenance':provenance
+                            }
+                        ]
+                    })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END tBLASTn_Search
@@ -5333,16 +5444,51 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
+        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
             report += 'sequences in many set: '+str(seq_total)+"\n"
             report += 'sequences in hit set:  '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
-            reportObj = {
-                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':search_tool_name+'_Search hits'}],
-                'text_message':report
-                }
+
+            reportObj = {'objects_created': [],
+                         #'text_message': '',  # or is it 'message'?
+                         'message': '',  # or is it 'text_message'?
+                         'direct_html': '',
+                         'direct_html_index': 0,
+                         'file_links': [],
+                         'html_links': [],
+                         'workspace_name': params['workspace_name'],
+                         'report_object_name': reportName
+                         }
+
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['message'] = report
+
+            # add html report
+            """
+            dfu = DFUClient(self.callbackURL)
+            try:
+                upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
+                                                'make_handle': 0,
+                                                'pack': 'zip'})
+            except:
+                raise ValueError ('Logging exception loading html_report to shock')
+
+            reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
+                                        'name': 'blast_search.html',
+                                        'label': search_tool_name+' results'}
+                                       ]
+            """
+
+            # save report object
+            #
+            SERVICE_VER = 'release'
+            reportClient = KBaseReport(self.callbackURL, token=ctx['token'], service_ver=SERVICE_VER)
+            #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
+            report_info = reportClient.create_extended_report(reportObj)
+
         else:
             report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
             reportObj = {
@@ -5350,29 +5496,31 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(uuid.uuid4())
-        report_obj_info = ws.save_objects({
-#                'id':info[6],
-                'workspace':params['workspace_name'],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
+            report_obj_info = ws.save_objects({
+                    #                'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                            'type':'KBaseReport.Report',
+                            'data':reportObj,
+                            'name':reportName,
+                            'meta':{},
+                            'hidden':1,
+                            'provenance':provenance
+                            }
+                        ]
+                    })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END tBLASTx_Search
@@ -6217,16 +6365,51 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
+        reportName = 'blast_report_'+str(uuid.uuid4())
         if len(invalid_msgs) == 0:
             report += 'sequences in many set: '+str(seq_total)+"\n"
             report += 'sequences in hit set:  '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
-            reportObj = {
-                'objects_created':[{'ref':params['workspace_name']+'/'+params['output_filtered_name'], 'description':search_tool_name+'_Search hits'}],
-                'text_message':report
-                }
+
+            reportObj = {'objects_created': [],
+                         #'text_message': '',  # or is it 'message'?
+                         'message': '',  # or is it 'text_message'?
+                         'direct_html': '',
+                         'direct_html_index': 0,
+                         'file_links': [],
+                         'html_links': [],
+                         'workspace_name': params['workspace_name'],
+                         'report_object_name': reportName
+                         }
+
+            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            reportObj['message'] = report
+
+            # add html report
+            """
+            dfu = DFUClient(self.callbackURL)
+            try:
+                upload_ret = dfu.file_to_shock({'file_path': output_html_file_path,
+                                                'make_handle': 0,
+                                                'pack': 'zip'})
+            except:
+                raise ValueError ('Logging exception loading html_report to shock')
+
+            reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
+                                        'name': 'blast_search.html',
+                                        'label': search_tool_name+' results'}
+                                       ]
+            """
+
+            # save report object
+            #
+            SERVICE_VER = 'release'
+            reportClient = KBaseReport(self.callbackURL, token=ctx['token'], service_ver=SERVICE_VER)
+            #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
+            report_info = reportClient.create_extended_report(reportObj)
+
         else:
             report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
             reportObj = {
@@ -6234,29 +6417,31 @@ class kb_blast:
                 'text_message':report
                 }
 
-        reportName = 'blast_report_'+str(uuid.uuid4())
-        report_obj_info = ws.save_objects({
-#                'id':info[6],
-                'workspace':params['workspace_name'],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
+            report_obj_info = ws.save_objects({
+                    #                'id':info[6],
+                    'workspace':params['workspace_name'],
+                    'objects':[
+                        {
+                            'type':'KBaseReport.Report',
+                            'data':reportObj,
+                            'name':reportName,
+                            'meta':{},
+                            'hidden':1,
+                            'provenance':provenance
+                            }
+                        ]
+                    })[0]
+            report_info = dict()
+            report_info['name'] = report_obj_info[1]
+            report_info['ref'] = str(report_obj_info[6])+'/'+str(report_obj_info[0])+'/'+str(report_obj_info[4])
 
         self.log(console,"BUILDING RETURN OBJECT")
 #        returnVal = { 'output_report_name': reportName,
 #                      'output_report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
 #                      'output_filtered_ref': params['workspace_name']+'/'+params['output_filtered_name']
 #                      }
-        returnVal = { 'report_name': reportName,
-                      'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]),
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
                       }
         self.log(console,search_tool_name+"_Search DONE")
         #END psiBLAST_msa_start_Search
