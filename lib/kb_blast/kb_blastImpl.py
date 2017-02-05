@@ -2365,12 +2365,13 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor=row_color>']
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
                     # add overlap bar
                     html_report_lines += ['<td>']
-                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0>']
+                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0><tr>']
                     for i in range (0,bar_width):
                         html_report_lines += ['<td><font color="'+bar_line_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                    html_report_lines += ['</tr></table>']
                     html_report_lines += ['</td>']
 
                     # add other cells
