@@ -2333,7 +2333,7 @@ class kb_blast:
                 [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
-                identity = round (identity, 1)
+                identity = str(round(float(identity), 1))
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
