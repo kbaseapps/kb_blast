@@ -2332,7 +2332,8 @@ class kb_blast:
 
                 [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
 
-                aln_len_perc = round (100.0 *float(aln_len)/float(query_len), 1)
+                aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
+                identity = round (identity, 1)
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -2380,10 +2381,17 @@ class kb_blast:
                     html_report_lines += ['<tr bgcolor="'+row_color+'">']
                     #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
                     # add overlap bar
-                    html_report_lines += ['<td>']
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'; border-top:solid 1px '+border_body_color+'; border-left:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0><tr>']
-                    for i in range (0,bar_width):
+                    full_len_pos = bar_width
+                    aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
+                    aln_end_pos = int (float(bar_width) * float(q_beg)/float(query_len))
+
+                    for i in range (0,aln_beg_pos):
                         html_report_lines += ['<td><font color="'+bar_line_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                    for i in range (aln_beg_pos,aln_end_pos):
+                        html_report_lines += ['<td bgcolor="'+bar_color+'"><font color="'+bar_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+
                     html_report_lines += ['</tr></table>']
                     html_report_lines += ['</td>']
 
