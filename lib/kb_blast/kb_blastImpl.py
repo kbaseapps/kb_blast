@@ -1309,7 +1309,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
@@ -1397,25 +1398,27 @@ class kb_blast:
                     #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
                     # add overlap bar
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
-                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0>']
+                    html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
-                    aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
-                    aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "3"
+                    aln_beg_pos = int (float(bar_width) * float(q_beg-1)/float(query_len-1))
+                    aln_end_pos = int (float(bar_width) * float(q_end-1)/float(query_len-1))
+                    cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
+
+                    cell_width = []
+                    cell_width.append(aln_beg_pos)
+                    cell_width.append(aln_end_pos-aln_beg_pos)
+                    cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
+                        cell_pix_width = str(cell_width[row_i])
 
-                        html_report_lines += ['<tr style="height: '+cell_pix_height+'px">']
-                        for i in range (0,aln_beg_pos):
-                            html_report_lines += ['<tr>']
-                            html_report_lines += ['<td valign=middle height='+cell_pix_height+' bgcolor="'+unalign_color+'"><font color="'+unalign_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
-                        for i in range (aln_beg_pos,aln_end_pos):
-                            html_report_lines += ['<td valign=middle height='+cell_pix_height+' bgcolor="'+bar_color+'"><font color="'+bar_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
-                        for i in range (aln_end_pos,bar_width):
-                            html_report_lines += ['<td valign=middle height='+cell_pix_height+' bgcolor="'+unalign_color+'"><font color="'+unalign_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
+                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
+                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
                         html_report_lines += ['</tr>']
 
                     html_report_lines += ['</table>']
@@ -2466,7 +2469,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
@@ -3573,7 +3577,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
@@ -4860,7 +4865,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
@@ -6150,7 +6156,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
@@ -7236,7 +7243,8 @@ class kb_blast:
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
-            bar_width = 50
+            bar_width = 100
+            bar_height = 15
             bar_color = "lightblue"
             bar_line_color = "#cccccc"
             bar_fontsize = "1"
