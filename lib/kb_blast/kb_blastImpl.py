@@ -1397,7 +1397,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
@@ -2550,7 +2550,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
@@ -3654,7 +3654,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
@@ -4939,7 +4939,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
@@ -6226,7 +6226,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
@@ -7309,7 +7309,7 @@ class kb_blast:
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
                     aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
-                    cell_pix_height = "5"
+                    cell_pix_height = "3"
 
                     for row_i in range(3):
                         unalign_color = row_color
