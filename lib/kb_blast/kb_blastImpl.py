@@ -2032,6 +2032,7 @@ class kb_blast:
         elif not os.path.getsize(output_aln_file_path) > 0:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
+        hit_fids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
@@ -2132,6 +2133,7 @@ class kb_blast:
                 id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                     #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
+                    hit_fids[id_untrans] = True
                     output_sequenceSet['sequences'].append(seq_obj)
 
         # FeatureSet input -> FeatureSet output
@@ -2155,6 +2157,7 @@ class kb_blast:
                     id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
+                        hit_fids[id_untrans] = True
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
@@ -2180,6 +2183,7 @@ class kb_blast:
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
+                    hit_fids[id_untrans] = True
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -2206,6 +2210,7 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
+                        hit_fids[id_untrans] = True
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
@@ -2298,7 +2303,7 @@ class kb_blast:
             bar_fontsize = "1"
             bar_char = "."
             cellpadding = "3"
-            cellspacing = "0"
+            cellspacing = "2"
             border = "0"
 
             html_report_lines = []
@@ -2350,7 +2355,7 @@ class kb_blast:
 
                         if id_untrans == hit_fid or id_trans == hit_fid:
                             #self.log (console, "GOT ONE!")  # DEBUG
-                            if id_untrans in hit_seq_ids or id_trans in hit_seq_ids:
+                            if id_untrans in hit_fids:
                                 row_color = accept_row_color
                             else:
                                 row_color = reject_row_color
@@ -2361,7 +2366,8 @@ class kb_blast:
                         raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
                     elif fid_lookup not in feature_id_to_function[genome_ref]:
                         raise ValueError ("unable to find function for fid: '"+str(fid_lookup))
-                    fid_disp = re.sub(r"^.*\.([^\.]+)\.([\.]+)$", r"\1.\2", fid_lookup)
+                    fid_disp = re.sub (r"^.*\.([^\.]+)\.([^\.]+)$", r"\1.\2", fid_lookup)
+
                     func_disp = feature_id_to_function[genome_ref][fid_lookup]
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
