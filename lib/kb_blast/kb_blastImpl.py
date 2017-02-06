@@ -1358,6 +1358,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
@@ -2512,6 +2515,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
@@ -3617,6 +3623,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
@@ -4903,6 +4912,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
@@ -6191,6 +6203,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
@@ -7275,6 +7290,9 @@ class kb_blast:
 
                     if many_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    else:
+                        genome_ref = input_many_ref
+
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
