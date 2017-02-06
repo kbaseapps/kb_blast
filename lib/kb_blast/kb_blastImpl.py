@@ -2381,16 +2381,24 @@ class kb_blast:
                     html_report_lines += ['<tr bgcolor="'+row_color+'">']
                     #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
                     # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'; border-top:solid 1px '+border_body_color+'; border-left:solid 1px '+border_body_color+'">']
-                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0><tr>']
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'; border-left:solid 1px '+border_body_color+'">']
+                    html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(q_beg)/float(query_len))
-                    aln_end_pos = int (float(bar_width) * float(q_beg)/float(query_len))
+                    aln_end_pos = int (float(bar_width) * float(q_end)/float(query_len))
+                    for row_i in range(3):
+                        unalign_color = row_color
+                        if row_i == 1:
+                            unalign_color = text_color
 
-                    for i in range (0,aln_beg_pos):
-                        html_report_lines += ['<td><font color="'+bar_line_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
-                    for i in range (aln_beg_pos,aln_end_pos):
-                        html_report_lines += ['<td bgcolor="'+bar_color+'"><font color="'+bar_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                        html_report_lines += ['<tr>']
+                        for i in range (0,aln_beg_pos):
+                            html_report_lines += ['<td bgcolor="'+unalign_color+'"><font color="'+unalign_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                        for i in range (aln_beg_pos,aln_end_pos):
+                            html_report_lines += ['<td bgcolor="'+bar_color+'"><font color="'+bar_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                        for i in range (aln_end_pos,bar_width):
+                            html_report_lines += ['<td bgcolor="'+unalign_color+'"><font color="'+unalign_color+'" size='+bar_fontsize+'>'+bar_char+'</font></td>']
+                        html_report_lines += ['</tr>']
 
                     html_report_lines += ['</tr></table>']
                     html_report_lines += ['</td>']
