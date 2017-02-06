@@ -1283,11 +1283,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
@@ -2436,11 +2437,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
@@ -3540,11 +3542,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
@@ -4825,11 +4828,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
@@ -6112,11 +6116,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
@@ -7195,11 +7200,12 @@ class kb_blast:
 
             # text report
             #
-            #report += 'sequences in many set: '+str(seq_total)+"\n"
-            #report += 'sequences in hit set:  '+str(hit_total)+"\n"
-            #report += "\n"
-            #for line in hit_buf:
-            #    report += line
+            report += 'sequences in many set: '+str(seq_total)+"\n"
+            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
 
             # build html report
