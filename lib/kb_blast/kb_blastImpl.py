@@ -1397,30 +1397,35 @@ class kb_blast:
                     html_report_lines += ['<tr bgcolor="'+row_color+'">']
                     #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
                     # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
@@ -2554,33 +2559,34 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                    # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
@@ -3664,33 +3670,34 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                    # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
@@ -4956,33 +4963,34 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                    # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
@@ -6250,33 +6258,34 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                    # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
@@ -7340,33 +7349,34 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                    # add overlap bar
-                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
                     html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
                     full_len_pos = bar_width
                     aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
+                    cell_color = []
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
                     cell_width.append(bar_width-aln_end_pos)
 
                     for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
                         unalign_color = row_color
                         if row_i == 1:
                             unalign_color = bar_line_color
-                        cell_pix_width = str(cell_width[row_i])
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
 
-                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+bar_color+'"></td>']
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+unalign_color+'"></td>']
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
                         html_report_lines += ['</tr>']
-
                     html_report_lines += ['</table>']
                     html_report_lines += ['</td>']
 
