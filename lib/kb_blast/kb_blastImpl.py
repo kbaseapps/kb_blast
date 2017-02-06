@@ -2291,6 +2291,7 @@ class kb_blast:
             reject_row_color = '#eeeeee'
             text_fontsize = "2"
             text_color = '#606060'
+            border_body_color = "#606060"
             bar_width = 50
             bar_color = "lightblue"
             bar_line_color = text_color
@@ -2310,13 +2311,13 @@ class kb_blast:
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN%'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
-            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'%</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
-            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'Q_BEG-Q_END:H_BEG-H_END'+'</font></td>']
-            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'MISMATCHES'+'</font></td>']
-            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GAP OPENINGS'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'<nobr>Q_BEG-Q_END:</nobr> <nobr><H_BEG-H_END</nobr>'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'MIS MATCH'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GAP OPEN'+'</font></td>']
             html_report_lines += ['</tr">']
 
             for line in hit_buf:
@@ -2365,7 +2366,8 @@ class kb_blast:
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
-                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
                     # add overlap bar
                     html_report_lines += ['<td>']
                     html_report_lines += ['<table border=0 cellpadding=0 cellspacing=0><tr>']
@@ -2375,16 +2377,17 @@ class kb_blast:
                     html_report_lines += ['</td>']
 
                     # add other cells
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len_perc)+'%</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(q_beg)+'-'+str(q_end)+':'+str(h_beg)+'-'+str(h_end)+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
-                    html_report_lines += ['<td><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(id_lookup)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len_perc)+'%</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
                     html_report_lines += ['</tr>']
 
             html_report_lines += ['</table>']
