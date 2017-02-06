@@ -2348,18 +2348,18 @@ class kb_blast:
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
-                        if many_type_name == 'Genome':
-                            id_untrans = fid
-                        elif many_type_name == 'GenomeSet' or many_type_name == 'FeatureSet':
-                            id_untrans = genome_ref+genome_id_feature_id_delim+fid
-
+                        id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
                         #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
 
                         if id_untrans == hit_fid or id_trans == hit_fid:
                             #self.log (console, "GOT ONE!")  # DEBUG
-                            if id_untrans in accept_fids:
+                            if many_type_name == 'Genome':
+                                accept_id = fid
+                            elif many_type_name == 'GenomeSet' or many_type_name == 'FeatureSet':
+                                accept_id = genome_ref+genome_id_feature_id_delim+fid
+                            if accept_id in accept_fids:
                                 row_color = accept_row_color
                             else:
                                 row_color = reject_row_color
