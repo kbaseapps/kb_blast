@@ -1406,7 +1406,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
@@ -2567,7 +2567,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
@@ -3678,7 +3678,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
@@ -4971,7 +4971,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
@@ -6266,7 +6266,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
@@ -7357,7 +7357,7 @@ class kb_blast:
                     aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
                     cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
 
-                    cell_color = []
+                    cell_color = ['','','']
                     cell_width = []
                     cell_width.append(aln_beg_pos)
                     cell_width.append(aln_end_pos-aln_beg_pos)
