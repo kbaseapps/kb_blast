@@ -1346,6 +1346,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -2511,6 +2512,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -2558,6 +2560,10 @@ class kb_blast:
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
 
                     # coverage graphic
                     html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
@@ -3622,6 +3628,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -3669,6 +3676,10 @@ class kb_blast:
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
 
                     # coverage graphic
                     html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
@@ -4915,6 +4926,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -4962,6 +4974,10 @@ class kb_blast:
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
 
                     # coverage graphic
                     html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
@@ -6210,6 +6226,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -6257,6 +6274,10 @@ class kb_blast:
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
 
                     # coverage graphic
                     html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
@@ -7301,6 +7322,7 @@ class kb_blast:
 
                 aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
                 identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
                 #if many_type_name == 'SingleEndLibrary':
                 #    pass
@@ -7348,6 +7370,10 @@ class kb_blast:
                     genome_sci_name = genome_ref_to_sci_name[genome_ref]
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
 
                     # coverage graphic
                     html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
