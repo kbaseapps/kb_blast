@@ -2032,7 +2032,7 @@ class kb_blast:
         elif not os.path.getsize(output_aln_file_path) > 0:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
-        hit_fids = dict()
+        accept_fids = dict()
         output_aln_file_handle = open (output_aln_file_path, "r", 0)
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
@@ -2133,7 +2133,7 @@ class kb_blast:
                 id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                     #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
-                    hit_fids[id_untrans] = True
+                    accept_fids[id_untrans] = True
                     output_sequenceSet['sequences'].append(seq_obj)
 
         # FeatureSet input -> FeatureSet output
@@ -2157,7 +2157,7 @@ class kb_blast:
                     id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
-                        hit_fids[id_untrans] = True
+                        accept_fids[id_untrans] = True
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
@@ -2183,7 +2183,7 @@ class kb_blast:
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
-                    hit_fids[id_untrans] = True
+                    accept_fids[id_untrans] = True
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -2210,7 +2210,7 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
-                        hit_fids[id_untrans] = True
+                        accept_fids[id_untrans] = True
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
@@ -2316,7 +2316,7 @@ class kb_blast:
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
             html_report_lines += ['<td align=center style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
-            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN%'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
@@ -2348,14 +2348,18 @@ class kb_blast:
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
                     for fid in feature_id_to_function[genome_ref].keys():
-                        id_untrans = fid
+                        if many_type_name == 'Genome':
+                            id_untrans = fid
+                        elif many_type_name == 'GenomeSet' or many_type_name == 'FeatureSet':
+                            id_untrans = genome_ref+genome_id_feature_id_delim+fid
+
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
                         #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
 
                         if id_untrans == hit_fid or id_trans == hit_fid:
                             #self.log (console, "GOT ONE!")  # DEBUG
-                            if id_untrans in hit_fids:
+                            if id_untrans in accept_fids:
                                 row_color = accept_row_color
                             else:
                                 row_color = reject_row_color
@@ -2384,17 +2388,17 @@ class kb_blast:
                     html_report_lines += ['</td>']
 
                     # add other cells
-                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(fid_disp)+'</font></td>']
-                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
-                    html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len_perc)+'%</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(fid_disp)+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len_perc)+'%</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+'</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(e_value)+'</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
+                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
                     html_report_lines += ['</tr>']
 
             html_report_lines += ['</table>']
