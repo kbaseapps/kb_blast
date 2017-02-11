@@ -327,7 +327,7 @@ class kb_blast:
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
                 
-            # Upload results
+            # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
@@ -1233,7 +1233,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SingleEndLibrary -> upload SingleEndLibrary
@@ -1279,12 +1279,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -1493,7 +1494,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -1640,7 +1645,7 @@ class kb_blast:
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
                 
-            # Upload results
+            # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
@@ -2411,7 +2416,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -2445,12 +2450,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -2659,7 +2665,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -2806,7 +2816,7 @@ class kb_blast:
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
                 
-            # Upload results
+            # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
@@ -3529,7 +3539,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -3546,7 +3556,7 @@ class kb_blast:
                                 }]
                         })[0]
 
-            else: # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+            else:  # input FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
                 new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
@@ -3562,12 +3572,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -3775,7 +3786,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -3922,7 +3937,7 @@ class kb_blast:
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
                 
-            # Upload results
+            # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
@@ -4811,10 +4826,8 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
-
-
 
             # input SingleEndLibrary -> upload SingleEndLibrary
             #
@@ -4859,12 +4872,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -5073,7 +5087,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -5220,7 +5238,7 @@ class kb_blast:
             provenance[0]['service'] = 'kb_blast'
             provenance[0]['method'] = search_tool_name+'_Search'
                 
-            # Upload results
+            # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
 
@@ -6113,7 +6131,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input SingleEndLibrary -> upload SingleEndLibrary
@@ -6159,12 +6177,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -6373,7 +6392,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -7222,7 +7245,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -7255,12 +7278,13 @@ class kb_blast:
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
-        if len(invalid_msgs) == 0:
+        if len(invalid_msgs) == 0 and len(hit_order) > 0:
 
             # text report
             #
-            report += 'sequences in many set: '+str(seq_total)+"\n"
-            report += 'sequences in hit set:  '+str(hit_total)+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
             report += "\n"
             for line in hit_buf:
                 report += line
@@ -7469,7 +7493,11 @@ class kb_blast:
             report_info = reportClient.create_extended_report(reportObj)
 
         else:
-            report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+            if len(hit_order) == 0:  # no hits
+                report += "No hits were found\n"
+            else:  # data validation error
+                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
+
             reportObj = {
                 'objects_created':[],
                 'text_message':report
