@@ -865,7 +865,6 @@ class kb_blast:
         # NEW SYNTAX: blastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTn
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -885,9 +884,72 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_extra_file_path = os.path.join(output_dir, 'alnout_extra.txt');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
-        # this is command for basic search mode
+        # this is command for extra output
+        extra_output = False
+        if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
+            blast_cmd = [blast_bin]
+            blast_cmd.append('-query')
+            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append('-db')
+            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append('-out')
+            blast_cmd.append(output_extra_file_path)
+            #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+            blast_cmd.append('-outfmt')
+            blast_cmd.append(str(params['output_extra_format']))
+            blast_cmd.append('-evalue')
+            blast_cmd.append(str(params['e_value']))
+
+            # options (not allowed for format 0)
+            #if 'maxaccepts' in params:
+            #    if params['maxaccepts']:
+            #        blast_cmd.append('-max_target_seqs')
+            #        blast_cmd.append(str(params['maxaccepts']))
+
+            # Run BLAST, capture output as it happens
+            #
+            self.log(console, 'RUNNING BLAST (FOR EXTRA OUTPUT):')
+            self.log(console, '    '+' '.join(blast_cmd))
+            #        report += "\n"+'running BLAST:'+"\n"
+            #        report += '    '+' '.join(blast_cmd)+"\n"
+
+            p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+            while True:
+                line = p.stdout.readline()
+                if not line: break
+                self.log(console, line.replace('\n', ''))
+
+            p.stdout.close()
+            p.wait()
+            self.log(console, 'return code: ' + str(p.returncode))
+            if p.returncode != 0:
+                raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+# DEBUG
+#                                                      'make_handle': 0,
+#                                                      'pack': 'zip'})
+                                                      'make_handle': 0})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
+
+
+        # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -930,6 +992,17 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
+        except:
+            raise ValueError ('error loading aln_out file to shock')
 
 
         # get query_len for filtering later
@@ -1484,6 +1557,24 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
+                            
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
@@ -2220,7 +2311,7 @@ class kb_blast:
 #                                                 'pack': 'zip'})
                                                  'make_handle': 0})
         except:
-            raise ValueError ('error loading output_extra file to shock')
+            raise ValueError ('error loading aln_out file to shock')
 
         # DEBUG
         #for outfile in os.listdir(output_dir):
@@ -3307,7 +3398,6 @@ class kb_blast:
         # NEW SYNTAX: blastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.BLASTx
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -3327,9 +3417,72 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_extra_file_path = os.path.join(output_dir, 'alnout_extra.txt');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.faa');
 
-        # this is command for basic search mode
+        # this is command for extra output
+        extra_output = False
+        if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
+            blast_cmd = [blast_bin]
+            blast_cmd.append('-query')
+            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append('-db')
+            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append('-out')
+            blast_cmd.append(output_extra_file_path)
+            #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+            blast_cmd.append('-outfmt')
+            blast_cmd.append(str(params['output_extra_format']))
+            blast_cmd.append('-evalue')
+            blast_cmd.append(str(params['e_value']))
+
+            # options (not allowed for format 0)
+            #if 'maxaccepts' in params:
+            #    if params['maxaccepts']:
+            #        blast_cmd.append('-max_target_seqs')
+            #        blast_cmd.append(str(params['maxaccepts']))
+
+            # Run BLAST, capture output as it happens
+            #
+            self.log(console, 'RUNNING BLAST (FOR EXTRA OUTPUT):')
+            self.log(console, '    '+' '.join(blast_cmd))
+            #        report += "\n"+'running BLAST:'+"\n"
+            #        report += '    '+' '.join(blast_cmd)+"\n"
+
+            p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+            while True:
+                line = p.stdout.readline()
+                if not line: break
+                self.log(console, line.replace('\n', ''))
+
+            p.stdout.close()
+            p.wait()
+            self.log(console, 'return code: ' + str(p.returncode))
+            if p.returncode != 0:
+                raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+# DEBUG
+#                                                      'make_handle': 0,
+#                                                      'pack': 'zip'})
+                                                      'make_handle': 0})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
+
+
+        # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -3371,6 +3524,17 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
+        except:
+            raise ValueError ('error loading aln_out file to shock')
 
 
         # get query_len for filtering later
@@ -3824,7 +3988,24 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
-                            
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
+                                                        
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
@@ -4532,7 +4713,6 @@ class kb_blast:
         # NEW SYNTAX: tblastn -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.tBLASTn
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -4552,9 +4732,72 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_extra_file_path = os.path.join(output_dir, 'alnout_extra.txt');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
-        # this is command for basic search mode
+        # this is command for extra output
+        extra_output = False
+        if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
+            blast_cmd = [blast_bin]
+            blast_cmd.append('-query')
+            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append('-db')
+            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append('-out')
+            blast_cmd.append(output_extra_file_path)
+            #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+            blast_cmd.append('-outfmt')
+            blast_cmd.append(str(params['output_extra_format']))
+            blast_cmd.append('-evalue')
+            blast_cmd.append(str(params['e_value']))
+
+            # options (not allowed for format 0)
+            #if 'maxaccepts' in params:
+            #    if params['maxaccepts']:
+            #        blast_cmd.append('-max_target_seqs')
+            #        blast_cmd.append(str(params['maxaccepts']))
+
+            # Run BLAST, capture output as it happens
+            #
+            self.log(console, 'RUNNING BLAST (FOR EXTRA OUTPUT):')
+            self.log(console, '    '+' '.join(blast_cmd))
+            #        report += "\n"+'running BLAST:'+"\n"
+            #        report += '    '+' '.join(blast_cmd)+"\n"
+
+            p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+            while True:
+                line = p.stdout.readline()
+                if not line: break
+                self.log(console, line.replace('\n', ''))
+
+            p.stdout.close()
+            p.wait()
+            self.log(console, 'return code: ' + str(p.returncode))
+            if p.returncode != 0:
+                raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+# DEBUG
+#                                                      'make_handle': 0,
+#                                                      'pack': 'zip'})
+                                                      'make_handle': 0})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
+
+
+        # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -4596,6 +4839,17 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
+        except:
+            raise ValueError ('error loading aln_out file to shock')
 
 
         # get query_len for filtering later
@@ -5128,6 +5382,23 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
@@ -5836,7 +6107,6 @@ class kb_blast:
         # NEW SYNTAX: tblastx -query <queryfile> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.tBLASTx
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -5856,9 +6126,72 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_extra_file_path = os.path.join(output_dir, 'alnout_extra.txt');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');
 
-        # this is command for basic search mode
+        # this is command for extra output
+        extra_output = False
+        if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
+            blast_cmd = [blast_bin]
+            blast_cmd.append('-query')
+            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append('-db')
+            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append('-out')
+            blast_cmd.append(output_extra_file_path)
+            #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+            blast_cmd.append('-outfmt')
+            blast_cmd.append(str(params['output_extra_format']))
+            blast_cmd.append('-evalue')
+            blast_cmd.append(str(params['e_value']))
+
+            # options (not allowed for format 0)
+            #if 'maxaccepts' in params:
+            #    if params['maxaccepts']:
+            #        blast_cmd.append('-max_target_seqs')
+            #        blast_cmd.append(str(params['maxaccepts']))
+
+            # Run BLAST, capture output as it happens
+            #
+            self.log(console, 'RUNNING BLAST (FOR EXTRA OUTPUT):')
+            self.log(console, '    '+' '.join(blast_cmd))
+            #        report += "\n"+'running BLAST:'+"\n"
+            #        report += '    '+' '.join(blast_cmd)+"\n"
+
+            p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+            while True:
+                line = p.stdout.readline()
+                if not line: break
+                self.log(console, line.replace('\n', ''))
+
+            p.stdout.close()
+            p.wait()
+            self.log(console, 'return code: ' + str(p.returncode))
+            if p.returncode != 0:
+                raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+# DEBUG
+#                                                      'make_handle': 0,
+#                                                      'pack': 'zip'})
+                                                      'make_handle': 0})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
+
+
+        # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
         blast_cmd.append('-query')
         blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-db')
@@ -5900,6 +6233,17 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
+        except:
+            raise ValueError ('error loading aln_out file to shock')
 
 
         # get query_len for filtering later
@@ -6436,6 +6780,23 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
@@ -7014,7 +7375,6 @@ class kb_blast:
         # NEW SYNTAX: psiblast -in_msa <msa_queryfile> -msa_master_idx <row_n> -db <basename> -out <out_aln_file> -outfmt 0/7 (8 became 7) -evalue <e_value> -dust no (DNA) -seg no (AA) -num_threads <num_cores>
         #
         blast_bin = self.psiBLAST
-        blast_cmd = [blast_bin]
 
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -7038,9 +7398,72 @@ class kb_blast:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         output_aln_file_path = os.path.join(output_dir, 'alnout.txt');
+        output_extra_file_path = os.path.join(output_dir, 'alnout_extra.txt');
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.faa');
 
-        # this is command for basic search mode
+        # this is command for extra output
+        extra_output = False
+        if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
+            blast_cmd = [blast_bin]
+            blast_cmd.append('-query')
+            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append('-db')
+            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append('-out')
+            blast_cmd.append(output_extra_file_path)
+            #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
+            blast_cmd.append('-outfmt')
+            blast_cmd.append(str(params['output_extra_format']))
+            blast_cmd.append('-evalue')
+            blast_cmd.append(str(params['e_value']))
+
+            # options (not allowed for format 0)
+            #if 'maxaccepts' in params:
+            #    if params['maxaccepts']:
+            #        blast_cmd.append('-max_target_seqs')
+            #        blast_cmd.append(str(params['maxaccepts']))
+
+            # Run BLAST, capture output as it happens
+            #
+            self.log(console, 'RUNNING BLAST (FOR EXTRA OUTPUT):')
+            self.log(console, '    '+' '.join(blast_cmd))
+            #        report += "\n"+'running BLAST:'+"\n"
+            #        report += '    '+' '.join(blast_cmd)+"\n"
+
+            p = subprocess.Popen(blast_cmd, \
+                             cwd = self.scratch, \
+                             stdout = subprocess.PIPE, \
+                             stderr = subprocess.STDOUT, \
+                             shell = False)
+
+            while True:
+                line = p.stdout.readline()
+                if not line: break
+                self.log(console, line.replace('\n', ''))
+
+            p.stdout.close()
+            p.wait()
+            self.log(console, 'return code: ' + str(p.returncode))
+            if p.returncode != 0:
+                raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+# DEBUG
+#                                                      'make_handle': 0,
+#                                                      'pack': 'zip'})
+                                                      'make_handle': 0})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
+
+
+        # this is command for basic search mode (with TAB TXT output)
+        blast_cmd = [blast_bin]
 #        blast_cmd.append('-query')
 #        blast_cmd.append(one_forward_reads_file_path)
         blast_cmd.append('-in_msa')
@@ -7086,6 +7509,17 @@ class kb_blast:
         if p.returncode != 0:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
+        except:
+            raise ValueError ('error loading aln_out file to shock')
 
 
         # get query_len for filtering later
@@ -7541,6 +7975,23 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
