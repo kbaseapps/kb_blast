@@ -81,6 +81,11 @@ parameters :
             Max Accepts
         short-hint : |
             limits the number of hits in result.  Default: 1000
+    output_extra_format:
+        ui-name : |
+            Extra text output format
+        short-hint : |
+            generate an additional output file.  you get tabular m=7 (which used to be m=8) for free.
 
 description : |
     <p>This method performs a nuc-prot (translated protein sequence alignment) BLASTx Search using NCBI's BLAST+ (version 2.6.0)</p>

@@ -33,12 +33,13 @@ module kb_blast {
 	data_obj_name  output_one_name;
         data_obj_name  output_filtered_name;
 
-	float ident_thresh;
-	float e_value;
-	float bitscore;
-	float overlap_fraction;
-	float maxaccepts;
-	float rounds;  /* for psiBLAST_iter */
+	float  ident_thresh;
+	float  e_value;
+	float  bitscore;
+	float  overlap_fraction;
+	float  maxaccepts;
+	string output_extra_format;
+	float  rounds;  /* for psiBLAST_iter if I add it later*/
     } BLAST_Params;
 
 

@@ -127,7 +127,86 @@
                 "validate_as": "int",
                 "min_integer" : 0
             }
+        },
+        {
+            "id": "output_extra_format",
+            "optional": false,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "none" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+	    	"options": [
+				{
+					"value": "none",
+					"display": "Only 7 (tabular with comment lines)",
+					"id": "none",
+					"ui-name": "none"
+				},
+				{
+					"value": "0",
+					"display": "0 (pairwise)",
+					"id": "0",
+					"ui-name": "0"
+				},
+				{
+					"value": "1",
+					"display": "1 (query-anchored showing identities)",
+					"id": "1",
+					"ui-name": "1"
+				},
+				{
+					"value": "2",
+					"display": "2 (query-anchored no identities)",
+					"id": "2",
+					"ui-name": "2"
+				},
+				{
+					"value": "3",
+					"display": "3 (flat query-anchored, show identities)",
+					"id": "3",
+					"ui-name": "3"
+				},
+				{
+					"value": "4",
+					"display": "4 (flat query-anchored, no identities)",
+					"id": "4",
+					"ui-name": "4"
+				},
+				{
+					"value": "5",
+					"display": "5 (XML Blast output)",
+					"id": "5",
+					"ui-name": "5"
+				},
+				{
+					"value": "8",
+					"display": "8 (Text ASN.1)",
+					"id": "8",
+					"ui-name": "8"
+				},
+				{
+					"value": "9",
+					"display": "9 (Binary ASN.1)",
+					"id": "9",
+					"ui-name": "9"
+				},
+				{
+					"value": "10",
+					"display": "10 (Comma-separated values)",
+					"id": "10",
+					"ui-name": "10"
+				},
+				{
+					"value": "11",
+					"display": "11 (BLAST archive format ASN.1)",
+					"id": "11",
+					"ui-name": "11"
+				}
+		]
+            }
         }
+
     ],
     "behavior": {
         "service-mapping": {
@@ -180,6 +259,10 @@
                 {
                     "input_parameter": "maxaccepts",
                     "target_property": "maxaccepts"
+                },
+                {
+                    "input_parameter": "output_extra_format",
+                    "target_property": "output_extra_format"
                 }
             ],
             "output_mapping": [
