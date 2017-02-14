@@ -1382,7 +1382,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -1546,7 +1546,6 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         #'direct_html_index': 0,
                          'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
@@ -1569,7 +1568,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
@@ -2605,7 +2606,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -2769,13 +2770,18 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
@@ -2786,7 +2792,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
@@ -3820,7 +3828,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -3983,13 +3991,18 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
@@ -4000,7 +4013,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
@@ -5213,7 +5228,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -5377,13 +5392,18 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
@@ -5394,7 +5414,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
@@ -6611,7 +6633,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -6775,13 +6797,18 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
@@ -6792,7 +6819,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
@@ -7806,7 +7835,7 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#eeeeee'
+            reject_row_color = '#ffeeee'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -7970,13 +7999,18 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
@@ -7987,7 +8021,9 @@ class kb_blast:
                                        ]
             if extra_output:
                 extension = 'txt'
-                if params['output_extra_format'] == '8':
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
                     extension = 'asn1txt'
                 elif params['output_extra_format'] == '9':
                     extension = 'asn1bin'
