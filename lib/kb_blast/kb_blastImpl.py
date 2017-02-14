@@ -2688,8 +2688,17 @@ class kb_blast:
                                         'label': search_tool_name+' Results: m'+'7'}
                                        ]
             if extra_output:
+                extension = 'txt'
+                if params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
                 reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
-                                                'name': search_tool_name+'_Search-m'+str(params['ouput_extra_format'])+'.txt',
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
