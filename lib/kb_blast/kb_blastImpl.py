@@ -52,9 +52,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.2"
+    VERSION = "0.0.3"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
-    GIT_COMMIT_HASH = "dc738060c636bacef584c58816e67aa4ad2803cf"
+    GIT_COMMIT_HASH = "4a0be4708575e01f5f21b10240f08d4acd77a7a7"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -242,7 +242,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -1562,7 +1563,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -2735,7 +2737,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -3858,7 +3861,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -5161,7 +5165,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -6468,7 +6473,8 @@ class kb_blast:
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

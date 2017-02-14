@@ -58,7 +58,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -86,7 +87,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -114,7 +116,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -142,7 +145,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -170,7 +174,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -198,7 +203,8 @@ class kb_blast(object):
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "rounds" of Double
+           parameter "output_extra_format" of String, parameter "rounds" of
+           Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

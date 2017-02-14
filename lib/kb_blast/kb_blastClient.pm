@@ -138,6 +138,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -168,6 +169,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -267,6 +269,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -297,6 +300,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -391,6 +395,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -421,6 +426,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -515,6 +521,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -545,6 +552,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -639,6 +647,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -669,6 +678,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -763,6 +773,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -793,6 +804,7 @@ BLAST_Params is a reference to a hash where the following keys are defined:
 	bitscore has a value which is a float
 	overlap_fraction has a value which is a float
 	maxaccepts has a value which is a float
+	output_extra_format has a value which is a string
 	rounds has a value which is a float
 workspace_name is a string
 sequence is a string
@@ -1092,6 +1104,7 @@ e_value has a value which is a float
 bitscore has a value which is a float
 overlap_fraction has a value which is a float
 maxaccepts has a value which is a float
+output_extra_format has a value which is a string
 rounds has a value which is a float
 
 </pre>
@@ -1113,6 +1126,7 @@ e_value has a value which is a float
 bitscore has a value which is a float
 overlap_fraction has a value which is a float
 maxaccepts has a value which is a float
+output_extra_format has a value which is a string
 rounds has a value which is a float
 
 
