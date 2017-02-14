@@ -2213,8 +2213,10 @@ class kb_blast:
         dfu = DFUClient(self.callbackURL)
         try:
             base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
-                                                 'make_handle': 0,
-                                                 'pack': 'zip'})
+# DEBUG
+#                                                 'make_handle': 0,
+#                                                 'pack': 'zip'})
+                                                 'make_handle': 0})
         except:
             raise ValueError ('error loading output_extra file to shock')
 
