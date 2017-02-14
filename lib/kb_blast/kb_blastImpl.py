@@ -1546,13 +1546,19 @@ class kb_blast:
                          #'text_message': '',  # or is it 'message'?
                          'message': '',  # or is it 'text_message'?
                          'direct_html': '',
-                         'direct_html_index': 0,
+                         #'direct_html_index': 0,
+                         'direct_html_index': None,
                          'file_links': [],
                          'html_links': [],
                          'workspace_name': params['workspace_name'],
                          'report_object_name': reportName
                          }
-            reportObj['direct_html'] = html_report_str
+            html_buf_lim = 16000  # really 16KB, but whatever
+            if len(html_report_str) <= html_buf_lim:
+                reportObj['direct_html'] = html_report_str
+            else:
+                reportObj['direct_html_index'] = 0
+
             reportObj['html_links'] = [{'shock_id': upload_ret['shock_id'],
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
