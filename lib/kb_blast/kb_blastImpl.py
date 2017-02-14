@@ -2107,7 +2107,10 @@ class kb_blast:
         output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.faa');
 
         # this is command for extra output
+        extra_output = False
         if 'output_extra_format' in params and params['output_extra_format'] != None and params['output_extra_format'] != '' and params['output_extra_format'] != 'none':
+            extra_output = True
+
             blast_cmd = [blast_bin]
             blast_cmd.append('-query')
             blast_cmd.append(one_forward_reads_file_path)
@@ -2151,6 +2154,15 @@ class kb_blast:
             if p.returncode != 0:
                 raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
+
+            # upload BLAST output
+            dfu = DFUClient(self.callbackURL)
+            try:
+                extra_upload_ret = dfu.file_to_shock({'file_path': output_extra_file_path,
+                                                      'make_handle': 0,
+                                                      'pack': 'zip'})
+            except:
+                raise ValueError ('error loading output_extra file to shock')
 
 
         # this is command for basic search mode (with TAB TXT output)
@@ -2197,9 +2209,18 @@ class kb_blast:
             raise ValueError('Error running BLAST, return code: '+str(p.returncode) + 
                 '\n\n'+ '\n'.join(console))
 
+        # upload BLAST output
+        dfu = DFUClient(self.callbackURL)
+        try:
+            base_upload_ret = dfu.file_to_shock({'file_path': output_aln_file_path,
+                                                 'make_handle': 0,
+                                                 'pack': 'zip'})
+        except:
+            raise ValueError ('error loading output_extra file to shock')
+
         # DEBUG
-        for outfile in os.listdir(output_dir):
-            self.log(console, "OUTFILE: '"+outfile+"'")
+        #for outfile in os.listdir(output_dir):
+        #    self.log(console, "OUTFILE: '"+outfile+"'")
 
 
         # get query_len for filtering later
@@ -2658,6 +2679,14 @@ class kb_blast:
                                         'name': html_file,
                                         'label': search_tool_name+' Results'}
                                        ]
+            reportObj['file_links'] = [{'shock_id': base_upload_ret['shock_id'],
+                                        'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                        'label': search_tool_name+' Results: m'+'7'}
+                                       ]
+            if extra_output:
+                reportObj['file_links'].append({'shock_id': extra_upload_ret['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['ouput_extra_format'])+'.txt',
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
             reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
