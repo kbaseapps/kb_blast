@@ -370,8 +370,8 @@ class kb_blast:
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_one_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
@@ -481,8 +481,8 @@ class kb_blast:
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
@@ -1691,8 +1691,8 @@ class kb_blast:
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_one_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
@@ -1804,8 +1804,8 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
@@ -2894,8 +2894,8 @@ class kb_blast:
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_one_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
@@ -3010,8 +3010,8 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
@@ -4018,8 +4018,8 @@ class kb_blast:
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_one_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
@@ -4136,8 +4136,8 @@ class kb_blast:
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
@@ -5322,8 +5322,8 @@ class kb_blast:
 
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_one_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
@@ -5439,8 +5439,8 @@ class kb_blast:
         sequencing_tech = 'N/A'
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
@@ -6550,8 +6550,8 @@ class kb_blast:
         if 'input_one_ref' in params and params['input_one_ref'] != None:
             try:
                 ws = workspaceService(self.workspaceURL, token=ctx['token'])
-                #objects = ws.get_objects([{'ref': params['input_one_ref']}])
-                objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+                objects = ws.get_objects([{'ref': params['input_one_ref']}])
+                #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
                 input_one_data = objects[0]['data']
                 input_one_name = str(objects[0]['info'][1])
                 info = objects[0]['info']
@@ -6636,8 +6636,8 @@ class kb_blast:
         master_row_idx = 0
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_msa_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_msa_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_msa_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_msa_ref}]})['data']
             input_msa_data = objects[0]['data']
             info = objects[0]['info']
             input_msa_name = str(info[1])
@@ -6718,8 +6718,8 @@ class kb_blast:
         ##
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            objects = ws.get_objects([{'ref': input_many_ref}])
+            #objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
             input_many_data = objects[0]['data']
             info = objects[0]['info']
             input_many_name = str(info[1])
