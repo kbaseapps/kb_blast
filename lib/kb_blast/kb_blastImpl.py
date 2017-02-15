@@ -261,6 +261,7 @@ class kb_blast:
 #        report += "\n"+pformat(params)
         appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -425,10 +426,9 @@ class kb_blast:
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = input_one_name+".fasta"
- 
+
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             FeatureSetToFASTA_params = {
@@ -632,7 +632,6 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -705,7 +704,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -1222,7 +1220,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -1234,10 +1232,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -1250,7 +1250,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -1260,6 +1260,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -1272,7 +1274,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -1286,10 +1288,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -1680,6 +1684,7 @@ class kb_blast:
 #        report += "\n"+pformat(params)
         appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -1840,7 +1845,6 @@ class kb_blast:
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = input_one_name+".fasta"
 
@@ -1949,7 +1953,6 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -2022,7 +2025,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -2457,7 +2459,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -2469,10 +2471,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -2485,7 +2489,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -2495,6 +2499,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -2507,7 +2513,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -2522,10 +2528,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -2903,6 +2911,7 @@ class kb_blast:
 #        report += "\n"+pformat(params)
         #appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -3066,7 +3075,6 @@ class kb_blast:
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = input_one_name+".fasta"
             
@@ -3180,7 +3188,6 @@ class kb_blast:
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -3253,7 +3260,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -3680,7 +3686,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -3692,10 +3698,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -3708,7 +3716,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -3718,6 +3726,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -3730,7 +3740,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -3745,10 +3755,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -4124,6 +4136,7 @@ class kb_blast:
 #        report += "\n"+pformat(params)
         appropriate_sequence_found_in_one_input = False
         #appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -4286,7 +4299,6 @@ class kb_blast:
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = input_one_name+".fasta"
             
@@ -4502,7 +4514,6 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -4575,7 +4586,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -5067,7 +5077,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -5079,10 +5089,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -5095,7 +5107,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -5105,6 +5117,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -5117,7 +5131,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -5132,10 +5146,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -5525,6 +5541,7 @@ class kb_blast:
 #        report += "\n"+pformat(params)
         appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -5687,7 +5704,6 @@ class kb_blast:
         elif one_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            genome_id_feature_id_delim = '.f:'
             one_forward_reads_file_dir = self.scratch
             one_forward_reads_file = input_one_name+".fasta"
 
@@ -5902,7 +5918,6 @@ class kb_blast:
         elif many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -5975,7 +5990,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -6472,7 +6486,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -6484,10 +6498,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -6500,7 +6516,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -6510,6 +6526,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -6522,7 +6540,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -6537,10 +6555,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -6931,6 +6951,7 @@ class kb_blast:
         appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_MSA_input = False
         appropriate_sequence_found_in_many_input = False
+        genome_id_feature_id_delim = '.f:'
 
 
         #### do some basic checks
@@ -6976,7 +6997,6 @@ class kb_blast:
             if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
                 #input_one_featureSet = input_one_data
-                genome_id_feature_id_delim = '.f:'
                 one_forward_reads_file_dir = self.scratch
                 one_forward_reads_file = input_one_name+".fasta"
 
@@ -7174,7 +7194,6 @@ class kb_blast:
         if many_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -7247,7 +7266,6 @@ class kb_blast:
         #
         elif many_type_name == 'GenomeSet':
             input_many_genomeSet = input_many_data
-            genome_id_feature_id_delim = '.f:'
             many_forward_reads_file_dir = self.scratch
             many_forward_reads_file = input_many_name+".fasta"
 
@@ -7686,7 +7704,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             fId_list = input_many_featureSet['elements'].keys()
@@ -7698,10 +7716,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
+                        fId = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
+                        output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -7714,7 +7734,7 @@ class kb_blast:
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in feature_ids:
                 seq_total += 1
@@ -7724,6 +7744,8 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
+                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
         # Parse GenomeSet hits into FeatureSet
@@ -7736,7 +7758,7 @@ class kb_blast:
                 output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_featureSet['description'] = search_tool_name+"_Search filtered"
-            #output_featureSet['element_ordering'] = []
+            output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
@@ -7751,10 +7773,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
+                        feature_id = id_untrans
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
+                        output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
