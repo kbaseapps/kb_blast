@@ -8,7 +8,7 @@
     "categories": ["active","sequence"],
     "widgets": {
         "input": null,
-        "output": "kbaseReportView"
+        "output": "no-display"
     },
     "parameters": [ 
         {
