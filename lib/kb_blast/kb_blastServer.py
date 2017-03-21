@@ -20,7 +20,7 @@ from kb_blast.authclient import KBaseAuth as _KBaseAuth
 
 DEPLOY = 'KB_DEPLOYMENT_CONFIG'
 SERVICE = 'KB_SERVICE_NAME'
-AUTH = 'auth-server-url'
+AUTH = 'auth-service-url'
 
 # Note that the error fields do not match the 2.0 JSONRPC spec
 
@@ -109,7 +109,11 @@ class JSONRPCServiceCustom(JSONRPCService):
             # Exception was raised inside the method.
             newerr = JSONServerError()
             newerr.trace = traceback.format_exc()
-            newerr.data = e.message
+            if isinstance(e.message, basestring):
+                newerr.data = e.message
+            else:
+                # Some exceptions embed other exceptions as the message
+                newerr.data = repr(e.message)
             raise newerr
         return result
 
@@ -332,27 +336,27 @@ class Application(object):
         self.rpc_service.add(impl_kb_blast.BLASTn_Search,
                              name='kb_blast.BLASTn_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.BLASTn_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.BLASTn_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.BLASTp_Search,
                              name='kb_blast.BLASTp_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.BLASTp_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.BLASTp_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.BLASTx_Search,
                              name='kb_blast.BLASTx_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.BLASTx_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.BLASTx_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.tBLASTn_Search,
                              name='kb_blast.tBLASTn_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.tBLASTn_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.tBLASTn_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.tBLASTx_Search,
                              name='kb_blast.tBLASTx_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.tBLASTx_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.tBLASTx_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.psiBLAST_msa_start_Search,
                              name='kb_blast.psiBLAST_msa_start_Search',
                              types=[dict])
-        self.method_authentication['kb_blast.psiBLAST_msa_start_Search'] = 'required' # noqa
+        self.method_authentication['kb_blast.psiBLAST_msa_start_Search'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_blast.status,
                              name='kb_blast.status',
                              types=[dict])
