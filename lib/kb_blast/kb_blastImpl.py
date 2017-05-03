@@ -2394,15 +2394,24 @@ class kb_blast:
                 high_bitscore_alnlen[hit_seq_id] = hit_aln_len
                 high_bitscore_line[hit_seq_id] = line
 
+        filtering_fields = dict()
         for hit_seq_id in hit_order:
             hit_buf.append(high_bitscore_line[hit_seq_id])
+            filtering_fields[hit_seq_id] = dict()
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
+            filter = False
             if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
-                continue
+                filter = True
+                filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
-                continue
+                filter = True
+                filtering_fields[hit_seq_id]['bitscore'] = True
             if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+                filter = True
+                filtering_fields[hit_seq_id]['overlap_fraction'] = True
+                
+            if filter:
                 continue
             
             hit_total += 1
@@ -2614,7 +2623,10 @@ class kb_blast:
             head_color = "#eeeeee"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            reject_row_color = '#ffeeee'
+            accept_cell_color = accept_row_color
+            #reject_row_color = '#ffeeee'
+            reject_row_color = '#eeeeee'
+            reject_cell_color = '#ffcccc'
             text_fontsize = "2"
             text_color = '#606060'
             border_body_color = "#cccccc"
@@ -2740,16 +2752,38 @@ class kb_blast:
                     html_report_lines += ['</td>']
 
                     # add other cells
+                    # fid
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(fid_disp)+'</font></td>']
+                    # func
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
+                    # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
-                    html_report_lines += ['<td align=center  style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
+                    # ident
+                    if filtering_fields[fid_lookup]['ident_thresh']:
+                        cell_color = reject_cell_color
+                    else:
+                        cell_color = default_cell_color
+                    html_report_lines += ['<td align=center style="color: '+cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
+                    # aln len
+                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                        cell_color = reject_cell_color
+                    else:
+                        cell_color = default_cell_color
+                    html_report_lines += ['<td align=center style="color: '+cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
+                    # evalue
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
+                    # bitscore
+                    if filtering_fields[fid_lookup]['bitscore']:
+                        cell_color = reject_cell_color
+                    else:
+                        cell_color = default_cell_color
+                    html_report_lines += ['<td align=center style="color: '+cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
+                    # aln coords
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
+                    # mismatches
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
+                    # gaps
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
                     html_report_lines += ['</tr>']
 
             html_report_lines += ['</table>']
