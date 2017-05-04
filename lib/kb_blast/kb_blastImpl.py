@@ -2793,13 +2793,13 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[fid_lookup]:
                         this_cell_color = reject_cell_color
                     else:
                         this_cell_color = default_cell_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[fid_lookup]:
                         this_cell_color = reject_cell_color
                     else:
                         this_cell_color = default_cell_color
@@ -2807,7 +2807,7 @@ class kb_blast:
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bitscore
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[fid_lookup]:
                         this_cell_color = reject_cell_color
                     else:
                         this_cell_color = default_cell_color
