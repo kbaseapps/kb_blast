@@ -1395,7 +1395,6 @@ class kb_blast:
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            accept_cell_color = accept_row_color
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -1531,24 +1530,24 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bitscore
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
@@ -2657,7 +2656,6 @@ class kb_blast:
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            accept_cell_color = accept_row_color
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -2796,13 +2794,13 @@ class kb_blast:
                     if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
                     if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
@@ -2810,7 +2808,7 @@ class kb_blast:
                     if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
@@ -3917,7 +3915,6 @@ class kb_blast:
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            accept_cell_color = accept_row_color
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -4052,24 +4049,24 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bitscore
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
@@ -5354,8 +5351,7 @@ class kb_blast:
                 
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
-            #accept_row_color = 'white'
-            accept_cell_color = accept_row_color
+            accept_row_color = 'white'
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -5491,24 +5487,24 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bitscore
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
@@ -6798,7 +6794,6 @@ class kb_blast:
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            accept_cell_color = accept_row_color
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -6934,24 +6929,24 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bit score
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
@@ -8038,7 +8033,6 @@ class kb_blast:
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
-            accept_cell_color = accept_row_color
             #reject_row_color = '#ffeeee'
             reject_row_color = '#eeeeee'
             reject_cell_color = '#ffcccc'
@@ -8174,24 +8168,24 @@ class kb_blast:
                     # sci name
                     html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
                     # ident
-                    if filtering_fields[fid_lookup]['ident_thresh']:
+                    if 'ident_thresh' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
                     # aln len
-                    if filtering_fields[fid_lookup]['overlap_fraction']:
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
                     # evalue
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
                     # bit score
-                    if filtering_fields[fid_lookup]['bitscore']:
+                    if 'bitscore' in filtering_fields[hit_id]:
                         this_cell_color = reject_cell_color
                     else:
-                        this_cell_color = default_cell_color
+                        this_cell_color = row_color
                     html_report_lines += ['<td align=center style="color: '+this_cell_color+'; border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
                     # aln coords
                     html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
