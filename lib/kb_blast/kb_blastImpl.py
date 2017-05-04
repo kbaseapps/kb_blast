@@ -7293,15 +7293,17 @@ class kb_blast:
 
             # Determine whether nuc or protein sequences
             #
-            NUC_MSA_pattern = re.compile("^[\.\-_ACGTUXNRYSWKMBDHVacgtuxnryswkmbdhv \t\n]+$")
-            all_seqs_nuc = True
+            self.log (console, "CHECKING MSA for PROTEIN seqs...")  # DEBUG                                  
+            PROT_MSA_pattern = re.compile("^[\.\-_acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
+            #NUC_MSA_pattern = re.compile("^[\.\-_ACGTUXNRYSWKMBDHVacgtuxnryswkmbdhv \t\n]+$")               
+            appropriate_sequence_found_in_MSA_input = True
             for row_id in row_order:
-                #self.log(console, row_id+": '"+MSA_in['alignment'][row_id]+"'")
-                if NUC_MSA_pattern.match(MSA_in['alignment'][row_id]) == None:
-                    all_seqs_nuc = False
+                #self.log(console, row_id+": '"+MSA_in['alignment'][row_id]+"'")    # DEBUG                   
+                if not PROT_MSA_pattern.match(MSA_in['alignment'][row_id]):
+                    self.log(invalid_msgs,"BAD record for MSA row_id: "+row_id+"\n"+MSA_in['alignment'][row_\
+id]+"\n")
+                    appropriate_sequence_found_in_MSA_input = False
                     break
-                else:
-                    appropriate_sequence_found_in_MSA_input = True
 
         # Missing proper input_type
         #
