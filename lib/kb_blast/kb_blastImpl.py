@@ -2445,6 +2445,7 @@ class kb_blast:
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
                 
             if filter:
+                self.log (console, "FILTERING: '"+hit_seq_id+"'")  # DEBUG
                 continue
             
             hit_total += 1
