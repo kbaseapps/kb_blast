@@ -7216,7 +7216,7 @@ class kb_blast:
                 FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
                 one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
                 genome_refs = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()
-                if len(genome_refs) == 1 and len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'][genome_ref]) == 1:
+                if len(genome_refs) == 1 and len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'][genome_refs[0]]) == 1:
                     appropriate_sequence_found_in_one_input = True
                     input_one_feature_id = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'][genome_refs[0]][0]
 
