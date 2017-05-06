@@ -472,7 +472,7 @@ class kb_blast:
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)
+            raise ValueError('Cannot yet handle input_one type of: '+one_type_name)
 
 
         #### Get the input_many object
@@ -740,7 +740,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)
 
 
         # check for failed input file creation
@@ -1933,7 +1933,7 @@ class kb_blast:
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
 
         #### Get the input_many object
         ##
@@ -2094,7 +2094,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+man_type_name)            
 
 
         # check for failed input file creation
@@ -3196,7 +3196,7 @@ class kb_blast:
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
 
 
         #### Get the input_many object
@@ -3363,7 +3363,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)            
 
         # check for failed input file creation
         #
@@ -4454,7 +4454,7 @@ class kb_blast:
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True                
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
 
 
         #### Get the input_many object
@@ -4722,7 +4722,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)            
 
         # check for failed input file creation
         #
@@ -5891,7 +5891,7 @@ class kb_blast:
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
         else:
-            raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
 
 
         #### Get the input_many object
@@ -6159,7 +6159,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)            
 
 
         # check for failed input file creation
@@ -7219,7 +7219,7 @@ class kb_blast:
                     SeqIO.write([record], one_forward_reads_file_path, "fasta")
                     appropriate_sequence_found_in_one_input = True
             else:
-                raise ValueError('Cannot yet handle input_one type of: '+type_name)            
+                raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
         else:
             raise ValueError('Must define either input_one_sequence or input_one_name')
 
@@ -7236,13 +7236,13 @@ class kb_blast:
             input_msa_data = objects[0]['data']
             info = objects[0]['info']
             input_msa_name = str(info[1])
-            input_msa_type = info[2].split('.')[1].split('-')[0]
+            msa_type_name = info[2].split('.')[1].split('-')[0]
 
         except Exception as e:
             raise ValueError('Unable to fetch input_msa_name object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
-        if input_msa_type == 'MSA':
+        if msa_type_name == 'MSA':
             MSA_in = input_msa_data
             row_order = []
             default_row_labels = dict()
@@ -7307,7 +7307,7 @@ class kb_blast:
         # Missing proper input_type
         #
         else:
-            raise ValueError('Cannot yet handle input_name type of: '+type_name)
+            raise ValueError('Cannot yet handle input_msa type of: '+msa_type_name)
 
 
         #### Get the input_many object
@@ -7469,7 +7469,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)            
 
 
         # check for failed input file creation
