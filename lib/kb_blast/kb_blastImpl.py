@@ -7158,9 +7158,34 @@ class kb_blast:
                 #to get the full stack trace: traceback.format_exc()
 
 
-            # Handle overloading (input_one can be Feature, or FeatureSet)
+            # Handle overloading (input_one can be SequenceSet, Feature, or FeatureSet)
             #
-            if one_type_name == 'FeatureSet':
+            if one_type_name == 'SequenceSet':
+                try:
+                    input_one_sequenceSet = input_one_data
+                except Exception as e:
+                    print(traceback.format_exc())
+                    raise ValueError('Unable to get sequenceSet object: ' + str(e))
+
+                header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
+                sequence_str = input_one_data['sequences'][0]['sequence']
+
+                PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
+                #DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")
+                if not PROT_pattern.match(sequence_str):
+                    self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                else:
+                    appropriate_sequence_found_in_one_input = True
+
+                one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
+                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+                self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
+                one_forward_reads_file_handle.write('>'+header_id+"\n")
+                one_forward_reads_file_handle.write(sequence_str+"\n")
+                one_forward_reads_file_handle.close();
+                self.log(console, 'done')
+
+            elif one_type_name == 'FeatureSet':
                 # retrieve sequences for features
                 #input_one_featureSet = input_one_data
                 one_forward_reads_file_dir = self.scratch
