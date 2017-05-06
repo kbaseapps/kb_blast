@@ -7158,8 +7158,9 @@ class kb_blast:
                 #to get the full stack trace: traceback.format_exc()
 
 
-            # Handle overloading (input_one can be SequenceSet, Feature, or FeatureSet)
+            # Handle overloading (input_one can be Feature, or FeatureSet, but NOT SequenceSet because then it lacks feature_id to find in MSA)
             #
+            """
             if one_type_name == 'SequenceSet':
                 try:
                     input_one_sequenceSet = input_one_data
@@ -7184,8 +7185,10 @@ class kb_blast:
                 one_forward_reads_file_handle.write(sequence_str+"\n")
                 one_forward_reads_file_handle.close();
                 self.log(console, 'done')
-
             elif one_type_name == 'FeatureSet':
+            """
+
+            if one_type_name == 'FeatureSet':
                 # retrieve sequences for features
                 #input_one_featureSet = input_one_data
                 one_forward_reads_file_dir = self.scratch

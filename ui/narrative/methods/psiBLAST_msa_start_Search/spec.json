@@ -19,7 +19,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseGenomes.Feature" ]
+                "valid_ws_types": [ "KBaseGenomes.Feature","KBaseCollections.FeatureSet" ]
             }
         },
         {
