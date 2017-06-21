@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTn nuc-nuc Search
+name: BLASTn nuc-nuc Search - v2.6.0
 tooltip: |
     Search for matches to a sequence
 screenshots: []

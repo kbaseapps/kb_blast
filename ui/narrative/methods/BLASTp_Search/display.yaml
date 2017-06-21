@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTp prot-prot Search
+name: BLASTp prot-prot Search - v2.6.0
 tooltip: |
     Search for matches to a sequence
 screenshots: []
