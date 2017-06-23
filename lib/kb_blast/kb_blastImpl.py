@@ -52,9 +52,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.4"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "67303f38acb3562825aa8c7a9f66e4f187b04eef"
+    VERSION = "1.0.0"
+    GIT_URL = "https://github.com/dcchivian/kb_blast"
+    GIT_COMMIT_HASH = "f663a9f17a89886826f4f2ff2d9c211db4318384"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
