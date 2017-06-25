@@ -12,17 +12,6 @@
     },
     "parameters": [ 
         {
-            "id": "input_one_ref",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "" ],
-            "field_type": "text",
-            "text_options": {
-                "valid_ws_types": [ "KBaseGenomes.Feature","KBaseCollections.FeatureSet" ]
-            }
-        },
-        {
             "id": "input_msa_ref",
             "optional": false,
             "advanced": false,
@@ -78,18 +67,6 @@
             "text_options": {
                 "validate_as": "float",
                 "min_integer" : 25
-            }
-        },
-        {
-            "id": "ident_thresh",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "0.40" ],
-            "field_type": "text",
-            "text_options": {
-                "validate_as": "float",
-                "min_integer" : 0
             }
         },
         {
@@ -207,11 +184,6 @@
                     "target_property": "workspace_name"
                 },
                 {
-                    "input_parameter": "input_one_ref",
-                    "target_property": "input_one_ref",
-		    "target_type_transform": "resolved-ref"
-                },
-                {
                     "input_parameter": "input_msa_ref",
                     "target_property": "input_msa_ref",
 		    "target_type_transform": "resolved-ref"
@@ -232,10 +204,6 @@
                 {
                     "input_parameter": "bitscore",
                     "target_property": "bitscore"
-                },
-                {
-                    "input_parameter": "ident_thresh",
-                    "target_property": "ident_thresh"
                 },
                 {
                     "input_parameter": "overlap_fraction",

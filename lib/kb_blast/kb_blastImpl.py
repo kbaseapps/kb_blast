@@ -52,9 +52,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.4"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "67303f38acb3562825aa8c7a9f66e4f187b04eef"
+    VERSION = "1.0.0"
+    GIT_URL = "https://github.com/dcchivian/kb_blast"
+    GIT_COMMIT_HASH = "f663a9f17a89886826f4f2ff2d9c211db4318384"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -4283,7 +4283,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
                 'fasta_str':     params['input_one_sequence'],
-                'residue_type': 'NUC',
+                'residue_type': 'PROT',
                 'case':         'UPPER',
                 'console':      console,
                 'invalid_msgs': invalid_msgs
@@ -7114,7 +7114,7 @@ class kb_blast:
         report = ''
 #        report = 'Running '+search_tool_name+'_Search with params='
 #        report += "\n"+pformat(params)
-        appropriate_sequence_found_in_one_input = False
+        #appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_MSA_input = False
         appropriate_sequence_found_in_many_input = False
         genome_id_feature_id_delim = '.f:'
@@ -7124,8 +7124,8 @@ class kb_blast:
         #
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-        if 'input_one_ref' not in params:
-            raise ValueError('input_one_ref parameter is required')
+        #if 'input_one_ref' not in params:
+        #    raise ValueError('input_one_ref parameter is required')
         if 'input_msa_ref' not in params:
             raise ValueError('input_msa_ref parameter is required')
         if 'input_many_ref' not in params:
@@ -7135,130 +7135,16 @@ class kb_blast:
 
 
         # set local names
-        input_one_ref = params['input_one_ref']
+        #input_one_ref = params['input_one_ref']
         input_msa_ref = params['input_msa_ref']
         input_many_ref = params['input_many_ref']
         
 
-        #### Get the input_one object
-        ##
-        input_one_id = None
-        if 'input_one_ref' in params and params['input_one_ref'] != None:
-            try:
-                ws = workspaceService(self.workspaceURL, token=ctx['token'])
-                objects = ws.get_objects([{'ref': params['input_one_ref']}])
-                #objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
-                input_one_data = objects[0]['data']
-                input_one_name = str(objects[0]['info'][1])
-                info = objects[0]['info']
-
-                one_type_name = info[2].split('.')[1].split('-')[0]
-            except Exception as e:
-                raise ValueError('Unable to fetch input_one_name object from workspace: ' + str(e))
-                #to get the full stack trace: traceback.format_exc()
-
-
-            # Handle overloading (input_one can be Feature, or FeatureSet, but NOT SequenceSet because then it lacks feature_id to find in MSA)
-            #
-            """
-            if one_type_name == 'SequenceSet':
-                try:
-                    input_one_sequenceSet = input_one_data
-                except Exception as e:
-                    print(traceback.format_exc())
-                    raise ValueError('Unable to get sequenceSet object: ' + str(e))
-
-                header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
-                sequence_str = input_one_data['sequences'][0]['sequence']
-
-                PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
-                #DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")
-                if not PROT_pattern.match(sequence_str):
-                    self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
-                else:
-                    appropriate_sequence_found_in_one_input = True
-
-                one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-                one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
-                self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
-                one_forward_reads_file_handle.write('>'+header_id+"\n")
-                one_forward_reads_file_handle.write(sequence_str+"\n")
-                one_forward_reads_file_handle.close();
-                self.log(console, 'done')
-            elif one_type_name == 'FeatureSet':
-            """
-
-            if one_type_name == 'FeatureSet':
-                # retrieve sequences for features
-                #input_one_featureSet = input_one_data
-                one_forward_reads_file_dir = self.scratch
-                one_forward_reads_file = input_one_name+".fasta"
-
-                # DEBUG
-                #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-                FeatureSetToFASTA_params = {
-                    'featureSet_ref':      input_one_ref,
-                    'file':                one_forward_reads_file,
-                    'dir':                 one_forward_reads_file_dir,
-                    'console':             console,
-                    'invalid_msgs':        invalid_msgs,
-                    'residue_type':        'protein',
-                    'feature_type':        'CDS',
-                    'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
-                    'record_desc_pattern': '[%%genome_ref%%]',
-                    'case':                'upper',
-                    'linewrap':            50,
-                    'merge_fasta_files':   'TRUE'
-                    }
-
-                #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-                DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-                FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
-                one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-                genome_refs = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()
-                if len(genome_refs) == 1 and len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'][genome_refs[0]]) == 1:
-                    appropriate_sequence_found_in_one_input = True
-                    input_one_feature_id = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'][genome_refs[0]][0]
-
-                # DEBUG
-                #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-                #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-
-
-            # Feature
-            #
-            elif one_type_name == 'Feature':
-                # export feature to FASTA file
-                feature = input_one_data
-                input_one_feature_id = feature['id']
-                one_forward_reads_file_path = os.path.join(self.scratch, input_one_name+".fasta")
-                self.log(console, 'writing fasta file: '+one_forward_reads_file_path)
-                # psiBLAST is prot-prot
-                #record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-                #if feature['type'] != 'CDS':
-                #    self.log(console,input_one_name+" feature type must be CDS")
-                #    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
-                if 'protein_translation' not in feature or feature['protein_translation'] == None:
-                    #self.log(console,"bad CDS Feature "+input_one_name+": no protein_translation found")
-                    #raise ValueError ("bad CDS Feature "input_one_name+": no protein_translation found")
-                    self.log(console,input_one_name+" feature type must be CDS")
-                    self.log(invalid_msgs,input_one_name+" feature type must be CDS")
-                else:
-                    appropriate_sequence_found_in_one_input = True
-                    record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description='['+feature['genome_id']+']'+' '+feature['function'])
-                    SeqIO.write([record], one_forward_reads_file_path, "fasta")
-                    appropriate_sequence_found_in_one_input = True
-            else:
-                raise ValueError('Cannot yet handle input_one type of: '+one_type_name)            
-        else:
-            raise ValueError('Must define either input_one_sequence or input_one_name')
-
-
         #### Get the input_msa object
         ##
-        if input_one_feature_id == None:
-            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+input_one_name)
-        master_row_idx = 0
+#        if input_one_feature_id == None:
+#            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+input_one_name)
+#       master_row_idx = 0
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': input_msa_ref}])
@@ -7272,7 +7158,9 @@ class kb_blast:
             raise ValueError('Unable to fetch input_msa_name object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
-        if msa_type_name == 'MSA':
+        if msa_type_name != 'MSA':
+            raise ValueError('Cannot yet handle input_msa type of: '+msa_type_name)
+        else:
             MSA_in = input_msa_data
             row_order = []
             default_row_labels = dict()
@@ -7287,6 +7175,7 @@ class kb_blast:
                 for row_id in row_order:
                     default_row_labels[row_id] = row_id
 
+            """
             # determine row index of query sequence
             for row_id in row_order:
                 master_row_idx += 1
@@ -7294,6 +7183,24 @@ class kb_blast:
                     break
             if master_row_idx == 0:
                 self.log(invalid_msgs,"Failed to find query id "+input_one_feature_id+" from Query Object "+input_one_name+" within MSA: "+input_msa_name)
+            """
+
+            # use longest sequence in MSA to use as the query sequence
+            master_row_idx = -1
+            longest_seq_len = 0
+            longest_seq = ''
+            for i,row_id in enumerate(row_order):
+                msa_seq = MSA_in['alignment'][row_id].replace('-','')
+                if len(msa_seq) > longest_seq_len:
+                    master_row_idx = i
+                    longest_seq_len = len(msa_seq)
+                    longest_seq = msa_seq
+            if longest_seq == '':
+                raise ValueError ("unable to find longest seq in MSA")
+            one_forward_reads_file_path = os.path.join(self.scratch, input_msa_name+"-query.fasta")
+            with open (one_forward_reads_file_path, 'w', 0) as input_one_fh:
+                input_one_fh.write('>query'+"\n")
+                input_one_fh.write(longest_seq+"\n")
 
             
             # export features to Clustal-esque file that PSI-BLAST likes
@@ -7333,11 +7240,6 @@ class kb_blast:
                     self.log(invalid_msgs,"BAD record for MSA row_id: "+row_id+"\n"+MSA_in['alignment'][row_id]+"\n")
                     appropriate_sequence_found_in_MSA_input = False
                     break
-
-        # Missing proper input_type
-        #
-        else:
-            raise ValueError('Cannot yet handle input_msa type of: '+msa_type_name)
 
 
         #### Get the input_many object
@@ -7504,11 +7406,13 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not appropriate_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
-        if not appropriate_sequence_found_in_MSA_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+input_msa_name+"'")
-        if not appropriate_sequence_found_in_many_input:
+        if not os.path.isfile(one_forward_reads_file_path) or \
+           not os.path.getsize(one_forward_reads_file_path) > 0 or \
+           not os.path.isfile(input_MSA_file_path) or \
+           not os.path.getsize(input_MSA_file_path):
+            self.log(invalid_msgs,"no protein sequences found in MSA'"+input_msa_ref+"'")
+        if not os.path.isfile(many_forward_reads_file_path) or \
+           not os.path.getsize(many_forward_reads_file_path) > 0:
             self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
 
@@ -7524,7 +7428,7 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(input_one_ref)
+            #provenance[0]['input_ws_objects'].append(input_one_ref)
             provenance[0]['input_ws_objects'].append(input_msa_ref)
             provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
@@ -7629,17 +7533,17 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(blast_bin):
             raise ValueError("no such file '"+blast_bin+"'")
-        #if not os.path.isfile(one_forward_reads_file_path):
-        #    raise ValueError("no such file '"+one_forward_reads_file_path+"'")
-        #elif not os.path.getsize(one_forward_reads_file_path) > 0:
-        #    raise ValueError("empty file '"+one_forward_reads_file_path+"'")
+        if not os.path.isfile(one_forward_reads_file_path):
+            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(input_MSA_file_path):
             raise ValueError("no such file '"+input_MSA_file_path+"'")
-        elif not os.path.getsize(input_MSA_file_path):
+        elif not os.path.getsize(input_MSA_file_path) > 0:
             raise ValueError("empty file '"+input_MSA_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
-        elif not os.path.getsize(many_forward_reads_file_path):
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
             raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
@@ -7846,9 +7750,9 @@ class kb_blast:
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
-                filter = True
-                filtering_fields[hit_seq_id]['ident_thresh'] = True
+            #if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bit#score_ident[hit_seq_id]):
+            #    filter = True
+            #    filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
@@ -7996,7 +7900,7 @@ class kb_blast:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        provenance[0]['input_ws_objects'].append(input_one_ref)
+        #provenance[0]['input_ws_objects'].append(input_one_ref)
         provenance[0]['input_ws_objects'].append(input_msa_ref)
         provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'

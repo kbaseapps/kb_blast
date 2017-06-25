@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: psiBLAST MSA start prot-prot Search
+name: psiBLAST MSA start prot-prot Search - v2.6.0
 tooltip: |
     Search for matches to a Multiple Sequence Alignment (MSA)
 screenshots: []
@@ -27,11 +27,6 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    input_one_ref:
-        ui-name : |
-            Query Object
-        short-hint : |
-            Query with single PROTEIN sequence to use as query.  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
     input_msa_ref:
         ui-name : |
             Query MSA
@@ -47,11 +42,6 @@ parameters :
             Output Object
         short-hint : |
             Object containing matches.  Output will be SequenceSet for SequenceSet Targets, otherwise will be FeatureSet.
-    ident_thresh:
-        ui-name : |
-            Identity Threshold
-        short-hint : |
-            threshold for hits
     e_value:
         ui-name : |
             E-value
