@@ -70,18 +70,6 @@
             }
         },
         {
-            "id": "ident_thresh",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "0.40" ],
-            "field_type": "text",
-            "text_options": {
-                "validate_as": "float",
-                "min_integer" : 0
-            }
-        },
-        {
             "id": "overlap_fraction",
             "optional": true,
             "advanced": true,

@@ -42,11 +42,6 @@ parameters :
             Output Object
         short-hint : |
             Object containing matches.  Output will be SequenceSet for SequenceSet Targets, otherwise will be FeatureSet.
-    ident_thresh:
-        ui-name : |
-            Identity Threshold
-        short-hint : |
-            threshold for hits
     e_value:
         ui-name : |
             E-value
