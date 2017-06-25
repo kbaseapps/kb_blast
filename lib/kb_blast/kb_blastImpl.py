@@ -7144,7 +7144,7 @@ class kb_blast:
         ##
 #        if input_one_feature_id == None:
 #            self.log(invalid_msgs,"input_one_feature_id was not obtained from Query Object: "+input_one_name)
-#        master_row_idx = 0
+#       master_row_idx = 0
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
             objects = ws.get_objects([{'ref': input_msa_ref}])
@@ -7186,11 +7186,13 @@ class kb_blast:
             """
 
             # use longest sequence in MSA to use as the query sequence
+            master_row_idx = -1
             longest_seq_len = 0
             longest_seq = ''
-            for row_id in row_order:
+            for i,row_id in enumerate(row_order):
                 msa_seq = MSA_in['alignment'][row_id].replace('-','')
                 if len(msa_seq) > longest_seq_len:
+                    master_row_idx = i
                     longest_seq_len = len(msa_seq)
                     longest_seq = msa_seq
             if longest_seq == '':
@@ -7404,11 +7406,13 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not appropriate_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+input_one_name+"'")
-        if not appropriate_sequence_found_in_MSA_input:
-            self.log(invalid_msgs,"no protein sequences found in '"+input_msa_name+"'")
-        if not appropriate_sequence_found_in_many_input:
+        if not os.path.isfile(one_forward_reads_file_path) or \
+           not os.path.getsize(one_forward_reads_file_path) > 0 or \
+           not os.path.isfile(input_MSA_file_path) or \
+           not os.path.getsize(input_MSA_file_path):
+            self.log(invalid_msgs,"no protein sequences found in MSA'"+input_msa_ref+"'")
+        if not os.path.isfile(many_forward_reads_file_path) or \
+           not os.path.getsize(many_forward_reads_file_path) > 0:
             self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
 
@@ -7424,7 +7428,7 @@ class kb_blast:
                 provenance = ctx['provenance']
             # add additional info to provenance here, in this case the input data object reference
             provenance[0]['input_ws_objects'] = []
-            provenance[0]['input_ws_objects'].append(input_one_ref)
+            #provenance[0]['input_ws_objects'].append(input_one_ref)
             provenance[0]['input_ws_objects'].append(input_msa_ref)
             provenance[0]['input_ws_objects'].append(input_many_ref)
             provenance[0]['service'] = 'kb_blast'
@@ -7529,17 +7533,17 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(blast_bin):
             raise ValueError("no such file '"+blast_bin+"'")
-        #if not os.path.isfile(one_forward_reads_file_path):
-        #    raise ValueError("no such file '"+one_forward_reads_file_path+"'")
-        #elif not os.path.getsize(one_forward_reads_file_path) > 0:
-        #    raise ValueError("empty file '"+one_forward_reads_file_path+"'")
+        if not os.path.isfile(one_forward_reads_file_path):
+            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
+        elif not os.path.getsize(one_forward_reads_file_path) > 0:
+            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
         if not os.path.isfile(input_MSA_file_path):
             raise ValueError("no such file '"+input_MSA_file_path+"'")
-        elif not os.path.getsize(input_MSA_file_path):
+        elif not os.path.getsize(input_MSA_file_path) > 0:
             raise ValueError("empty file '"+input_MSA_file_path+"'")
         if not os.path.isfile(many_forward_reads_file_path):
             raise ValueError("no such file '"+many_forward_reads_file_path+"'")
-        elif not os.path.getsize(many_forward_reads_file_path):
+        elif not os.path.getsize(many_forward_reads_file_path) > 0:
             raise ValueError("empty file '"+many_forward_reads_file_path+"'")
 
         # set the output path
@@ -7896,7 +7900,7 @@ class kb_blast:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
-        provenance[0]['input_ws_objects'].append(input_one_ref)
+        #provenance[0]['input_ws_objects'].append(input_one_ref)
         provenance[0]['input_ws_objects'].append(input_msa_ref)
         provenance[0]['input_ws_objects'].append(input_many_ref)
         provenance[0]['service'] = 'kb_blast'
