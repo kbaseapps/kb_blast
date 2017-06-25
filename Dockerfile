@@ -22,15 +22,6 @@ RUN pip install cffi --upgrade \
     && pip install 'requests[security]' --upgrade
 
 
-# To download the Grinder software and install it
-RUN wget https://sourceforge.net/projects/biogrinder/files/biogrinder/Grinder-0.5.4/Grinder-0.5.4.tar.gz/download &&\
-    tar xvf download && \
-    cd Grinder-0.5.4 && \
-    perl Makefile.PL && \
-    make && \
-    make install
-
-
 # -----------------------------------------
 
 COPY ./ /kb/module
