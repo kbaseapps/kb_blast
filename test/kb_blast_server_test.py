@@ -77,7 +77,7 @@ class kb_blastTest(unittest.TestCase):
         return self.__class__.ctx
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def HIDE_kb_blast_BLASTn_Search_01(self):
+    def test_kb_blast_BLASTn_Search_01(self):
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
         #                                  'objects': []})
@@ -114,7 +114,7 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
-    def HIDE_kb_blast_BLASTp_Search_01(self):
+    def test_kb_blast_BLASTp_Search_01(self):
         obj_basename = 'BLASTp'
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
@@ -141,7 +141,7 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
-    def HIDE_kb_blast_BLASTx_Search_01(self):
+    def test_kb_blast_BLASTx_Search_01(self):
         obj_basename = 'BLASTx'
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
@@ -168,7 +168,7 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
-    def HIDE_kb_blast_tBLASTx_Search_01(self):
+    def test_kb_blast_tBLASTx_Search_01(self):
         obj_basename = 'tBLASTx'
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
@@ -195,7 +195,7 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
-    def HIDE_kb_blast_tBLASTn_Search_01(self):
+    def test_kb_blast_tBLASTn_Search_01(self):
         obj_basename = 'tBLASTn'
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
