@@ -196,11 +196,6 @@
                     "target_property": "workspace_name"
                 },
                 {
-                    "input_parameter": "input_one_ref",
-                    "target_property": "input_one_ref",
-		    "target_type_transform": "resolved-ref"
-                },
-                {
                     "input_parameter": "input_msa_ref",
                     "target_property": "input_msa_ref",
 		    "target_type_transform": "resolved-ref"
@@ -221,10 +216,6 @@
                 {
                     "input_parameter": "bitscore",
                     "target_property": "bitscore"
-                },
-                {
-                    "input_parameter": "ident_thresh",
-                    "target_property": "ident_thresh"
                 },
                 {
                     "input_parameter": "overlap_fraction",
