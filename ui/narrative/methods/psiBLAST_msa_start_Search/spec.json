@@ -12,17 +12,6 @@
     },
     "parameters": [ 
         {
-            "id": "input_one_ref",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "" ],
-            "field_type": "text",
-            "text_options": {
-                "valid_ws_types": [ "KBaseGenomes.Feature","KBaseCollections.FeatureSet" ]
-            }
-        },
-        {
             "id": "input_msa_ref",
             "optional": false,
             "advanced": false,

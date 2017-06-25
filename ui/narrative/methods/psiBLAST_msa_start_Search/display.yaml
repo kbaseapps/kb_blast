@@ -27,11 +27,6 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    input_one_ref:
-        ui-name : |
-            Query Object
-        short-hint : |
-            Query with single PROTEIN sequence to use as query.  Data types may be Feature, SequenceSet (with one sequence), or FeatureSet (with one sequence).
     input_msa_ref:
         ui-name : |
             Query MSA
