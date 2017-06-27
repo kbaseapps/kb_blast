@@ -89,6 +89,9 @@ class kb_blastTest(unittest.TestCase):
         # self.assertEqual(ret[...], ...) or other unittest methods
 
         obj_basename = 'BLASTn'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
 
@@ -100,7 +103,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".97",
@@ -111,11 +114,24 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().BLASTn_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
     def test_kb_blast_BLASTp_Search_01(self):
         obj_basename = 'BLASTp'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
 
@@ -127,7 +143,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".4",
@@ -138,11 +154,24 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
     def test_kb_blast_BLASTx_Search_01(self):
         obj_basename = 'BLASTx'
+        obj_out_name = obj_basename+'.'+"test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
 
@@ -154,7 +183,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".4",
@@ -165,11 +194,24 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().BLASTx_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
     def test_kb_blast_tBLASTx_Search_01(self):
         obj_basename = 'tBLASTx'
+        obj_out_name = obj_basename+'.'+"test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
 
@@ -181,7 +223,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".4",
@@ -192,11 +234,24 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().tBLASTx_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
     def test_kb_blast_tBLASTn_Search_01(self):
         obj_basename = 'tBLASTn'
+        obj_out_name = obj_basename+'.'+"test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
 
@@ -208,7 +263,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".4",
@@ -219,11 +274,24 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().tBLASTn_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
     def test_kb_blast_psiBLAST_msa_start_Search_01(self):
         obj_basename = 'psiBLAST_msa_start'
+        obj_out_name = obj_basename+'.'+"test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_000021385.1/1'  # D. vulgaris str. 'Miyazaki F'
 
@@ -255,7 +323,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_msa_ref': MSA_ref,
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
-                       'output_filtered_name': obj_basename+'.'+"test_output.FS",
+                       'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': ".1",
@@ -266,4 +334,14 @@ class kb_blastTest(unittest.TestCase):
 
         ret = self.getImpl().psiBLAST_msa_start_Search(self.getContext(), parameters)[0]
         self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
