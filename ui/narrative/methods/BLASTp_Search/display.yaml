@@ -4,7 +4,10 @@
 name: BLASTp prot-prot Search - v2.6.0
 tooltip: |
     Search for matches to a sequence
-screenshots: []
+screenshots:
+
+    - BLASTp_input_widget.png
+    - BLASTp_output_table.png
 
 icon: blast-cyan.png
 
