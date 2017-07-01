@@ -98,7 +98,7 @@ description : |
     <p><i>Implemented for KBase by Dylan Chivian (DCChivian@lbl.gov)</i></p>
     <p>BLASTp is a protein sequence search against a protein sequence database.  The KBase implementation permits searching through the genes in a Genome objet, the genes in the Genomes members of a GenomeSet, or the genes in a FeatureSet.  The output object of these searches is a FeatureSet containing those genes that pass the thresholds given by the user.  The App also provides a table of the hits (with those hits that are below the thresholds in gray) and links to download other formats of BLAST output files.</p>
     <p><hr></p>
-    <p><b>Input Configuration:</b></p>
+    <p><b>Configuration:</b></p>
     <p><b><i>Query Object:</i></b> If you don't provide a Query Sequence, you must instead provide a query object.  This may be a gene or a Sequence Set object with a single sequence.  This latter object will be available after running BLASTp once, and can be used in subsequent runs.  It must contain amino acid sequence.</p>
     <p><b><i>Query Sequence:</i></b> If you don't provide a Query Object, you must cut-and-paste a query sequence.  In addition, you must name the Output Query Object in which to save the query sequence.  It must be a one letter code amino acid sequence.</p>
     <p><b><i>Targets Object:</i></b> The Targets Object may be a FeatureSet of genes, a Genome, or a GenomeSet.  A BLAST search database will be automatically generated from the Targets Object.</p>
