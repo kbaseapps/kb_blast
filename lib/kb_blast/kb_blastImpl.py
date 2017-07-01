@@ -1620,7 +1620,8 @@ class kb_blast:
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -2881,7 +2882,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -4139,7 +4141,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                                                         
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -5577,7 +5580,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -7019,7 +7023,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -8193,7 +8198,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
