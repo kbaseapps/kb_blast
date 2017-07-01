@@ -1620,7 +1620,8 @@ class kb_blast:
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -2881,7 +2882,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -3942,6 +3944,7 @@ class kb_blast:
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
             html_report_lines += ['<td align=center style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
             html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'<nobr>Q_BEG-Q_END:</nobr> <nobr>H_BEG-H_END</nobr>'+'</font></td>']
@@ -4139,7 +4142,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                                                         
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -5577,7 +5581,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -7019,7 +7024,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
@@ -8193,7 +8199,8 @@ class kb_blast:
                                                 'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
                                                 'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
-            reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+            if hit_total > 0:
+                reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
             #reportObj['message'] = report
 
 
