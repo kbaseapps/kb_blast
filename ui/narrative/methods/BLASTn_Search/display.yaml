@@ -4,7 +4,10 @@
 name: BLASTn nuc-nuc Search - v2.6.0
 tooltip: |
     Search for matches to a sequence
-screenshots: []
+screenshots: 
+
+    - BLASTn_input_widget.png
+    - BLASTn_output_table.png
 
 icon: blast-cyan.png
 
@@ -21,7 +24,7 @@ suggestions:
         related:
             []
         next:
-            []
+            ["kb_muscle.MUSCLE_nuc", "kb_muscle.MUSCLE_prot"]
 
 #
 # Configure the display and description of parameters
@@ -91,3 +94,25 @@ description : |
     <p>This method performs a nuc-nuc (nucleotide sequence alignment) BLASTn Search using NCBI's BLAST+ (version 2.6.0)</p>
     <p><A HREF="http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-421">Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, Madden TL. (2009) "BLAST+: architecture and applications." BMC Bioinformatics. 2009 Dec 15;10:421.</A> doi: 10.1186/1471-2105-10-421</p>
     <p><A HREF="http://nar.oxfordjournals.org/content/25/17/3389.long">Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, & Lipman DJ. (1997) "Gapped BLAST and PSI-BLAST: a new generation of protein database search programs." Nucleic Acids Res. 25:3389-3402.</A> doi: 10.1093/nar/25.17.3389</p>
+    <p><hr></p>
+    <p><i>Implemented for KBase by <a href="mailto:DCChivian@lbl.gov">Dylan Chivian (DCChivian@lbl.gov)</a></i></p>
+    <p><hr></p>
+    <p>BLASTn is a nucleotide sequence search against a nucleotide sequence database.  The KBase implementation permits searching through the genes in a Genome object, the genes in the Genome members of a GenomeSet, or the genes in a FeatureSet.  The output object of these searches is a FeatureSet containing those genes that pass the thresholds given by the user.  The App also provides a table of the hits (with those hits that are below the thresholds in gray) and links to download other formats of BLAST output files.</p>
+    <p><hr></p>
+    <p><b>Configuration:</b></p>
+    <p><b><i>Query Object:</i></b> If you don't provide a Query Sequence, you must instead provide a query object.  This may be a gene or a Sequence Set object with a single sequence.  This latter object will be available after running BLASTn once, and can be used in subsequent runs.  It must contain nucleic acid sequence.</p>
+    <p><b><i>Query Sequence:</i></b> If you don't provide a Query Object, you must cut-and-paste a query sequence.  In addition, you must name the Output Query Object in which to save the query sequence.  It must be a one letter code nucleic acid sequence.</p>
+    <p><b><i>Targets Object:</i></b> The Targets Object may be a FeatureSet of genes, a Genome, or a GenomeSet.  A BLAST search database will be automatically generated from the Targets Object.</p>
+    <p><b><i>Output Query Object:</i></b> If your query is input as a cut-and-paste sequence, you must name the object in which to store that query.</p>
+    <p><b><i>Output Object:</i></b> This is the set of genes that are both hit and pass user-defined thresholds.</p>
+    <p><b><i>E-value:</i></b> This bounds the e-value for the weakest hit to consider viable.  Values below this do not get reported in the table or the BLAST output text downloads.</p>
+    <p><b><i>Bitscore:</i></b> This bounds the bitscore for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p>
+    <p><b><i>Identity Threshold:</i></b> This bounds the sequence identity between the query and each hit for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p>
+    <p><b><i>Overlap Fraction:</i></b> This bounds the overlap fraction (fraction of the query length covered by the hit alignment) for inclusion in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p></p>
+    <p><b><i>Max Accepts:</i></b> Hard cap on how many hits to report (Default: 1000)</p>
+    <p><b><i>Extra Text Output format:</i></b> The BLAST m=7 (tab-delimited table) text output format is available automatically for download.  A user may request up to one extra format to be generated and downloadable.  These include <ul><li>0 (pairwise)<li>1 (query-anchored showing identities)<li>2 (query-anchored no identities)<li>3 (flat query-anchored, show identities)<li>4 (flat query-anchored, no identities)<li>5 (XML Blast output)<li>8 (Text ASN.1)<li>9 (Binary ASN.1)<li>10 (Comma-separated values)<li>11 (BLAST archive format ASN.1)</ul></p>
+    <p><hr></p>
+    <p><b>Output:</b></p>
+    <p><b><i>Output Object:</i></b> Gene hits are captured in a FeatureSet output object.  If there are additional user-defined thresholds, those are filtered out and do not appear in the object, even if they are shown in the output table.</p>
+    <p><b><i>Output HTML Table:</i></b> The tab-delimited hit table is HTML formatted and additionally shows the region of the query covered by the BLAST alignment.  Hits that are above the e-value threshold but below other thresholds and are not included in the FeatureSet output object are shown in gray, with the attributes that were below the threshold in red.</p>
+    <p><b><i>Downloadable files:</i></b> BLAST text outputs that are requested (as indicated in <i>Configuration<i> above) are available for download.  These are not altered from the direct output from the BLAST run.  The m=7 (tab-delimited) format is always provided.</p>
