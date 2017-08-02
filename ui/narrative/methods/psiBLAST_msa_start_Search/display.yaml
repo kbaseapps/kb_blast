@@ -38,12 +38,12 @@ parameters :
         ui-name : |
             Targets Object
         short-hint : |
-            PROTEIN Targets object to be searched.  Data types may be SequenceSet, FeatureSet, Genome, or GenomeSet.
+            PROTEIN Targets object to be searched.  Data types may be FeatureSet, Genome, or GenomeSet.
     output_filtered_name:
         ui-name : |
             Output Object
         short-hint : |
-            Object containing matches.  Output will be SequenceSet for SequenceSet Targets, otherwise will be FeatureSet.
+            Object containing matches.  Output will be FeatureSet.
     e_value:
         ui-name : |
             E-value
