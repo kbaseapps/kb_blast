@@ -1242,12 +1242,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -1270,7 +1270,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -1298,12 +1298,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -2516,12 +2516,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -2544,7 +2544,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -2573,12 +2573,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -3777,12 +3777,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -3805,7 +3805,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -3834,12 +3834,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -5203,12 +5203,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -5231,7 +5231,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -5260,12 +5260,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -6646,12 +6646,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -6674,7 +6674,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -6703,12 +6703,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
@@ -7833,12 +7833,12 @@ class kb_blast:
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
                         accept_fids[id_untrans] = True
-                        fId = id_untrans
+                        #fId = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][fId]
                         except:
                             output_featureSet['elements'][fId] = []
-                        output_featureSet['element_ordering'].append(fId)
+                            output_featureSet['element_ordering'].append(fId)
                         output_featureSet['elements'][fId].append(genome_ref)
 
         # Parse Genome hits into FeatureSet
@@ -7861,7 +7861,7 @@ class kb_blast:
                     #self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    fid = input_many_ref+genome_id_feature_id_delim+id_untrans
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [input_many_ref]
 
@@ -7890,12 +7890,12 @@ class kb_blast:
                         #self.log(console, 'FOUND HIT: '+feature['id'])  # DEBUG
                         #output_featureSet['element_ordering'].append(feature['id'])
                         accept_fids[id_untrans] = True
-                        feature_id = id_untrans
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
                         try:
                             this_genome_ref_list = output_featureSet['elements'][feature_id]
                         except:
                             output_featureSet['elements'][feature_id] = []
-                        output_featureSet['element_ordering'].append(feature_id)
+                            output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
 
