@@ -106,8 +106,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".97",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "97.0",
+                       'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -146,8 +146,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".4",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "40.0",
+                       'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -186,8 +186,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".4",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "40.0",
+                       'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -226,8 +226,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".4",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "40",
+                       'overlap_fraction': "50",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -266,8 +266,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".4",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "40",
+                       'overlap_fraction': "50",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -326,8 +326,8 @@ class kb_blastTest(unittest.TestCase):
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
-                       'ident_thresh': ".1",
-                       'overlap_fraction': "0.5",
+                       'ident_thresh': "10",
+                       'overlap_fraction': "50",
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
