@@ -60,7 +60,7 @@ parameters :
             Object containing matches.  Output will be FeatureSet.
     ident_thresh:
         ui-name : |
-            Identity Threshold
+            Identity Threshold (%)
         short-hint : |
             threshold for hits
     e_value:
@@ -75,7 +75,7 @@ parameters :
             threshold for hits
     overlap_fraction:
         ui-name : |
-            Overlap Fraction
+            Alignment Overlap Threshold (%)
         short-hint : |
             threshold for hits
     maxaccepts:
@@ -106,8 +106,8 @@ description : |
     <p><b><i>Output Object:</i></b> This is the set of genes that are both hit and pass user-defined thresholds.</p>
     <p><b><i>E-value:</i></b> This bounds the e-value for the weakest hit to consider viable.  Values below this do not get reported in the table or the BLAST output text downloads.</p>
     <p><b><i>Bitscore:</i></b> This bounds the bitscore for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p>
-    <p><b><i>Identity Threshold:</i></b> This bounds the sequence identity between the query and each hit for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p>
-    <p><b><i>Overlap Fraction:</i></b> This bounds the overlap fraction (fraction of the query length covered by the hit alignment) for inclusion in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p></p>
+    <p><b><i>Identity Threshold (%):</i></b> This bounds the sequence identity between the query and each hit for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.  Identity is calculated for amino acids.</p>
+    <p><b><i>Alignment Overlap Threshold (%):</i></b> This bounds the overlap percentage (portion of the query length covered by the hit alignment) for inclusion in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p></p>
     <p><b><i>Max Accepts:</i></b> Hard cap on how many hits to report (Default: 1000)</p>
     <p><b><i>Extra Text Output format:</i></b> The BLAST m=7 (tab-delimited table) text output format is available automatically for download.  A user may request up to one extra format to be generated and downloadable.  These include <ul><li>0 (pairwise)<li>1 (query-anchored showing identities)<li>2 (query-anchored no identities)<li>3 (flat query-anchored, show identities)<li>4 (flat query-anchored, no identities)<li>5 (XML Blast output)<li>8 (Text ASN.1)<li>9 (Binary ASN.1)<li>10 (Comma-separated values)<li>11 (BLAST archive format ASN.1)</ul></p>
     <p><hr></p>
