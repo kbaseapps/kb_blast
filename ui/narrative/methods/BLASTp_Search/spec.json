@@ -97,11 +97,12 @@
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "0.40" ],
+            "default_values": [ "40.0" ],
             "field_type": "text",
             "text_options": {
                 "validate_as": "float",
-                "min_integer" : 0
+                "min_float" : 0.0,
+                "max_float" : 100.0
             }
         },
         {
@@ -109,11 +110,12 @@
             "optional": true,
             "advanced": true,
             "allow_multiple": false,
-            "default_values": [ "0.5" ],
+            "default_values": [ "50.0" ],
             "field_type": "text",
             "text_options": {
                 "validate_as": "float",
-                "min_integer" : 0
+                "min_float" : 0.0,
+                "max_float" : 100.0
             }
         },
         {
@@ -125,7 +127,7 @@
             "field_type": "text",
             "text_options": {
                 "validate_as": "int",
-                "min_integer" : 0
+                "min_integer" : 1
             }
         },
         {

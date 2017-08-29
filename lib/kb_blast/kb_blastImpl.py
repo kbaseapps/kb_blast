@@ -1103,13 +1103,13 @@ class kb_blast:
             filtering_fields[hit_seq_id] = dict()
 
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
 
@@ -2436,13 +2436,13 @@ class kb_blast:
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
                 
@@ -3702,13 +3702,13 @@ class kb_blast:
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
 
@@ -5063,13 +5063,13 @@ class kb_blast:
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
 
@@ -6506,13 +6506,13 @@ class kb_blast:
 
             #self.log(console,"HIT_SEQ_ID: '"+hit_seq_id+"'")
             filter = False
-            if 'ident_thresh' in params and float(params['ident_thresh']) > float(high_bitscore_ident[hit_seq_id]):
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
 
@@ -7763,7 +7763,7 @@ class kb_blast:
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
-            if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
 
