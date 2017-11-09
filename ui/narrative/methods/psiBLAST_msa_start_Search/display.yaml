@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: psiBLAST MSA start prot-prot Search - v2.6.0
+name: psiBLAST MSA start prot-prot Search - v2.7.1
 tooltip: |
     Search for matches to a Multiple Sequence Alignment (MSA)
 screenshots:
