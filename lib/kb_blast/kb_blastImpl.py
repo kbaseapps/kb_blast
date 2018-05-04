@@ -7208,6 +7208,10 @@ class kb_blast:
             with open (one_forward_reads_file_path, 'w', 0) as input_one_fh:
                 input_one_fh.write('>query'+"\n")
                 input_one_fh.write(longest_seq+"\n")
+            if master_row_idx == -1:
+                raise ValueError ("unable to find longest sequence in MSA")
+            else:
+                master_row_idx += 1  # psiBLAST counts rows starting from 1 instead of 0
 
             
             # export features to Clustal-esque file that PSI-BLAST likes
