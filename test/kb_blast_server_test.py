@@ -76,7 +76,15 @@ class kb_blastTest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
+    #
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
+    #
+
+
+    # Test BLASTn
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
     def test_kb_blast_BLASTn_Search_01(self):
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
@@ -127,6 +135,10 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test BLASTp
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01")
     def test_kb_blast_BLASTp_Search_01(self):
         obj_basename = 'BLASTp'
         obj_out_name = obj_basename+".test_output.FS"
@@ -167,6 +179,10 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test BLASTx
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
     def test_kb_blast_BLASTx_Search_01(self):
         obj_basename = 'BLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -207,6 +223,10 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test tBLASTx
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTx_Search_01")
     def test_kb_blast_tBLASTx_Search_01(self):
         obj_basename = 'tBLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -247,6 +267,10 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test tBLASTn
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
     def test_kb_blast_tBLASTn_Search_01(self):
         obj_basename = 'tBLASTn'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -287,6 +311,10 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test psiBLAST
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_01")
     def test_kb_blast_psiBLAST_msa_start_Search_01(self):
         obj_basename = 'psiBLAST_msa_start'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -321,7 +349,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_sequence': "",
                        #'input_one_ref': "",
                        'input_msa_ref': MSA_ref,
-                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       #'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_ref': genome_ref_1,
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
