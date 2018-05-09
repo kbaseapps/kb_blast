@@ -7445,12 +7445,14 @@ class kb_blast:
 
         # check for failed input file creation
         #
-        if not os.path.isfile(one_forward_reads_file_path) or \
+        if not appropriate_sequence_found_in_MSA_input or \
+           not os.path.isfile(one_forward_reads_file_path) or \
            not os.path.getsize(one_forward_reads_file_path) > 0 or \
            not os.path.isfile(input_MSA_file_path) or \
            not os.path.getsize(input_MSA_file_path):
             self.log(invalid_msgs,"no protein sequences found in MSA'"+input_msa_ref+"'")
-        if not os.path.isfile(many_forward_reads_file_path) or \
+        if not appropriate_sequence_found_in_many_input or \
+           not os.path.isfile(many_forward_reads_file_path) or \
            not os.path.getsize(many_forward_reads_file_path) > 0:
             self.log(invalid_msgs,"no protein sequences found in '"+input_many_name+"'")
 
