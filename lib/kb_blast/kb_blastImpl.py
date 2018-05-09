@@ -1863,7 +1863,9 @@ class kb_blast:
             PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
             DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")
             if DNA_pattern.match(sequence_str):
-                self.log(invalid_msgs,"Need protein query sequence.  BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                self.log(invalid_msgs,
+                         "Need protein query sequence. "+
+                         "BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
             elif not PROT_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
             else:
@@ -1976,7 +1978,9 @@ class kb_blast:
                 PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
                 DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")
                 if DNA_pattern.match(sequence_str):
-                    self.log(invalid_msgs,"Need protein query sequence.  BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                    self.log(invalid_msgs,
+                             "Need protein target sequences. "+
+                             "BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
                 elif not PROT_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
@@ -3249,7 +3253,9 @@ class kb_blast:
                 PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
                 DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")   
                 if DNA_pattern.match(sequence_str):
-                    self.log(invalid_msgs,"Need protein query sequence.  BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                    self.log(invalid_msgs,
+                             "Need protein target sequences. "+
+                             "BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
                     continue
                 elif not PROT_pattern.match(sequence_str):
                     self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
@@ -4395,7 +4401,9 @@ class kb_blast:
             PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
             DNA_pattern  = re.compile("^[acgtuACGTUnryNRY ]+$")
             if DNA_pattern.match(sequence_str):
-                self.log(invalid_msgs,"Need protein query sequence.  BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                self.log(invalid_msgs,
+                         "Need protein query sequence. "+
+                         "BAD nucleotide record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
             elif not PROT_pattern.match(sequence_str):
                 self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
             else:
@@ -7262,7 +7270,9 @@ class kb_blast:
                     #self.log(console, row_id+": '"+MSA_in['alignment'][row_id]+"'")    # DEBUG                   
                     #if not PROT_MSA_pattern.match(MSA_in['alignment'][row_id]):
                     if DNA_MSA_pattern.match(MSA_in['alignment'][row_id]):
-                        self.log(invalid_msgs,"Need protein sequences in MSA.  BAD nucleotide record for MSA row_id: "+row_id+"\n"+MSA_in['alignment'][row_id]+"\n")
+                        self.log(invalid_msgs,
+                                 "Need protein sequences in MSA. "+
+                                 "BAD nucleotide record for MSA row_id: "+row_id+"\n"+MSA_in['alignment'][row_id]+"\n")
                         appropriate_sequence_found_in_MSA_input = False
                         break
                     elif not PROT_MSA_pattern.match(MSA_in['alignment'][row_id]):
