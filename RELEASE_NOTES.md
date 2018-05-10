@@ -1,6 +1,8 @@
+### Version 1.0.6
+- made protein sequence checking stricter
+
 ### Version 1.0.5
 - bugfix for psiBLAST with MSA index
-- made protein sequence checking stricter
 - changed base docker image to sdkbase2
 
 ### Version 1.0.4
