@@ -373,3 +373,60 @@ class kb_blastTest(unittest.TestCase):
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
+
+
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_02_nuc_MSA")
+    def test_kb_blast_psiBLAST_msa_start_Search_02_nuc_MSA(self):
+        obj_basename = 'psiBLAST_msa_start'
+        obj_out_name = obj_basename+'.'+"test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
+        reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
+        genome_ref_1 = 'ReferenceDataManager/GCF_000021385.1/1'  # D. vulgaris str. 'Miyazaki F'
+
+        # MSA
+        MSA_json_file = os.path.join('data', 'ExbD_nuc.MSA.json')
+        with open (MSA_json_file, 'r', 0) as MSA_json_fh:
+            MSA_obj = json.load(MSA_json_fh)
+
+        provenance = [{}]
+        MSA_info = self.getWsClient().save_objects({
+            'workspace': self.getWsName(), 
+            'objects': [
+                {
+                    'type': 'KBaseTrees.MSA',
+                    'data': MSA_obj,
+                    'name': 'test_MSA_nuc',
+                    'meta': {},
+                    'provenance': provenance
+                }
+            ]})[0]
+
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        MSA_ref = str(MSA_info[WSID_I])+'/'+str(MSA_info[OBJID_I])+'/'+str(MSA_info[VERSION_I])
+
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       #'input_one_sequence': "",
+                       #'input_one_ref': "",
+                       'input_msa_ref': MSA_ref,
+                       #'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_ref': genome_ref_1,
+                       'output_filtered_name': obj_out_name,
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "10",
+                       'overlap_fraction': "50",
+                       'maxaccepts': "1000",
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().psiBLAST_msa_start_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertEqual(report_obj['text_message'][0:7],"FAILURE")
+        pass
