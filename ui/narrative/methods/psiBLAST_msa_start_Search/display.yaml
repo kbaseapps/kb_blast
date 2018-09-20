@@ -72,9 +72,6 @@ parameters :
 
 description : |
     <p>This method performs a prot-prot (protein sequence alignment) psiBLAST Search that uses the input MSA as the profile with which to search using NCBI's BLAST+ (version 2.6.0)</p>
-    <p><A HREF="http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-421">Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, Madden TL. (2009) "BLAST+: architecture and applications." BMC Bioinformatics. 2009 Dec 15;10:421.</A> doi: 10.1186/1471-2105-10-421</p>
-    <p><A HREF="http://nar.oxfordjournals.org/content/25/17/3389.long">Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, & Lipman DJ. (1997) "Gapped BLAST and PSI-BLAST: a new generation of protein database search programs." Nucleic Acids Res. 25:3389-3402.</A> doi: 10.1093/nar/25.17.3389</p>
-    <p><hr></p>
     <p><i>Implemented for KBase by <a href="https://github.com/dcchivian">Dylan Chivian</a> (<a href="mailto:DCChivian@lbl.gov">DCChivian@lbl.gov</a>)</i></p>
     <p><hr></p>
     <p>psiBLAST MSA Start is a protein multiple sequence alignment (MSA) search against a protein sequence database.  Iteration is not currently implemented, and therefore a multiple sequence alignment must first be generated using an App such as MUSCLE to build an MSA from a FeatureSet object.  The KBase implementation permits searching through the genes in a Genome object, the genes in the Genome members of a GenomeSet, or the genes in a FeatureSet.  The output object of these searches is a FeatureSet containing those genes that pass the thresholds given by the user.  The App also provides a table of the hits (with those hits that are below the thresholds in gray) and links to download other formats of BLAST output files.</p>
@@ -93,3 +90,14 @@ description : |
     <p><b><i>Output Object:</i></b> Gene hits are captured in a FeatureSet output object.  If there are additional user-defined thresholds, those are filtered out and do not appear in the object, even if they are shown in the output table.</p>
     <p><b><i>Output HTML Table:</i></b> The tab-delimited hit table is HTML formatted and additionally shows the region of the query covered by the BLAST alignment.  Hits that are above the e-value threshold but below other thresholds and are not included in the FeatureSet output object are shown in gray, with the attributes that were below the threshold in red.</p>
     <p><b><i>Downloadable files:</i></b> BLAST text outputs that are requested (as indicated in <i>Configuration</i> above) are available for download.  These are not altered from the direct output from the BLAST run.  The m=7 (tab-delimited) format is always provided.</p>
+
+publications :
+    -
+        display-text: |
+            Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, et al. Gapped BLAST and PSI-BLAST: a new generation of protein database search programs. Nucleic Acids Res. 1997;25: 3389–3402. doi:10.1093/nar/25.17.3389
+        link: https://academic.oup.com/nar/article/25/17/3389/1061651
+
+    -
+        display-text: |
+            Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, et al. BLAST+: architecture and applications. BMC Bioinformatics. 2009;10: 421. doi:10.1186/1471-2105-10-421
+        link: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-421
