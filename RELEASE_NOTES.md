@@ -1,3 +1,6 @@
+### Version 1.0.7
+- changed citations to be PLOS format
+
 ### Version 1.0.6
 - made protein sequence checking stricter
 
@@ -11,4 +14,3 @@
 
 ### Version 1.0.0
 - Initial release (BLAST+ v2.6.0)
-
