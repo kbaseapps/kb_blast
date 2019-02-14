@@ -2105,7 +2105,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+man_type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)            
 
 
         # check for failed input file creation
