@@ -12,7 +12,7 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except:
+except ImportError:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 
@@ -23,7 +23,7 @@ class kb_blast(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -64,9 +64,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.BLASTn_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.BLASTn_Search',
+                                        [params], self._service_ver, context)
 
     def BLASTp_Search(self, params, context=None):
         """
@@ -93,9 +92,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.BLASTp_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.BLASTp_Search',
+                                        [params], self._service_ver, context)
 
     def BLASTx_Search(self, params, context=None):
         """
@@ -122,9 +120,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.BLASTx_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.BLASTx_Search',
+                                        [params], self._service_ver, context)
 
     def tBLASTn_Search(self, params, context=None):
         """
@@ -151,9 +148,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.tBLASTn_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.tBLASTn_Search',
+                                        [params], self._service_ver, context)
 
     def tBLASTx_Search(self, params, context=None):
         """
@@ -180,9 +176,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.tBLASTx_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.tBLASTx_Search',
+                                        [params], self._service_ver, context)
 
     def psiBLAST_msa_start_Search(self, params, context=None):
         """
@@ -209,9 +204,8 @@ class kb_blast(object):
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
         """
-        return self._client.call_method(
-            'kb_blast.psiBLAST_msa_start_Search',
-            [params], self._service_ver, context)
+        return self._client.call_method('kb_blast.psiBLAST_msa_start_Search',
+                                        [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('kb_blast.status',

@@ -14,7 +14,7 @@ except:
 
 from pprint import pprint  # noqa: F401
 
-from biokbase.workspace.client import Workspace as workspaceService
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 from kb_blast.kb_blastImpl import kb_blast
 from kb_blast.kb_blastServer import MethodContext
 from kb_blast.authclient import KBaseAuth as _KBaseAuth
