@@ -19,14 +19,15 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein
 #from biokbase.workspace.client import Workspace as workspaceService
-from Workspace.WorkspaceClient import Workspace as workspaceService
+#from Workspace.WorkspaceClient import Workspace as workspaceService
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 from requests_toolbelt import MultipartEncoder
 from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
 # SDK Utils
-from KBaseDataObjectToFileUtils.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
-from DataFileUtil.DataFileUtilClient import DataFileUtil as DFUClient
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
+from installed_clients.KBaseReportClient import KBaseReport
 
 # silence whining
 import requests
@@ -53,9 +54,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.6"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
+    VERSION = "1.1.0"
+    GIT_URL = "https://github.com/dcchivian/kb_blast"
+    GIT_COMMIT_HASH = "f519cf72699e4d07f51c9fccd4bbd52e16cea41e"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
