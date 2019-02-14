@@ -18,8 +18,6 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein
-#from biokbase.workspace.client import Workspace as workspaceService
-#from Workspace.WorkspaceClient import Workspace as workspaceService
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 from requests_toolbelt import MultipartEncoder
 from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
