@@ -1,36 +1,27 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
+import gzip
 import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
 import re
+import subprocess
+import sys
 import traceback
 import uuid
 from datetime import datetime
-from pprint import pprint, pformat
-#import numpy as np
-import gzip
+from pprint import pformat
 
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-#from biokbase.workspace.client import Workspace as workspaceService
-from Workspace.WorkspaceClient import Workspace as workspaceService
+import requests
 from requests_toolbelt import MultipartEncoder
-from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 
 # SDK Utils
-from KBaseDataObjectToFileUtils.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
-from DataFileUtil.DataFileUtilClient import DataFileUtil as DFUClient
-from KBaseReport.KBaseReportClient import KBaseReport
-
-# silence whining
-import requests
-requests.packages.urllib3.disable_warnings()
+from installed_clients.AbstractHandleClient import AbstractHandle
+from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
+from installed_clients.KBaseReportClient import KBaseReport
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 #END_HEADER
 
@@ -53,8 +44,8 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.6"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast"
+    VERSION = "1.1.0"
+    GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
     GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
 
     #BEGIN_CLASS_HEADER
@@ -147,7 +138,7 @@ class kb_blast:
 
         # 2) create handle
         self.log(console,'GETTING HANDLE')
-        hs = HandleService(url=self.handleURL, token=token)
+        hs = AbstractHandle(url=self.handleURL, token=token)
         forward_handle = hs.persist_handle({
                                         'id' : forward_shock_file['id'], 
                                         'type' : 'shock',
@@ -400,7 +391,7 @@ class kb_blast:
             try:
                 input_one_sequenceSet = input_one_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get sequenceSet object: ' + str(e))
 
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
@@ -414,11 +405,11 @@ class kb_blast:
                 appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close();
+            one_forward_reads_file_handle.close()
 
             self.log(console, 'done')
 
@@ -451,7 +442,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+            if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
 
@@ -514,12 +505,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -562,7 +553,7 @@ class kb_blast:
 
                 ### NOTE: this section is what could be replaced by the transform services
                 many_forward_reads_file_path = os.path.join(self.scratch,many_forward_reads['file_name'])
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
                 self.log(console, 'downloading reads file: '+str(many_forward_reads_file_path))
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
@@ -576,8 +567,8 @@ class kb_blast:
 
                 # remove carriage returns
                 new_file_path = many_forward_reads_file_path+"-CRfree"
-                new_file_handle = open(new_file_path, 'w', 0)
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                new_file_handle = open(new_file_path, 'w')
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 for line in many_forward_reads_file_handle:
                     line = re.sub("\r","",line)
                     new_file_handle.write(line)
@@ -588,11 +579,11 @@ class kb_blast:
 
                 # convert FASTQ to FASTA (if necessary)
                 new_file_path = many_forward_reads_file_path+".fna"
-                new_file_handle = open(new_file_path, 'w', 0)
+                new_file_handle = open(new_file_path, 'w')
                 if many_forward_reads_file_compression == 'gz':
-                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r')
                 else:
-                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 header = None
                 last_header = None
                 last_seq_buf = None
@@ -625,7 +616,7 @@ class kb_blast:
                     many_forward_reads_file_path = new_file_path
 
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to download single-end read library files: ' + str(e))
 
         # FeatureSet
@@ -658,7 +649,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -730,7 +721,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -840,7 +831,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -924,7 +915,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -981,7 +972,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -1007,7 +998,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -1015,12 +1006,12 @@ class kb_blast:
         
 
         # DEBUG
-        #one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r', 0)
+        #one_forward_reads_file_handle = open(one_forward_reads_file_path, 'r')
         #self.log(console, 'reading QUERY reads file: '+str(one_forward_reads_file_path))
         #self.log(console, "".join(one_forward_reads_file_handle.readlines()))
         #one_forward_reads_file_handle.close();
 
-        #many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+        #many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
         #self.log(console, 'reading TARGET reads file: '+str(many_forward_reads_file_path))
         #self.log(console, "".join(many_forward_reads_file_handle.readlines()))
 
@@ -1048,7 +1039,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -1223,7 +1214,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -1233,7 +1224,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -1288,7 +1279,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -1323,7 +1314,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SingleEndLibrary -> upload SingleEndLibrary
@@ -1458,7 +1449,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -1566,7 +1557,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)
@@ -1854,7 +1845,7 @@ class kb_blast:
             try:
                 input_one_sequenceSet = input_one_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get sequenceSet object: ' + str(e))
 
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
@@ -1872,11 +1863,11 @@ class kb_blast:
                 appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close();
+            one_forward_reads_file_handle.close()
             self.log(console, 'done')
 
         # FeatureSet
@@ -1908,7 +1899,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+            if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
             # DEBUG
@@ -1963,12 +1954,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -2022,7 +2013,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -2094,7 +2085,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -2105,7 +2096,7 @@ class kb_blast:
         # Missing proper input_many_type
         #
         else:
-            raise ValueError('Cannot yet handle input_many type of: '+man_type_name)            
+            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)
 
 
         # check for failed input file creation
@@ -2204,7 +2195,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -2288,7 +2279,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -2344,7 +2335,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -2374,7 +2365,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -2390,7 +2381,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -2465,7 +2456,7 @@ class kb_blast:
         
 
         # DEBUG
-        for hit_seq_id in hit_seq_ids.keys():
+        for hit_seq_id in list(hit_seq_ids.keys()):
             self.log (console, "HIT_ID: '"+str(hit_seq_id)+"'")
 
         self.log(console, 'EXTRACTING HITS FROM INPUT')
@@ -2486,7 +2477,7 @@ class kb_blast:
             if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] != None:
                 output_sequenceSet['description'] = input_many_sequenceSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
-                output_sequenceSet['description'] = search_tool_anme+"_Search filtered"
+                output_sequenceSet['description'] = search_tool_name+"_Search filtered"
 
             self.log(console,"ADDING SEQUENCES TO SEQUENCESET")
             output_sequenceSet['sequences'] = []
@@ -2506,7 +2497,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -2516,7 +2507,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -2571,7 +2562,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -2607,7 +2598,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -2730,7 +2721,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -2838,7 +2829,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)
@@ -3128,7 +3119,7 @@ class kb_blast:
             try:
                 input_one_sequenceSet = input_one_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get sequenceSet object: ' + str(e))
 
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
@@ -3142,11 +3133,11 @@ class kb_blast:
                 appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close();
+            one_forward_reads_file_handle.close()
             self.log(console, 'done')        
 
         # FeatureSet
@@ -3178,7 +3169,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+            if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
             # DEBUG
@@ -3203,7 +3194,7 @@ class kb_blast:
                 self.log(console,params['input_one_ref']+" feature type must be CDS")
                 self.log(invalid_msgs,params['input_one_ref']+" feature type must be CDS")
             else:
-                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome_ref+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
@@ -3238,12 +3229,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -3297,7 +3288,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -3369,7 +3360,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -3478,7 +3469,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -3562,7 +3553,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -3618,7 +3609,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -3644,7 +3635,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -3661,7 +3652,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -3772,7 +3763,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -3782,7 +3773,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -3837,7 +3828,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -3873,7 +3864,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -3995,7 +3986,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -4103,7 +4094,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)
@@ -4392,7 +4383,7 @@ class kb_blast:
             try:
                 input_one_sequenceSet = input_one_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get sequenceSet object: ' + str(e))
 
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
@@ -4410,11 +4401,11 @@ class kb_blast:
                 appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close();
+            one_forward_reads_file_handle.close()
             self.log(console, 'done')
 
         # FeatureSet
@@ -4446,7 +4437,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+            if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
             # DEBUG
@@ -4473,7 +4464,7 @@ class kb_blast:
                 self.log(invalid_msgs,input_one_name+" feature type must be CDS")
             else:
                 appropriate_sequence_found_in_one_input = True
-                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genome_ref+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True                
         else:
@@ -4518,12 +4509,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -4566,7 +4557,7 @@ class kb_blast:
 
                 ### NOTE: this section is what could be replaced by the transform services
                 many_forward_reads_file_path = os.path.join(self.scratch,many_forward_reads['file_name'])
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
                 self.log(console, 'downloading reads file: '+str(many_forward_reads_file_path))
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
@@ -4580,8 +4571,8 @@ class kb_blast:
 
                 # remove carriage returns
                 new_file_path = many_forward_reads_file_path+"-CRfree"
-                new_file_handle = open(new_file_path, 'w', 0)
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                new_file_handle = open(new_file_path, 'w')
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 for line in many_forward_reads_file_handle:
                     line = re.sub("\r","",line)
                     new_file_handle.write(line)
@@ -4592,11 +4583,11 @@ class kb_blast:
 
                 # convert FASTQ to FASTA (if necessary)
                 new_file_path = many_forward_reads_file_path+".fna"
-                new_file_handle = open(new_file_path, 'w', 0)
+                new_file_handle = open(new_file_path, 'w')
                 if many_forward_reads_file_compression == 'gz':
-                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r')
                 else:
-                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 header = None
                 last_header = None
                 last_seq_buf = None
@@ -4629,7 +4620,7 @@ class kb_blast:
                     many_forward_reads_file_path = new_file_path
 
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to download single-end read library files: ' + str(e))
 
         # FeatureSet
@@ -4662,7 +4653,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -4734,7 +4725,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -4843,7 +4834,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -4927,7 +4918,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -4983,7 +4974,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -5009,7 +5000,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -5026,7 +5017,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -5202,7 +5193,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -5212,7 +5203,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -5267,7 +5258,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -5303,7 +5294,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input SingleEndLibrary -> upload SingleEndLibrary
@@ -5438,7 +5429,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -5546,7 +5537,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)
@@ -5835,7 +5826,7 @@ class kb_blast:
             try:
                 input_one_sequenceSet = input_one_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get sequenceSet object: ' + str(e))
 
             header_id = input_one_sequenceSet['sequences'][0]['sequence_id']
@@ -5849,11 +5840,11 @@ class kb_blast:
                 appropriate_sequence_found_in_one_input = True
 
             one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w', 0)
+            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
             one_forward_reads_file_handle.write('>'+header_id+"\n")
             one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close();
+            one_forward_reads_file_handle.close()
             self.log(console, 'done')
 
         # FeatureSet
@@ -5885,7 +5876,7 @@ class kb_blast:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            if len(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys()) > 0:
+            if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
             # DEBUG
@@ -5910,7 +5901,7 @@ class kb_blast:
                 self.log(console,input_one_name+" feature type must be CDS")
                 self.log(invalid_msgs,input_one_name+" feature type must be CDS")
             else:
-                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genomeRef+"."+feature['id'])
+                record = SeqRecord(Seq(feature['dna_sequence']), id=feature['id'], description=genome_ref+"."+feature['id'])
                 #record = SeqRecord(Seq(feature['protein_translation']), id=feature['id'], description=genomeRef+"."+feature['id'])
                 SeqIO.write([record], one_forward_reads_file_path, "fasta")
                 appropriate_sequence_found_in_one_input = True
@@ -5956,12 +5947,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -6004,7 +5995,7 @@ class kb_blast:
 
                 ### NOTE: this section is what could be replaced by the transform services
                 many_forward_reads_file_path = os.path.join(self.scratch,many_forward_reads['file_name'])
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
                 self.log(console, 'downloading reads file: '+str(many_forward_reads_file_path))
                 headers = {'Authorization': 'OAuth '+ctx['token']}
                 r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
@@ -6018,8 +6009,8 @@ class kb_blast:
 
                 # remove carriage returns
                 new_file_path = many_forward_reads_file_path+"-CRfree"
-                new_file_handle = open(new_file_path, 'w', 0)
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                new_file_handle = open(new_file_path, 'w')
+                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 for line in many_forward_reads_file_handle:
                     line = re.sub("\r","",line)
                     new_file_handle.write(line)
@@ -6030,11 +6021,11 @@ class kb_blast:
 
                 # convert FASTQ to FASTA (if necessary)
                 new_file_path = many_forward_reads_file_path+".fna"
-                new_file_handle = open(new_file_path, 'w', 0)
+                new_file_handle = open(new_file_path, 'w')
                 if many_forward_reads_file_compression == 'gz':
-                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r')
                 else:
-                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', 0)
+                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
                 header = None
                 last_header = None
                 last_seq_buf = None
@@ -6067,7 +6058,7 @@ class kb_blast:
                     many_forward_reads_file_path = new_file_path
 
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to download single-end read library files: ' + str(e))
 
         # FeatureSet
@@ -6100,7 +6091,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -6172,7 +6163,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -6282,7 +6273,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -6366,7 +6357,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -6422,7 +6413,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -6448,7 +6439,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -6465,7 +6456,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -6645,7 +6636,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -6655,7 +6646,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -6710,7 +6701,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -6746,7 +6737,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input SingleEndLibrary -> upload SingleEndLibrary
@@ -6881,7 +6872,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -6989,7 +6980,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)
@@ -7189,12 +7180,12 @@ class kb_blast:
             MSA_in = input_msa_data
             row_order = []
             default_row_labels = dict()
-            if 'row_order' in MSA_in.keys():
+            if 'row_order' in list(MSA_in.keys()):
                 row_order = MSA_in['row_order']
             else:
                 row_order = sorted(MSA_in['alignment'].keys())
 
-            if 'default_row_labels' in MSA_in.keys():
+            if 'default_row_labels' in list(MSA_in.keys()):
                 default_row_labels = MSA_in['default_row_labels']
             else:
                 for row_id in row_order:
@@ -7223,7 +7214,7 @@ class kb_blast:
             if longest_seq == '':
                 raise ValueError ("unable to find longest seq in MSA")
             one_forward_reads_file_path = os.path.join(self.scratch, input_msa_name+"-query.fasta")
-            with open (one_forward_reads_file_path, 'w', 0) as input_one_fh:
+            with open (one_forward_reads_file_path, 'w') as input_one_fh:
                 input_one_fh.write('>query'+"\n")
                 input_one_fh.write(longest_seq+"\n")
             if master_row_idx == -1:
@@ -7253,7 +7244,7 @@ class kb_blast:
                 records.append(row_id + padding + "\t" +
                                MSA_in['alignment'][row_id]
                                )
-            with open(input_MSA_file_path,'w',0) as input_MSA_file_handle:
+            with open(input_MSA_file_path, 'w') as input_MSA_file_handle:
                 input_MSA_file_handle.write("\n".join(records)+"\n")
 
 
@@ -7303,12 +7294,12 @@ class kb_blast:
             try:
                 input_many_sequenceSet = input_many_data
             except Exception as e:
-                print(traceback.format_exc())
+                print((traceback.format_exc()))
                 raise ValueError('Unable to get SequenceSet: ' + str(e))
 
             header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
             many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w', 0)
+            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
             self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
 
             for seq_obj in input_many_sequenceSet['sequences']:
@@ -7357,7 +7348,7 @@ class kb_blast:
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(feature_ids_by_genome_ref.keys()) > 0:
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -7429,7 +7420,7 @@ class kb_blast:
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(feature_ids_by_genome_id.keys()) > 0:
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
 
             # DEBUG
@@ -7546,7 +7537,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -7634,7 +7625,7 @@ class kb_blast:
                              shell = False)
 
             while True:
-                line = p.stdout.readline()
+                line = p.stdout.readline().decode()
                 if not line: break
                 self.log(console, line.replace('\n', ''))
 
@@ -7694,7 +7685,7 @@ class kb_blast:
                              shell = False)
 
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode()
             if not line: break
             self.log(console, line.replace('\n', ''))
 
@@ -7720,7 +7711,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r', 0) as query_file_handle:
+        with open(one_forward_reads_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -7736,7 +7727,7 @@ class kb_blast:
             raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
         hit_seq_ids = dict()
         accept_fids = dict()
-        output_aln_file_handle = open (output_aln_file_path, "r", 0)
+        output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
         hit_total = 0
@@ -7827,7 +7818,7 @@ class kb_blast:
             if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] != None:
                 output_sequenceSet['description'] = input_many_sequenceSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
-                output_sequenceSet['description'] = search_tool_anme+"_Search filtered"
+                output_sequenceSet['description'] = search_tool_name+"_Search filtered"
 
             self.log(console,"ADDING SEQUENCES TO SEQUENCESET")
             output_sequenceSet['sequences'] = []
@@ -7848,7 +7839,7 @@ class kb_blast:
         # FeatureSet input -> FeatureSet output
         #
         elif many_type_name == 'FeatureSet':
-            seq_total = len(input_many_featureSet['elements'].keys())
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
             if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
@@ -7858,7 +7849,7 @@ class kb_blast:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = input_many_featureSet['elements'].keys()
+            fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
             for fId in sorted(fId_list):
                 for genome_ref in input_many_featureSet['elements'][fId]:
@@ -7913,7 +7904,7 @@ class kb_blast:
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
-            for genome_id in feature_ids_by_genome_id.keys():
+            for genome_id in list(feature_ids_by_genome_id.keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 for feature_id in feature_ids_by_genome_id[genome_id]:
@@ -7950,7 +7941,7 @@ class kb_blast:
 
         # Upload results
         #
-        if len(invalid_msgs) == 0 and len(hit_seq_ids.keys()) > 0:
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
             # input many SequenceSet -> save SequenceSet
@@ -8072,7 +8063,7 @@ class kb_blast:
 
                     # can't just use hit_fid because may have pipes translated and can't translate back
                     fid_lookup = None
-                    for fid in feature_id_to_function[genome_ref].keys():
+                    for fid in list(feature_id_to_function[genome_ref].keys()):
                         id_untrans = fid
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
@@ -8180,7 +8171,7 @@ class kb_blast:
             html_report_str = "\n".join(html_report_lines)
             html_file = search_tool_name+'_Search.html'
             html_path = os.path.join (output_dir, html_file)
-            with open (html_path, 'w', 0) as html_handle:
+            with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
 
             dfu = DFUClient(self.callbackURL)

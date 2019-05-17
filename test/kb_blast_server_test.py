@@ -1,23 +1,15 @@
 # -*- coding: utf-8 -*-
-import unittest
-import os  # noqa: F401
 import json  # noqa: F401
+import os  # noqa: F401
 import time
-import requests
-import uuid
-
+import unittest
+from configparser import ConfigParser  # py3
 from os import environ
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
 
-from pprint import pprint  # noqa: F401
-
-from biokbase.workspace.client import Workspace as workspaceService
+from installed_clients.WorkspaceClient import Workspace as workspaceService
+from kb_blast.authclient import KBaseAuth as _KBaseAuth
 from kb_blast.kb_blastImpl import kb_blast
 from kb_blast.kb_blastServer import MethodContext
-from kb_blast.authclient import KBaseAuth as _KBaseAuth
 
 
 class kb_blastTest(unittest.TestCase):
@@ -129,7 +121,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -173,7 +165,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -217,7 +209,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -261,7 +253,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -305,7 +297,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -325,7 +317,7 @@ class kb_blastTest(unittest.TestCase):
 
         # MSA
         MSA_json_file = os.path.join('data', 'DsrA.MSA.json')
-        with open (MSA_json_file, 'r', 0) as MSA_json_fh:
+        with open (MSA_json_file, 'r') as MSA_json_fh:
             MSA_obj = json.load(MSA_json_fh)
 
         provenance = [{}]
@@ -341,7 +333,7 @@ class kb_blastTest(unittest.TestCase):
                 }
             ]})[0]
 
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         MSA_ref = str(MSA_info[WSID_I])+'/'+str(MSA_info[OBJID_I])+'/'+str(MSA_info[VERSION_I])
 
         
@@ -369,7 +361,7 @@ class kb_blastTest(unittest.TestCase):
         self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
@@ -387,7 +379,7 @@ class kb_blastTest(unittest.TestCase):
 
         # MSA
         MSA_json_file = os.path.join('data', 'ExbD_nuc.MSA.json')
-        with open (MSA_json_file, 'r', 0) as MSA_json_fh:
+        with open (MSA_json_file, 'r') as MSA_json_fh:
             MSA_obj = json.load(MSA_json_fh)
 
         provenance = [{}]
@@ -403,7 +395,7 @@ class kb_blastTest(unittest.TestCase):
                 }
             ]})[0]
 
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         MSA_ref = str(MSA_info[WSID_I])+'/'+str(MSA_info[OBJID_I])+'/'+str(MSA_info[VERSION_I])
 
         

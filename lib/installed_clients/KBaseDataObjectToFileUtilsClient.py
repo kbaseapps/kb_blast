@@ -12,10 +12,9 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except:
+except ImportError:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
-import time
 
 
 class KBaseDataObjectToFileUtils(object):
@@ -24,7 +23,7 @@ class KBaseDataObjectToFileUtils(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login',
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login',
             service_ver='dev',
             async_job_check_time_ms=100, async_job_check_time_scale_percent=150, 
             async_job_check_max_time_ms=300000):
@@ -40,14 +39,6 @@ class KBaseDataObjectToFileUtils(object):
             async_job_check_time_scale_percent=async_job_check_time_scale_percent,
             async_job_check_max_time_ms=async_job_check_max_time_ms)
 
-    def _check_job(self, job_id):
-        return self._client._check_job('KBaseDataObjectToFileUtils', job_id)
-
-    def _TranslateNucToProtSeq_submit(self, params, context=None):
-        return self._client._submit_job(
-             'KBaseDataObjectToFileUtils.TranslateNucToProtSeq', [params],
-             self._service_ver, context)
-
     def TranslateNucToProtSeq(self, params, context=None):
         """
         Methods for converting KBase Data Objects to common bioinformatics format files
@@ -59,22 +50,8 @@ class KBaseDataObjectToFileUtils(object):
            (TranslateNucToProtSeq() Output) -> structure: parameter
            "prot_seq" of String
         """
-        job_id = self._TranslateNucToProtSeq_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _ParseFastaStr_submit(self, params, context=None):
-        return self._client._submit_job(
-             'KBaseDataObjectToFileUtils.ParseFastaStr', [params],
-             self._service_ver, context)
+        return self._client.run_job('KBaseDataObjectToFileUtils.TranslateNucToProtSeq',
+                                    [params], self._service_ver, context)
 
     def ParseFastaStr(self, params, context=None):
         """
@@ -87,22 +64,8 @@ class KBaseDataObjectToFileUtils(object):
            Output) -> structure: parameter "id" of String, parameter "desc"
            of String, parameter "seq" of String
         """
-        job_id = self._ParseFastaStr_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _GenomeToFASTA_submit(self, params, context=None):
-        return self._client._submit_job(
-             'KBaseDataObjectToFileUtils.GenomeToFASTA', [params],
-             self._service_ver, context)
+        return self._client.run_job('KBaseDataObjectToFileUtils.ParseFastaStr',
+                                    [params], self._service_ver, context)
 
     def GenomeToFASTA(self, params, context=None):
         """
@@ -120,22 +83,8 @@ class KBaseDataObjectToFileUtils(object):
            Output) -> structure: parameter "fasta_file_path" of type
            "path_type", parameter "feature_ids" of list of type "feature_id"
         """
-        job_id = self._GenomeToFASTA_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _GenomeSetToFASTA_submit(self, params, context=None):
-        return self._client._submit_job(
-             'KBaseDataObjectToFileUtils.GenomeSetToFASTA', [params],
-             self._service_ver, context)
+        return self._client.run_job('KBaseDataObjectToFileUtils.GenomeToFASTA',
+                                    [params], self._service_ver, context)
 
     def GenomeSetToFASTA(self, params, context=None):
         """
@@ -155,22 +104,8 @@ class KBaseDataObjectToFileUtils(object):
            "feature_ids_by_genome_id" of mapping from type "genome_id" to
            list of type "feature_id"
         """
-        job_id = self._GenomeSetToFASTA_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _FeatureSetToFASTA_submit(self, params, context=None):
-        return self._client._submit_job(
-             'KBaseDataObjectToFileUtils.FeatureSetToFASTA', [params],
-             self._service_ver, context)
+        return self._client.run_job('KBaseDataObjectToFileUtils.GenomeSetToFASTA',
+                                    [params], self._service_ver, context)
 
     def FeatureSetToFASTA(self, params, context=None):
         """
@@ -190,28 +125,9 @@ class KBaseDataObjectToFileUtils(object):
            "feature_ids_by_genome_ref" of mapping from type "data_obj_ref" to
            list of type "feature_id"
         """
-        job_id = self._FeatureSetToFASTA_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
+        return self._client.run_job('KBaseDataObjectToFileUtils.FeatureSetToFASTA',
+                                    [params], self._service_ver, context)
 
     def status(self, context=None):
-        job_id = self._client._submit_job('KBaseDataObjectToFileUtils.status', 
-            [], self._service_ver, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
+        return self._client.run_job('KBaseDataObjectToFileUtils.status',
+                                    [], self._service_ver, context)

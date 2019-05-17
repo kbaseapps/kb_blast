@@ -1,17 +1,10 @@
-FROM kbase/kbase:sdkbase2.latest
+FROM kbase/sdkbase2:python
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
 # to run your App.  For instance, you could place an apt-get update or
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
-
-# RUN apt-get update
-
-# Here we install a python coverage tool and an
-# https library that is out of date in the base image.
-
-RUN pip install coverage
 
 # -----------------------------------------
 
@@ -20,18 +13,11 @@ RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
-
-RUN make all
-
-
-# Install BLAST+
-#
-WORKDIR /kb/module
 RUN \
-  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.7.1+-x64-linux.tar.gz > ncbi-blast-2.7.1+-x64-linux.tar.gz && \
-  tar xfz ncbi-blast-2.7.1+-x64-linux.tar.gz && \
-  ln -s ncbi-blast-2.7.1+ blast && \
-  rm -f ncbi-blast-2.7.1+-x64-linux.tar.gz && \
+  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.8.1+-x64-linux.tar.gz > ncbi-blast-2.8.1+-x64-linux.tar.gz && \
+  tar xfz ncbi-blast-2.8.1+-x64-linux.tar.gz && \
+  ln -s ncbi-blast-2.8.1+ blast && \
+  rm -f ncbi-blast-2.8.1+-x64-linux.tar.gz && \
   rm -f blast/bin/blastdb_aliastool && \
   rm -f blast/bin/blastdbcheck && \
   rm -f blast/bin/blastdbcmd && \
@@ -49,7 +35,7 @@ RUN \
   rm -f blast/bin/windowmasker
 
 
-WORKDIR /kb/module
+RUN make all
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
 CMD [ ]
