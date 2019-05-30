@@ -3,11 +3,10 @@
 #
 name: BLASTn nuc-nuc Search - v2.8.1
 tooltip: |
-    Search for matches to a sequence
+    Search for untranslated protein matches to an untranslated protein sequence.
 screenshots:
 
-    - BLASTn_input_widget.png
-    - BLASTn_output_table.png
+    []
 
 icon: blast-cyan.png
 
@@ -32,87 +31,120 @@ suggestions:
 parameters :
     input_one_sequence:
         ui-name : |
-            Query Sequence (optional)
+            Query DNA Sequence (optional)
         short-hint : |
-            Single DNA sequence to use for the search.  If you enter something here, Output Query Object will be created with this sequence as a SequenceSet with one element.
+            Must enter either a query DNA (nucleotide) sequence or an input query object. This is a single DNA (nucleotide) sequence to use for the search. The sequence entered here will be saved as a Query Object and must be named in the output section below.
         placeholder : |
             Optionally enter DNA sequence...
     input_one_ref:
         ui-name : |
-            Query Object (optional)
+            Input Query Object (optional)
         short-hint : |
-            Query with single DNA sequence to use as query.  Data types may be Feature or SequenceSet (with one sequence)
+            Must enter either a query DNA sequence or an input query object. This is a data object with a single DNA (nucleotide) sequence to use as the search query. The data object is a SequenceSet with one sequence.
         placeholder : |
             ...or select DNA Query Object
     output_one_name:
         ui-name : |
-            Output Query Object (if Query Seq)
+            Output Query Object
         short-hint : |
-            Created if sequence entered above.  Data type is SequenceSet (with one sequence).
+            Mandatory if the input query DNA sequence was used. The name of the new output data object containing the query DNA sequence saved as a SequenceSet (with one sequence).
     input_many_ref:
         ui-name : |
-            Targets Object
+            Search Database
         short-hint : |
-            DNA Targets object to be searched.  Data types may be FeatureSet, Genome, or GenomeSet.
+            The KBase data object with proteins to be searched. Objects may be a FeatureSet, Genome, or GenomeSet.
     output_filtered_name:
         ui-name : |
             Output Object
         short-hint : |
-            Object containing matches.  Output will be FeatureSet.
+            Name of the FeatureSet object containing the BLAST hits to the supplied query.
     ident_thresh:
         ui-name : |
-            Identity Threshold (%)
+            Sequence Identity Threshold (%)
         short-hint : |
-            threshold for hits
+            The minimum percent identity threshold for hits (1-100).
     e_value:
         ui-name : |
-            E-value
+            E-value Threshold
         short-hint : |
-            threshold for hits
+            The maximum e-value threshold for hits. The default is 0.001, but the number could also be written in exponential notation (e.g., 1E-3). All outputs will ignore hits with e-values greater than the e-value threshold.
     bitscore:
         ui-name : |
-            Bit Score
+            Bit Score Threshold
         short-hint : |
-            threshold for hits
+            The minimum bit score threshold for hits.
     overlap_fraction:
         ui-name : |
             Alignment Overlap Threshold (%)
         short-hint : |
-            threshold for hits
+            The minimum alignment coverage threshold for hits (1-100). Labeled as ALN_LEN in the output.
     maxaccepts:
         ui-name : |
             Max Accepts
         short-hint : |
-            limits the number of hits in result.  Default: 1000
+            Limit for the maximum number of hits in the result (default is 1000).
     output_extra_format:
         ui-name : |
-            Extra text output format
+            Extra Text Output Format
         short-hint : |
-            generate an additional output file.  you get tabular m=7 (which used to be m=8) for free.
+            Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-    <p>This method performs a nuc-nuc (nucleotide sequence alignment) BLASTn Search using NCBI's BLAST+ (version 2.6.0)</p>
-    <p><i>Implemented for KBase by <a href="https://github.com/dcchivian">Dylan Chivian</a> (<a href="mailto:DCChivian@lbl.gov">DCChivian@lbl.gov</a>)</i></p>
-    <p><hr></p>
-    <p>BLASTn is a nucleotide sequence search against a nucleotide sequence database.  The KBase implementation permits searching through the genes in a Genome object, the genes in the Genome members of a GenomeSet, or the genes in a FeatureSet.  The output object of these searches is a FeatureSet containing those genes that pass the thresholds given by the user.  The App also provides a table of the hits (with those hits that are below the thresholds in gray) and links to download other formats of BLAST output files.</p>
-    <p><hr></p>
-    <p><b>Configuration:</b></p>
-    <p><b><i>Query Object:</i></b> If you don't provide a Query Sequence, you must instead provide a query object.  This may be a gene or a Sequence Set object with a single sequence.  This latter object will be available after running BLASTn once, and can be used in subsequent runs.  It must contain nucleic acid sequence.</p>
-    <p><b><i>Query Sequence:</i></b> If you don't provide a Query Object, you must cut-and-paste a query sequence.  In addition, you must name the Output Query Object in which to save the query sequence.  It must be a one letter code nucleic acid sequence.</p>
-    <p><b><i>Targets Object:</i></b> The Targets Object may be a FeatureSet of genes, a Genome, or a GenomeSet.  A BLAST search database will be automatically generated from the Targets Object.</p>
-    <p><b><i>Output Query Object:</i></b> If your query is input as a cut-and-paste sequence, you must name the object in which to store that query.</p>
-    <p><b><i>Output Object:</i></b> This is the set of genes that are both hit and pass user-defined thresholds.</p>
-    <p><b><i>E-value:</i></b> This bounds the e-value for the weakest hit to consider viable.  Values below this do not get reported in the table or the BLAST output text downloads.</p>
-    <p><b><i>Bitscore:</i></b> This bounds the bitscore for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p>
-    <p><b><i>Identity Threshold (%):</i></b> This bounds the sequence identity between the query and each hit for the weakest hit to include in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.  Identity is calculated for nucleotides.</p>
-    <p><b><i>Alignment Overlap Threshold (%):</i></b> This bounds the overlap percentage (portion of the query length covered by the hit alignment) for inclusion in the FeatureSet output object.  Hits below this threshold are still reported in the table and BLAST text downloads.</p></p>
-    <p><b><i>Max Accepts:</i></b> Hard cap on how many hits to report (Default: 1000)</p>
-    <p><b><i>Extra Text Output format:</i></b> The BLAST m=7 (tab-delimited table) text output format is available automatically for download.  A user may request up to one extra format to be generated and downloadable.  These include <ul><li>0 (pairwise)<li>1 (query-anchored showing identities)<li>2 (query-anchored no identities)<li>3 (flat query-anchored, show identities)<li>4 (flat query-anchored, no identities)<li>5 (XML Blast output)<li>8 (Text ASN.1)<li>9 (Binary ASN.1)<li>10 (Comma-separated values)<li>11 (BLAST archive format ASN.1)</ul></p>
-    <p><hr></p>
-    <p><b>Output:</b></p>
-    <p><b><i>Output Object:</i></b> Gene hits are captured in a FeatureSet output object.  If there are additional user-defined thresholds, those are filtered out and do not appear in the object, even if they are shown in the output table.</p>
-    <p><b><i>Output HTML Table:</i></b> The tab-delimited hit table is HTML formatted and additionally shows the region of the query covered by the BLAST alignment.  Hits that are above the e-value threshold but below other thresholds and are not included in the FeatureSet output object are shown in gray, with the attributes that were below the threshold in red.</p>
-    <p><b><i>Downloadable files:</i></b> BLAST text outputs that are requested (as indicated in <i>Configuration</i> above) are available for download.  These are not altered from the direct output from the BLAST run.  The m=7 (tab-delimited) format is always provided.</p>
+    <p>This App performs a nucleotide-nucleotide (nucleotide sequence alignment) BLASTn Search using NCBI's BLAST+ (version 2.8.1). At this time, the App <u>does not</u> search the non-coding regions of target Genomes and cannot be used to find RNAs, repeats, or other non-coding features in a Genome.</p>
+
+    <p>BLASTn is a nucleotide sequence search against a nucleotide sequence database. The KBase implementation is restricted to searches of the DNA sequences of protein-coding genes in a Genome object, the Genome members of a GenomeSet, or a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
+
+    <p>All output formats respect the e-value cutoff threshold. The on-screen table and downloadable files give the user the opportunity to examine the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the proteins that fail to pass one or more of these three thresholds will appear in a gray line with the specific threshold that was not met highlighted in red. The downloadable files give users the most flexibility for exploring alternative thresholds. All hits that are below the e-value threshold are included in the downloadable text files and users can examine all of the cutoffs without having to rerun the App. Several NCBI BLAST formats are supported in the downloadable files (discussed below under extra text output).</p>
+
+    <p>KBase does not have a database equivalent of NR. Large GenomeSets for searching can be created through the insertion of genomes into a species tree, annotation of an AssemblySet, or adding to and/or merging GenomeSets. Several Apps are available to support these set operations.</p>
+
+    <p>Your input must provide either a query DNA sequence or an input query object, and it must contain a <b>single</b> DNA nucleic acid sequence. At this time, KBase does not support multiple query DNA sequences. The query can be in the form of a SequenceSet object or a single nucleic acid sequence. An amino acid sequence will produce an error message.</p>
+
+    <p><h3>Input:</h3></p>
+    <p><b><i>Input Query Object:</i></b> You must provide either a query DNA sequence or an input query object and it must contain a single nucleic acid sequence. A valid query object is a SequenceSet with a single nucleotide sequence.</p>
+
+    <p><b><i>Input Query DNA Sequence:</i></b> If you don't provide an input query object, you must copy-and-paste in a query DNA sequence. The format can be with or without a Fasta header line. If this query DNA sequence is used, you must also supply an output name for the single-element SequenceSet object that will be saved. The resulting SequenceSet can then be used in subsequent BLASTn runs.</p>
+
+    <p><b><i>Search Database:</i></b> The search database must be an object in your Narrative containing untranslated gene sequences. It may be a FeatureSet of genes, a Genome, or a GenomeSet. The App will automatically generate a database from the Narrative object for BLASTn.</p>
+
+    <p><h4>Parameters:</h4></p>
+    <p><b><i>E-value:</i></b> This sets the maximal e-value threshold for the reported search  hits. Hits with e-values above this threshold do not get reported in any of the output formats, i.e., the on-screen table, the text downloads, or the save FeatureSet.</p>
+
+    <p>The following three thresholds only affect the saved FeatureSet object:
+      <ul>
+        <li><b><i>Bit Score:</i></b> This bounds the bit score for the weakest hit to include in the FeatureSet output object. Hits below this threshold are highlighted in red in the on-screen table. Typically, hits with bit scores below 50 are not to be trusted (as are hits with bit scores above 50!).</li>
+        <li><b><i>Sequence Identity Threshold (%)</i></b>: This bounds the percent sequence identity between the query and each hit for inclusion in the FeatureSet output object. Identity is calculated from the amino acid alignment. The value should be between 1-100.  Hits below this threshold are highlighted in red in the on-screen table.</li>
+        <li><b><i>Alignment Coverage Threshold (%)</i></b>(advanced): This bounds the percent alignment coverage (portion of the query nucleotide sequence length covered by the hit nucleotide sequence in the  alignment) for inclusion in the FeatureSet output object. The value should be between 1-100. Hits below this threshold are highlighted in red in the on-screen table.</li>
+    </ul></p>
+    <p><b><i>Max Accepts</i></b>(advanced): A hard limit on how many hits to report. The default is 1000.</p>
+    <p><b><i>Extra Text Output format</i></b>(advanced) <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> has several defined output formats (in the section called outfmt). Among them, the BLAST m=7 (tab-delimited table) text output format is automatically generated and is available for download, so it should not be redundantly included here. A user may request up to one extra format to be generated and made downloadable. These include:
+      <ul>
+        <li>0 Pairwise</li>
+        <li>1 Query-anchored showing identities</li>
+        <li>2 Query-anchored no identities</li>
+        <li>3 Flat query-anchored, show identities</li>
+        <li>4 Flat query-anchored, no identities</li>
+        <li>5 XML Blast output</li>
+        <li>8 Text ASN.1</li>
+        <li>9 Binary ASN.1</li>
+        <li>10 Comma-separated values</li>
+        <li>11 BLAST archive format ASN.1</li>
+      </ul>
+    </p>
+
+    <p><h3>Output:</h3></p>
+    <p><b><i>BLAST Hits Object:</i></b> BLAST hits (genes) that pass all the user-defined filters are saved in an output FeatureSet. This field is for the name of the new FeatureSet.</p>
+
+    <p><b><i>Output HTML Table:</i></b> The on-screen table includes all the BLAST hits that meet the e-value cutoff threshold. It includes several columns commonly found in BLAST outputs and includes a graphic with the region of the query covered by the BLAST alignment. The table gives users the opportunity to explore the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the hits that exceed these thresholds are included but appear in a gray line with the threshold that was not met highlighted in red. This gives users the opportunity to refine their thresholds, rerun the App, and recreate the output FeatureSet.</p>
+
+    <p><b><i>Downloadable files:</i></b> The downloadable files include all the BLAST hits that meet the e-value cutoff threshold. This gives the user the opportunity to explore the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). After download, the thresholds can be explored without rerunning the App. By default, the BLAST output is automatically available for download in a tab-delimited (m=7) format. Up to one additional format can be selected. The additional formats are found in the advanced parameters as ‘Extra Text Output format’. These formats are not altered from the direct output from the BLAST run.</p>
+
+    <p><b><i>Output Query Object:</i></b> If the query DNA sequence was used above, it will be saved as SequenceSet object with a single nucleotide sequence. You must supply a name for this new object.</p>
+
+    <b><u>NOTE:</u></b>
+    <p>The error message <i>’No sequence found in fasta_str’</i> or <i>’local variable 'appropriate_sequence_found_in_one_input' referenced before assignment’</i> is a sign that the query DNA sequence may not be nucleotides. It might be an amino acid sequence which doesn’t work with this App.</p>
+
+    <p><strong>Team members who implemented App in KBase:</strong> Dylan Chivian. For questions, please <a href=”http://kbase.us/contact-us/”>contact us</a>.</p>
 
 publications :
     -
