@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: PSI-BLAST MSA prot-prot Search - v2.8.1
+name: PSI-BLAST MSA prot-prot Search - v2.9.0
 tooltip: |
     Search for protein sequence matches to a protein Multiple Sequence Alignment (MSA).
 screenshots:

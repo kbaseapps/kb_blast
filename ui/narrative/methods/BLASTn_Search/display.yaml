@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTn nuc-nuc Search - v2.8.1
+name: BLASTn nuc-nuc Search - v2.9.0
 tooltip: |
     Search for untranslated protein matches to an untranslated protein sequence.
 screenshots:
