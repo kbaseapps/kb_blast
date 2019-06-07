@@ -14,7 +14,7 @@ RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
 RUN \
-  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.8.1+-x64-linux.tar.gz > ncbi-blast-2.8.1+-x64-linux.tar.gz && \
+  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.9.0+-x64-linux.tar.gz > ncbi-blast-2.9.0+-x64-linux.tar.gz && \
   tar xfz ncbi-blast-2.8.1+-x64-linux.tar.gz && \
   ln -s ncbi-blast-2.8.1+ blast && \
   rm -f ncbi-blast-2.8.1+-x64-linux.tar.gz && \

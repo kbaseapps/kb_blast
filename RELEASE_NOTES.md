@@ -1,3 +1,7 @@
+### Version 1.2.0
+__Changes__
+- updated BLAST to 2.9.0
+
 ### Version 1.1.0
 __Changes__
 - patched CheckJob() "Bad Status Line" error
