@@ -218,7 +218,7 @@ class kb_blastTest(unittest.TestCase):
     # Test tBLASTx
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTx_Search_01")
+    @unittest.skip("skipped test_kb_blast_tBLASTx_Search_01")
     def test_kb_blast_tBLASTx_Search_01(self):
         obj_basename = 'tBLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -262,7 +262,7 @@ class kb_blastTest(unittest.TestCase):
     # Test tBLASTn
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
+    @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
     def test_kb_blast_tBLASTn_Search_01(self):
         obj_basename = 'tBLASTn'
         obj_out_name = obj_basename+'.'+"test_output.FS"
