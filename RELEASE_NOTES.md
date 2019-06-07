@@ -2,6 +2,7 @@
 __Changes__
 - patched CheckJob() "Bad Status Line" error
 - updated BLAST to 2.8.1
+- Update to Python 3
 
 ### Version 1.0.7
 __Changes__

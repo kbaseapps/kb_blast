@@ -1,6 +1,6 @@
 import sys
 from jinja2 import Template
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
