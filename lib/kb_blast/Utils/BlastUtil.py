@@ -61,7 +61,7 @@ class BlastUtil:
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
-    def __init__(self, config):
+    def __init__(self, config, ctx):
         #BEGIN_CONSTRUCTOR
         self.workspaceURL = config['workspace-url']
         self.shockURL = config['shock-url']
@@ -82,3 +82,39 @@ class BlastUtil:
         #END_CONSTRUCTOR
         pass
 
+
+    # Validate App input params
+    #
+    def CheckBlastParams (self, params, app_name):
+
+        # do some basic checks
+        if 'workspace_name' not in params:
+            raise ValueError('workspace_name parameter is required')
+        if 'input_many_ref' not in params:
+            raise ValueError('input_many_ref parameter is required')
+        if 'output_filtered_name' not in params:
+            raise ValueError('output_filtered_name parameter is required')
+
+        # check query
+        if app_name == 'psiBLAST':
+            if 'input_msa_ref' not in params:
+                raise ValueError('input_msa_ref parameter is required')
+
+        else:  # need to store textarea query
+            if ('output_one_name' not in params or params['output_one_name'] == None) \
+                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+                raise ValueError('output_one_name parameter required if input_one_sequence parameter is provided')
+            if ('output_one_name' in params and params['output_one_name'] != None) \
+                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+                raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
+            if ('input_one_ref' in params and params['input_one_ref'] != None) \
+                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+                raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
+            if ('input_one_ref' in params and params['input_one_ref'] != None) \
+                and ('output_one_name' in params and params['output_one_name'] != None):
+                raise ValueError('cannot have both input_one_ref and output_one_name parameter')
+            if ('input_one_ref' not in params or params['input_one_ref'] == None) \
+                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+                raise ValueError('input_one_sequence or input_one_ref parameter is required')
+
+        return True
