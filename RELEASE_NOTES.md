@@ -1,6 +1,8 @@
 ### Version 1.2.0
 __Changes__
 - updated BLAST to 2.9.0
+- updated base Docker image to sdkbase2:latest
+- moved repeated methods to Utils/BlastUtil.py
 
 ### Version 1.1.0
 __Changes__
