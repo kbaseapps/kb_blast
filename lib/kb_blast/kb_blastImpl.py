@@ -181,283 +181,31 @@ class kb_blast:
 
         # Write query obj to fasta file (can be Feature, SequenceSet, or FeatureSet)
         #
-        (one_forward_reads_file_path, appropriate_sequence_found_in_one_input) = bu.write_query_obj_to_file (params, input_one_ref, 'NUC')
+        write_query_obj_to_file_result = bu.write_query_obj_to_file (params, input_one_ref, 'NUC')
+        query_type_name = write_query_obj_to_file_result['query_type_name']
+        query_fasta_file_path = write_query_obj_to_file_result['query_fasta_file_path']
+        appropriate_sequence_found_in_one_input = write_query_obj_to_file_result['appropriate_sequence_found_in_one_input']
+        invalid_msgs.extend(write_query_obj_to_file_result['invalid_msgs'])
 
 
-        #### Get the input_many object
-        ##
-        many_forward_reads_file_compression = None
-        sequencing_tech = 'N/A'
-        try:
-            ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            #objects = ws.get_objects([{'ref': input_many_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
-            input_many_data = objects[0]['data']
-            info = objects[0]['info']
-            input_many_name = str(info[1])
-            many_type_name = info[2].split('.')[1].split('-')[0]
-
-            if many_type_name == 'SingleEndLibrary':
-                many_type_namespace = info[2].split('.')[0]
-                if many_type_namespace == 'KBaseAssembly':
-                    file_name = input_many_data['handle']['file_name']
-                elif many_type_namespace == 'KBaseFile':
-                    file_name = input_many_data['lib']['file']['file_name']
-                else:
-                    raise ValueError('bad data type namespace: '+many_type_namespace)
-                #self.log(console, 'INPUT_MANY_FILENAME: '+file_name)  # DEBUG
-                if file_name[-3:] == ".gz":
-                    many_forward_reads_file_compression = 'gz'
-                if 'sequencing_tech' in input_many_data:
-                    sequencing_tech = input_many_data['sequencing_tech']
-
-        except Exception as e:
-            raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
-            #to get the full stack trace: traceback.format_exc()
-
-
-        # Handle overloading (input_many can be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
+        # Write target obj to fasta file (can be Feature, SequenceSet, or FeatureSet)
         #
-        if many_type_name == 'SequenceSet':
-            try:
-                input_many_sequenceSet = input_many_data
-            except Exception as e:
-                print((traceback.format_exc()))
-                raise ValueError('Unable to get SequenceSet: ' + str(e))
-
-            header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
-            many_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
-            self.log(console, 'writing reads file: '+str(many_forward_reads_file_path))
-
-            for seq_obj in input_many_sequenceSet['sequences']:
-                header_id = seq_obj['sequence_id']
-                sequence_str = seq_obj['sequence']
-
-                #PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
-                DNA_pattern = re.compile("^[acgtuACGTUnryNRY ]+$")   
-                if not DNA_pattern.match(sequence_str):
-                    self.log(invalid_msgs,"BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
-                    continue
-                appropriate_sequence_found_in_many_input = True
-                many_forward_reads_file_handle.write('>'+header_id+"\n")
-                many_forward_reads_file_handle.write(sequence_str+"\n")
-            many_forward_reads_file_handle.close();
-            self.log(console, 'done')
-
-        # SingleEndLibrary
-        #
-        elif many_type_name == 'SingleEndLibrary':
-
-            # DEBUG
-            #for k in data:
-            #    self.log(console,"SingleEndLibrary ["+k+"]: "+str(data[k]))
-
-            try:
-                if 'lib' in input_many_data:
-                    many_forward_reads = input_many_data['lib']['file']
-                elif 'handle' in input_many_data:
-                    many_forward_reads = input_many_data['handle']
-                else:
-                    self.log(console,"bad structure for 'many_forward_reads'")
-                    raise ValueError("bad structure for 'many_forward_reads'")
-                #if 'lib2' in data:
-                #    reverse_reads = data['lib2']['file']
-                #elif 'handle_2' in data:
-                #    reverse_reads = data['handle_2']
-                #else:
-                #    reverse_reads={}
-
-                ### NOTE: this section is what could be replaced by the transform services
-                many_forward_reads_file_path = os.path.join(self.scratch,many_forward_reads['file_name'])
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'w')
-                self.log(console, 'downloading reads file: '+str(many_forward_reads_file_path))
-                headers = {'Authorization': 'OAuth '+ctx['token']}
-                r = requests.get(many_forward_reads['url']+'/node/'+many_forward_reads['id']+'?download', stream=True, headers=headers)
-                for chunk in r.iter_content(1024):
-                    appropriate_sequence_found_in_many_input = True
-                    many_forward_reads_file_handle.write(chunk)
-                many_forward_reads_file_handle.close();
-                self.log(console, 'done')
-                ### END NOTE
-
-
-                # remove carriage returns
-                new_file_path = many_forward_reads_file_path+"-CRfree"
-                new_file_handle = open(new_file_path, 'w')
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
-                for line in many_forward_reads_file_handle:
-                    line = re.sub("\r","",line)
-                    new_file_handle.write(line)
-                many_forward_reads_file_handle.close();
-                new_file_handle.close()
-                many_forward_reads_file_path = new_file_path
-
-
-                # convert FASTQ to FASTA (if necessary)
-                new_file_path = many_forward_reads_file_path+".fna"
-                new_file_handle = open(new_file_path, 'w')
-                if many_forward_reads_file_compression == 'gz':
-                    many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r')
-                else:
-                    many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r')
-                header = None
-                last_header = None
-                last_seq_buf = None
-                last_line_was_header = False
-                was_fastq = False
-                for line in many_forward_reads_file_handle:
-                    if line.startswith('>'):
-                        break
-                    elif line.startswith('@'):
-                        was_fastq = True
-                        header = line[1:]
-                        if last_header != None:
-                            new_file_handle.write('>'+last_header)
-                            new_file_handle.write(last_seq_buf)
-                        last_seq_buf = None
-                        last_header = header
-                        last_line_was_header = True
-                    elif last_line_was_header:
-                        last_seq_buf = line
-                        last_line_was_header = False
-                    else:
-                        continue
-                if last_header != None:
-                    new_file_handle.write('>'+last_header)
-                    new_file_handle.write(last_seq_buf)
-
-                new_file_handle.close()
-                many_forward_reads_file_handle.close()
-                if was_fastq:
-                    many_forward_reads_file_path = new_file_path
-
-            except Exception as e:
-                print((traceback.format_exc()))
-                raise ValueError('Unable to download single-end read library files: ' + str(e))
-
-        # FeatureSet
-        #
-        elif many_type_name == 'FeatureSet':
-            # retrieve sequences for features
-            input_many_featureSet = input_many_data
-            many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = input_many_name+".fasta"
-
-            # DEBUG
-            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            FeatureSetToFASTA_params = {
-                'featureSet_ref':      input_many_ref,
-                'file':                many_forward_reads_file,
-                'dir':                 many_forward_reads_file_dir,
-                'console':             console,
-                'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
-                'feature_type':        'ALL',
-                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
-                'record_desc_pattern': '[%%genome_ref%%]',
-                'case':                'upper',
-                'linewrap':            50,
-                'merge_fasta_files':   'TRUE'
-                }
-
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
-            many_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
-            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
-            if len(list(feature_ids_by_genome_ref.keys())) > 0:
-                appropriate_sequence_found_in_many_input = True
-
-            # DEBUG
-            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-
-
-        # Genome
-        #
-        elif many_type_name == 'Genome':
-            many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = input_many_name+".fasta"
-
-            # DEBUG
-            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeToFASTA_params = {
-                'genome_ref':          input_many_ref,
-                'file':                many_forward_reads_file,
-                'dir':                 many_forward_reads_file_dir,
-                'console':             console,
-                'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
-                'feature_type':        'ALL',
-                'record_id_pattern':   '%%feature_id%%',
-                'record_desc_pattern': '[%%genome_id%%]',
-                'case':                'upper',
-                'linewrap':            50
-                }
-
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
-            many_forward_reads_file_path = GenomeToFASTA_retVal['fasta_file_path']
-            feature_ids = GenomeToFASTA_retVal['feature_ids']
-            if len(feature_ids) > 0:
-                appropriate_sequence_found_in_many_input = True
-
-            # DEBUG
-            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
-
-
-        # GenomeSet
-        #
-        elif many_type_name == 'GenomeSet':
-            input_many_genomeSet = input_many_data
-            many_forward_reads_file_dir = self.scratch
-            many_forward_reads_file = input_many_name+".fasta"
-
-            # DEBUG
-            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            GenomeSetToFASTA_params = {
-                'genomeSet_ref':       input_many_ref,
-                'file':                many_forward_reads_file,
-                'dir':                 many_forward_reads_file_dir,
-                'console':             console,
-                'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
-                'feature_type':        'ALL',
-                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
-                'record_desc_pattern': '[%%genome_ref%%]',
-                'case':                'upper',
-                'linewrap':            50,
-                'merge_fasta_files':   'TRUE'
-                }
-
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=ctx['token'])
-            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
-            many_forward_reads_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
-            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
-            if len(list(feature_ids_by_genome_id.keys())) > 0:
-                appropriate_sequence_found_in_many_input = True
-
-            # DEBUG
-            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
-
-
-        # Missing proper input_many_type
-        #
-        else:
-            raise ValueError('Cannot yet handle input_many type of: '+many_type_name)
-
+        write_target_obj_to_file_result = bu.write_target_obj_to_file (params, input_many_ref, 'NUC')
+        target_type_name = write_target_obj_to_file_result['target_type_name']
+        target_fasta_file_path = write_target_obj_to_file_result['target_fasta_file_path']
+        appropriate_sequence_found_in_many_input = write_target_obj_to_file_result['appropriate_sequence_found_in_many_input']
+        invalid_msgs.extend(write_target_obj_to_file_result['invalid_msgs'])
+        feature_ids = write_target_obj_to_file_result['feature_ids']
+        feature_ids_by_genome_ref = write_target_obj_to_file_result['feature_ids_by_genome_ref']
+        feature_ids_by_genome_id = write_target_obj_to_file_result['feature_ids_by_genome_id']
+        
 
         # check for failed input file creation
         #
         if not appropriate_sequence_found_in_one_input:
-            self.log(invalid_msgs,"no dna sequences found in '"+input_one_name+"'")
+            self.log(invalid_msgs,"no nucleotide sequences found in '"+input_one_name+"'")
         if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no dna sequences found in '"+input_many_name+"'")
+            self.log(invalid_msgs,"no nucleotide sequences found in '"+input_many_name+"'")
 
 
         # input data failed validation.  Need to return
@@ -521,18 +269,18 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(self.Make_BLAST_DB):
             raise ValueError("no such file '"+self.Make_BLAST_DB+"'")
-        if not os.path.isfile(many_forward_reads_file_path):
-            raise ValueError("no such file '"+many_forward_reads_file_path+"'")
-        elif not os.path.getsize(many_forward_reads_file_path) > 0:
-            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
+        if not os.path.isfile(target_fasta_file_path):
+            raise ValueError("no such file '"+target_fasta_file_path+"'")
+        elif not os.path.getsize(target_fasta_file_path) > 0:
+            raise ValueError("empty file '"+target_fasta_file_path+"'")
 
         makeblastdb_cmd.append('-in')
-        makeblastdb_cmd.append(many_forward_reads_file_path)
+        makeblastdb_cmd.append(target_fasta_file_path)
         makeblastdb_cmd.append('-parse_seqids')
         makeblastdb_cmd.append('-dbtype')
         makeblastdb_cmd.append('nucl')
         makeblastdb_cmd.append('-out')
-        makeblastdb_cmd.append(many_forward_reads_file_path)
+        makeblastdb_cmd.append(target_fasta_file_path)
 
         # Run Make_BLAST_DB, capture output as it happens
         #
@@ -560,10 +308,10 @@ class kb_blast:
                 '\n\n'+ '\n'.join(console))
 
         # Check for db output
-        if not os.path.isfile(many_forward_reads_file_path+".nsq") and not os.path.isfile(many_forward_reads_file_path+".00.nsq"):
-            raise ValueError("makeblastdb failed to create DB file '"+many_forward_reads_file_path+".nsq'")
-        elif not os.path.getsize(many_forward_reads_file_path+".nsq") > 0 and not os.path.getsize(many_forward_reads_file_path+".00.nsq") > 0:
-            raise ValueError("makeblastdb created empty DB file '"+many_forward_reads_file_path+".nsq'")
+        if not os.path.isfile(target_fasta_file_path+".nsq") and not os.path.isfile(target_fasta_file_path+".00.nsq"):
+            raise ValueError("makeblastdb failed to create DB file '"+target_fasta_file_path+".nsq'")
+        elif not os.path.getsize(target_fasta_file_path+".nsq") > 0 and not os.path.getsize(target_fasta_file_path+".00.nsq") > 0:
+            raise ValueError("makeblastdb created empty DB file '"+target_fasta_file_path+".nsq'")
 
 
         ### Construct the BLAST command
@@ -576,14 +324,14 @@ class kb_blast:
         # check for necessary files
         if not os.path.isfile(blast_bin):
             raise ValueError("no such file '"+blast_bin+"'")
-        if not os.path.isfile(one_forward_reads_file_path):
-            raise ValueError("no such file '"+one_forward_reads_file_path+"'")
-        elif not os.path.getsize(one_forward_reads_file_path) > 0:
-            raise ValueError("empty file '"+one_forward_reads_file_path+"'")
-        if not os.path.isfile(many_forward_reads_file_path):
-            raise ValueError("no such file '"+many_forward_reads_file_path+"'")
-        elif not os.path.getsize(many_forward_reads_file_path):
-            raise ValueError("empty file '"+many_forward_reads_file_path+"'")
+        if not os.path.isfile(query_fasta_file_path):
+            raise ValueError("no such file '"+query_fasta_file_path+"'")
+        elif not os.path.getsize(query_fasta_file_path) > 0:
+            raise ValueError("empty file '"+query_fasta_file_path+"'")
+        if not os.path.isfile(target_fasta_file_path):
+            raise ValueError("no such file '"+target_fasta_file_path+"'")
+        elif not os.path.getsize(target_fasta_file_path):
+            raise ValueError("empty file '"+target_fasta_file_path+"'")
 
         # set the output path
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -601,9 +349,9 @@ class kb_blast:
 
             blast_cmd = [blast_bin]
             blast_cmd.append('-query')
-            blast_cmd.append(one_forward_reads_file_path)
+            blast_cmd.append(query_fasta_file_path)
             blast_cmd.append('-db')
-            blast_cmd.append(many_forward_reads_file_path)
+            blast_cmd.append(target_fasta_file_path)
             blast_cmd.append('-out')
             blast_cmd.append(output_extra_file_path)
             #blast_cmd.append('-html')  # HTML is a flag so doesn't get an arg val
@@ -658,9 +406,9 @@ class kb_blast:
         # this is command for basic search mode (with TAB TXT output)
         blast_cmd = [blast_bin]
         blast_cmd.append('-query')
-        blast_cmd.append(one_forward_reads_file_path)
+        blast_cmd.append(query_fasta_file_path)
         blast_cmd.append('-db')
-        blast_cmd.append(many_forward_reads_file_path)
+        blast_cmd.append(target_fasta_file_path)
         blast_cmd.append('-out')
         blast_cmd.append(output_aln_file_path)
         blast_cmd.append('-outfmt')
@@ -715,7 +463,7 @@ class kb_blast:
         # get query_len for filtering later
         #
         query_len = 0
-        with open(one_forward_reads_file_path, 'r') as query_file_handle:
+        with open(query_fasta_file_path, 'r') as query_file_handle:
             for line in query_file_handle:
                 if line.startswith('>'):
                     continue
@@ -835,7 +583,7 @@ class kb_blast:
 
         # SequenceSet input -> SequenceSet output
         #
-        if many_type_name == 'SequenceSet':
+        if target_type_name == 'SequenceSet':
             seq_total = len(input_many_sequenceSet['sequences'])
 
             output_sequenceSet = dict()
@@ -866,16 +614,16 @@ class kb_blast:
 
         # SingleEndLibrary input -> SingleEndLibrary output
         #
-        elif many_type_name == 'SingleEndLibrary':
+        elif target_type_name == 'SingleEndLibrary':
 
             #  Note: don't use SeqIO.parse because loads everything into memory
             #
-#            with open(many_forward_reads_file_path, 'r', -1) as many_forward_reads_file_handle, open(output_filtered_fasta_file_path, 'w', -1) as output_filtered_fasta_file_handle:
+#            with open(target_fasta_file_path, 'r', -1) as target_fasta_file_handle, open(output_filtered_fasta_file_path, 'w', -1) as output_filtered_fasta_file_handle:
             output_filtered_fasta_file_handle = open(output_filtered_fasta_file_path, 'w', -1)
-            if many_forward_reads_file_compression == 'gz':
-                many_forward_reads_file_handle = gzip.open(many_forward_reads_file_path, 'r', -1)
+            if target_fasta_file_compression == 'gz':
+                target_fasta_file_handle = gzip.open(target_fasta_file_path, 'r', -1)
             else:
-                many_forward_reads_file_handle = open(many_forward_reads_file_path, 'r', -1)
+                target_fasta_file_handle = open(target_fasta_file_path, 'r', -1)
 
             seq_total = 0;
             filtered_seq_total = 0
@@ -883,7 +631,7 @@ class kb_blast:
             last_seq_id = None
             last_header = None
             pattern = re.compile('^\S*')
-            for line in many_forward_reads_file_handle:
+            for line in target_fasta_file_handle:
                 if line.startswith('>'):
                     #self.log(console, 'LINE: '+line)  # DEBUG
                     seq_total += 1
@@ -920,7 +668,7 @@ class kb_blast:
             last_seq_id = None
             last_header = None
 
-            many_forward_reads_file_handle.close()
+            target_fasta_file_handle.close()
             output_filtered_fasta_file_handle.close()
 
             if filtered_seq_total != hit_total:
@@ -930,7 +678,7 @@ class kb_blast:
 
         # FeatureSet input -> FeatureSet output
         #
-        elif many_type_name == 'FeatureSet':
+        elif target_type_name == 'FeatureSet':
             seq_total = len(list(input_many_featureSet['elements'].keys()))
 
             output_featureSet = dict()
@@ -960,7 +708,7 @@ class kb_blast:
 
         # Parse Genome hits into FeatureSet
         #
-        elif many_type_name == 'Genome':
+        elif target_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
 #            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
@@ -984,7 +732,7 @@ class kb_blast:
 
         # Parse GenomeSet hits into FeatureSet
         #
-        elif many_type_name == 'GenomeSet':
+        elif target_type_name == 'GenomeSet':
             seq_total = 0
 
             output_featureSet = dict()
@@ -1036,7 +784,7 @@ class kb_blast:
 
             # input many SingleEndLibrary -> upload SingleEndLibrary
             #
-            if many_type_name == 'SingleEndLibrary':
+            if target_type_name == 'SingleEndLibrary':
             
                 self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
                                                           console,  # DEBUG
@@ -1049,7 +797,7 @@ class kb_blast:
 
             # input many SequenceSet -> save SequenceSet
             #
-            elif many_type_name == 'SequenceSet':
+            elif target_type_name == 'SequenceSet':
                 new_obj_info = ws.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
@@ -1091,13 +839,13 @@ class kb_blast:
 
 
             # build html report
-            if many_type_name == 'Genome':
+            if target_type_name == 'Genome':
                 feature_id_to_function = GenomeToFASTA_retVal['feature_id_to_function']
                 genome_ref_to_sci_name = GenomeToFASTA_retVal['genome_ref_to_sci_name']
-            elif many_type_name == 'GenomeSet':
+            elif target_type_name == 'GenomeSet':
                 feature_id_to_function = GenomeSetToFASTA_retVal['feature_id_to_function']
                 genome_ref_to_sci_name = GenomeSetToFASTA_retVal['genome_ref_to_sci_name']
-            elif many_type_name == 'FeatureSet':
+            elif target_type_name == 'FeatureSet':
                 feature_id_to_function = FeatureSetToFASTA_retVal['feature_id_to_function']
                 genome_ref_to_sci_name = FeatureSetToFASTA_retVal['genome_ref_to_sci_name']
                 
@@ -1149,16 +897,16 @@ class kb_blast:
                 identity = str(round(float(identity), 1))
                 if identity == '100.0':  identity = '100'
 
-                #if many_type_name == 'SingleEndLibrary':
+                #if target_type_name == 'SingleEndLibrary':
                 #    pass
-                #elif many_type_name == 'SequenceSet':
-                if many_type_name == 'SequenceSet':
+                #elif target_type_name == 'SequenceSet':
+                if target_type_name == 'SequenceSet':
                     pass
-                elif many_type_name == 'Genome' or \
-                        many_type_name == 'GenomeSet' or \
-                        many_type_name == 'FeatureSet':
+                elif target_type_name == 'Genome' or \
+                        target_type_name == 'GenomeSet' or \
+                        target_type_name == 'FeatureSet':
 
-                    if many_type_name != 'Genome':
+                    if target_type_name != 'Genome':
                         [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
                     else:
                         genome_ref = input_many_ref
@@ -1174,9 +922,9 @@ class kb_blast:
 
                         if id_untrans == hit_fid or id_trans == hit_fid:
                             #self.log (console, "GOT ONE!")  # DEBUG
-                            if many_type_name == 'Genome':
+                            if target_type_name == 'Genome':
                                 accept_id = fid
-                            elif many_type_name == 'GenomeSet' or many_type_name == 'FeatureSet':
+                            elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
                                 accept_id = genome_ref+genome_id_feature_id_delim+fid
                             if accept_id in accept_fids:
                                 row_color = accept_row_color

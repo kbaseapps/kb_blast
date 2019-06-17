@@ -90,6 +90,11 @@ class BlastUtil:
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
 
+        try:
+            self.wsClient = workspaceService(self.workspaceURL, token=self.ctx['token'])
+        except:
+            raise ValueError ("Failed to connect to workspace service")
+
         #END_CONSTRUCTOR
         pass
 
@@ -205,8 +210,7 @@ class BlastUtil:
                                        }
 
             try:
-                ws = workspaceService(self.workspaceURL, token=self.ctx['token'])
-                new_obj_info = ws.save_objects({
+                new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseSequences.SequenceSet',
@@ -232,32 +236,36 @@ class BlastUtil:
         console = []
         invalid_msgs = []
         appropriate_sequence_found_in_one_input = False
+        feature_ids_by_genome_ref = None
 
         # determine query object type
         #
         try:
             ws = workspaceService(self.workspaceURL, token=self.ctx['token'])
             #objects = ws.get_objects([{'ref': input_one_ref}])
-            objects = ws.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
+            objects = self.wsClient.get_objects2({'objects':[{'ref': input_one_ref}]})['data']
             input_one_data = objects[0]['data']
             input_one_name = str(objects[0]['info'][1])
             info = objects[0]['info']
                                                              
-            one_type_name = info[2].split('.')[1].split('-')[0]
+            query_type_name = info[2].split('.')[1].split('-')[0]
         except Exception as e:
             raise ValueError('Unable to fetch input_one_ref object from workspace: ' + str(e))
         #to get the full stack trace: traceback.format_exc()
 
+        # DEBUG
+        self.log (console,"QUERY_TYPE: '"+query_type_name+"'")
+
 
         # SequenceSet
         #
-        if one_type_name == 'SequenceSet':
+        if query_type_name == 'SequenceSet':
             if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
-                and one_type_name != 'SequenceSet':
+                and query_type_name != 'SequenceSet':
 
-                self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+input_one_ref+" should be SequenceSet instead of: "+one_type_name)
+                self.log(invalid_msgs,"ERROR: Mismatched input type for Query Object: "+input_one_ref+" should be SequenceSet instead of: "+query_type_name)
 
             try:
                 input_one_sequenceSet = input_one_data
@@ -273,29 +281,29 @@ class BlastUtil:
             else:
                 appropriate_sequence_found_in_one_input = True
 
-            one_forward_reads_file_path = os.path.join(self.scratch, header_id+'.fasta')
-            one_forward_reads_file_handle = open(one_forward_reads_file_path, 'w')
-            self.log(console, 'writing reads file: '+str(one_forward_reads_file_path))
-            one_forward_reads_file_handle.write('>'+header_id+"\n")
-            one_forward_reads_file_handle.write(sequence_str+"\n")
-            one_forward_reads_file_handle.close()
+            query_fasta_file_path = os.path.join(self.scratch, header_id+'.fasta')
+            query_fasta_file_handle = open(query_fasta_file_path, 'w')
+            self.log(console, 'writing reads file: '+str(query_fasta_file_path))
+            query_fasta_file_handle.write('>'+header_id+"\n")
+            query_fasta_file_handle.write(sequence_str+"\n")
+            query_fasta_file_handle.close()
 
             self.log(console, 'done')
 
         # FeatureSet
         #
-        elif one_type_name == 'FeatureSet':
+        elif query_type_name == 'FeatureSet':
             # retrieve sequences for features
             #input_one_featureSet = input_one_data
-            one_forward_reads_file_dir = self.scratch
-            one_forward_reads_file = input_one_name+".fasta"
+            query_fasta_file_dir = self.scratch
+            query_fasta_file = input_one_name+".fasta"
 
             # DEBUG
             #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             FeatureSetToFASTA_params = {
                 'featureSet_ref':      input_one_ref,
-                'file':                one_forward_reads_file,
-                'dir':                 one_forward_reads_file_dir,
+                'file':                query_fasta_file,
+                'dir':                 query_fasta_file_dir,
                 'console':             console,
                 'invalid_msgs':        invalid_msgs,
                 'residue_type':        seq_type,
@@ -310,7 +318,7 @@ class BlastUtil:
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
-            one_forward_reads_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
@@ -320,4 +328,293 @@ class BlastUtil:
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
-        return (one_forward_reads_file_path, appropriate_sequence_found_in_one_input)
+        return ({ 'query_type_name': query_type_name,
+                  'query_fasta_file_path': query_fasta_file_path,
+                  'appropriate_sequence_found_in_one_input': appropriate_sequence_found_in_one_input,
+                  'invalid_msgs': invalid_msgs
+              })
+                 
+
+    #### Get the input_many object
+    ##
+    def write_target_obj_to_file (self, params, input_many_ref, seq_type):
+        console = []
+        invalid_msgs = []
+        appropriate_sequence_found_in_many_input = False
+        feature_ids = None
+        feature_ids_by_genome_ref = None
+        feature_ids_by_genome_id = None
+        target_fasta_file_compression = None
+        sequencing_tech = 'N/A'
+
+        try:
+            #objects = ws.get_objects([{'ref': input_many_ref}])
+            objects = self.wsClient.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
+            input_many_data = objects[0]['data']
+            info = objects[0]['info']
+            input_many_name = str(info[1])
+            target_type_name = info[2].split('.')[1].split('-')[0]
+
+            if target_type_name == 'SingleEndLibrary':
+                target_type_namespace = info[2].split('.')[0]
+                if target_type_namespace == 'KBaseAssembly':
+                    file_name = input_many_data['handle']['file_name']
+                elif target_type_namespace == 'KBaseFile':
+                    file_name = input_many_data['lib']['file']['file_name']
+                else:
+                    raise ValueError('bad data type namespace: '+target_type_namespace)
+                #self.log(console, 'INPUT_MANY_FILENAME: '+file_name)  # DEBUG
+                if file_name[-3:] == ".gz":
+                    target_fasta_file_compression = 'gz'
+                if 'sequencing_tech' in input_many_data:
+                    sequencing_tech = input_many_data['sequencing_tech']
+
+        except Exception as e:
+            raise ValueError('Unable to fetch input_many_name object from workspace: ' + str(e))
+            #to get the full stack trace: traceback.format_exc()
+
+
+        # Handle overloading (input_many can be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
+        #
+        if target_type_name == 'SequenceSet':
+            try:
+                input_many_sequenceSet = input_many_data
+            except Exception as e:
+                print((traceback.format_exc()))
+                raise ValueError('Unable to get SequenceSet: ' + str(e))
+
+            header_id = input_many_sequenceSet['sequences'][0]['sequence_id']
+            target_fasta_file_path = os.path.join(self.scratch, header_id+'.fasta')
+            target_fasta_file_handle = open(target_fasta_file_path, 'w')
+            self.log(console, 'writing reads file: '+str(target_fasta_file_path))
+
+            for seq_obj in input_many_sequenceSet['sequences']:
+                header_id = seq_obj['sequence_id']
+                sequence_str = seq_obj['sequence']
+
+                if not self.validateSeq (seq_type, sequence_str, header_id):
+                    raise ValueError ("BAD record for sequence_id: "+header_id+"\n"+sequence_str+"\n")
+                else:
+                    appropriate_sequence_found_in_many_input = True
+
+                target_fasta_file_handle.write('>'+header_id+"\n")
+                target_fasta_file_handle.write(sequence_str+"\n")
+            target_fasta_file_handle.close();
+            self.log(console, 'done')
+
+        # SingleEndLibrary
+        #
+        elif target_type_name == 'SingleEndLibrary':
+
+            # DEBUG
+            #for k in data:
+            #    self.log(console,"SingleEndLibrary ["+k+"]: "+str(data[k]))
+
+            try:
+                if 'lib' in input_many_data:
+                    target_fasta = input_many_data['lib']['file']
+                elif 'handle' in input_many_data:
+                    target_fasta = input_many_data['handle']
+                else:
+                    self.log(console,"bad structure for 'target_fasta'")
+                    raise ValueError("bad structure for 'target_fasta'")
+                #if 'lib2' in data:
+                #    reverse_reads = data['lib2']['file']
+                #elif 'handle_2' in data:
+                #    reverse_reads = data['handle_2']
+                #else:
+                #    reverse_reads={}
+
+                ### NOTE: this section is what could be replaced by the transform services
+                target_fasta_file_path = os.path.join(self.scratch,target_fasta['file_name'])
+                target_fasta_file_handle = open(target_fasta_file_path, 'w')
+                self.log(console, 'downloading reads file: '+str(target_fasta_file_path))
+                headers = {'Authorization': 'OAuth '+self.ctx['token']}
+                r = requests.get(target_fasta['url']+'/node/'+target_fasta['id']+'?download', stream=True, headers=headers)
+                for chunk in r.iter_content(1024):
+                    appropriate_sequence_found_in_many_input = True
+                    target_fasta_file_handle.write(chunk)
+                target_fasta_file_handle.close();
+                self.log(console, 'done')
+                ### END NOTE
+
+
+                # remove carriage returns
+                new_file_path = target_fasta_file_path+"-CRfree"
+                new_file_handle = open(new_file_path, 'w')
+                target_fasta_file_handle = open(target_fasta_file_path, 'r')
+                for line in target_fasta_file_handle:
+                    line = re.sub("\r","",line)
+                    new_file_handle.write(line)
+                target_fasta_file_handle.close();
+                new_file_handle.close()
+                target_fasta_file_path = new_file_path
+
+
+                # convert FASTQ to FASTA (if necessary)
+                new_file_path = target_fasta_file_path+".fna"
+                new_file_handle = open(new_file_path, 'w')
+                if target_fasta_file_compression == 'gz':
+                    target_fasta_file_handle = gzip.open(target_fasta_file_path, 'r')
+                else:
+                    target_fasta_file_handle = open(target_fasta_file_path, 'r')
+                header = None
+                last_header = None
+                last_seq_buf = None
+                last_line_was_header = False
+                was_fastq = False
+                for line in target_fasta_file_handle:
+                    if line.startswith('>'):
+                        break
+                    elif line.startswith('@'):
+                        was_fastq = True
+                        header = line[1:]
+                        if last_header != None:
+                            new_file_handle.write('>'+last_header)
+                            new_file_handle.write(last_seq_buf)
+                        last_seq_buf = None
+                        last_header = header
+                        last_line_was_header = True
+                    elif last_line_was_header:
+                        last_seq_buf = line
+                        last_line_was_header = False
+                    else:
+                        continue
+                if last_header != None:
+                    new_file_handle.write('>'+last_header)
+                    new_file_handle.write(last_seq_buf)
+
+                new_file_handle.close()
+                target_fasta_file_handle.close()
+                if was_fastq:
+                    target_fasta_file_path = new_file_path
+
+            except Exception as e:
+                print((traceback.format_exc()))
+                raise ValueError('Unable to download single-end read library files: ' + str(e))
+
+        # FeatureSet
+        #
+        elif target_type_name == 'FeatureSet':
+            # retrieve sequences for features
+            input_many_featureSet = input_many_data
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            FeatureSetToFASTA_params = {
+                'featureSet_ref':      input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
+            if len(list(feature_ids_by_genome_ref.keys())) > 0:
+                appropriate_sequence_found_in_many_input = True
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # Genome
+        #
+        elif target_type_name == 'Genome':
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeToFASTA_params = {
+                'genome_ref':          input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            feature_ids = GenomeToFASTA_retVal['feature_ids']
+            if len(feature_ids) > 0:
+                appropriate_sequence_found_in_many_input = True
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # GenomeSet
+        #
+        elif target_type_name == 'GenomeSet':
+            input_many_genomeSet = input_many_data
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            GenomeSetToFASTA_params = {
+                'genomeSet_ref':       input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        'nucleotide',
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'merge_fasta_files':   'TRUE'
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
+            if len(list(feature_ids_by_genome_id.keys())) > 0:
+                appropriate_sequence_found_in_many_input = True
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # Missing proper input_target_type
+        #
+        else:
+            raise ValueError('Cannot yet handle input_many type of: '+target_type_name)
+
+
+        return ({ 'target_type_name': target_type_name,
+                  'target_fasta_file_path': target_fasta_file_path,
+                  'appropriate_sequence_found_in_many_input': appropriate_sequence_found_in_many_input,
+                  'invalid_msgs': invalid_msgs,
+                  'feature_ids': feature_ids,
+                  'feature_ids_by_genome_ref': feature_ids_by_genome_ref,
+                  'feature_ids_by_genome_id': feature_ids_by_genome_id
+              })
+
