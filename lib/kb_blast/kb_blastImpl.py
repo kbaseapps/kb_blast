@@ -156,6 +156,13 @@ class kb_blast:
         genome_id_feature_id_delim = '.f:'
 
 
+        #### Instantiate workspace client
+        try:
+            wsClient = workspaceService(self.workspaceURL, token=ctx['token'])
+        except:
+            raise ValueError("unable to connect to workspace service")
+
+
         #### Instantiate BlastUtil
         #
         bu = BlastUtil(self.config, ctx)
@@ -198,6 +205,8 @@ class kb_blast:
         feature_ids = write_target_obj_to_file_result['feature_ids']
         feature_ids_by_genome_ref = write_target_obj_to_file_result['feature_ids_by_genome_ref']
         feature_ids_by_genome_id = write_target_obj_to_file_result['feature_ids_by_genome_id']
+        feature_id_to_function = write_target_obj_to_file_result['feature_id_to_function']
+        genome_ref_to_sci_name = write_target_obj_to_file_result['genome_ref_to_sci_name']
         
 
         # check for failed input file creation
@@ -236,8 +245,7 @@ class kb_blast:
                 }
 
             reportName = 'blast_report_'+str(uuid.uuid4())
-            ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            report_obj_info = ws.save_objects({
+            report_obj_info = wsClient.save_objects({
                     #'id':info[6],
                     'workspace':params['workspace_name'],
                     'objects':[
@@ -798,7 +806,7 @@ class kb_blast:
             # input many SequenceSet -> save SequenceSet
             #
             elif target_type_name == 'SequenceSet':
-                new_obj_info = ws.save_objects({
+                new_obj_info = wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseSequences.SequenceSet',
@@ -810,7 +818,7 @@ class kb_blast:
                         })[0]
 
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-                new_obj_info = ws.save_objects({
+                new_obj_info = wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
@@ -839,16 +847,6 @@ class kb_blast:
 
 
             # build html report
-            if target_type_name == 'Genome':
-                feature_id_to_function = GenomeToFASTA_retVal['feature_id_to_function']
-                genome_ref_to_sci_name = GenomeToFASTA_retVal['genome_ref_to_sci_name']
-            elif target_type_name == 'GenomeSet':
-                feature_id_to_function = GenomeSetToFASTA_retVal['feature_id_to_function']
-                genome_ref_to_sci_name = GenomeSetToFASTA_retVal['genome_ref_to_sci_name']
-            elif target_type_name == 'FeatureSet':
-                feature_id_to_function = FeatureSetToFASTA_retVal['feature_id_to_function']
-                genome_ref_to_sci_name = FeatureSetToFASTA_retVal['genome_ref_to_sci_name']
-                
             head_color = "#eeeeff"
             border_head_color = "#ffccff"
             accept_row_color = 'white'
@@ -1101,7 +1099,7 @@ class kb_blast:
                 }
 
             reportName = 'blast_report_'+str(uuid.uuid4())
-            report_obj_info = ws.save_objects({
+            report_obj_info = wsClient.save_objects({
                     #                'id':info[6],
                     'workspace':params['workspace_name'],
                     'objects':[

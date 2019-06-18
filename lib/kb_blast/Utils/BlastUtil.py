@@ -344,6 +344,9 @@ class BlastUtil:
         feature_ids = None
         feature_ids_by_genome_ref = None
         feature_ids_by_genome_id = None
+        feature_id_to_function = None
+        genome_ref_to_sci_name = None
+
         target_fasta_file_compression = None
         sequencing_tech = 'N/A'
 
@@ -374,8 +377,9 @@ class BlastUtil:
             #to get the full stack trace: traceback.format_exc()
 
 
-        # Handle overloading (input_many can be SequenceSet, SingleEndLibrary, FeatureSet, Genome, or GenomeSet)
+        # Handle overloading (input_many can be FeatureSet, Genome, or GenomeSet)
         #
+        """
         if target_type_name == 'SequenceSet':
             try:
                 input_many_sequenceSet = input_many_data
@@ -492,10 +496,12 @@ class BlastUtil:
             except Exception as e:
                 print((traceback.format_exc()))
                 raise ValueError('Unable to download single-end read library files: ' + str(e))
+        """
 
         # FeatureSet
         #
-        elif target_type_name == 'FeatureSet':
+        #elif target_type_name == 'FeatureSet':
+        if target_type_name == 'FeatureSet':
             # retrieve sequences for features
             input_many_featureSet = input_many_data
             target_fasta_file_dir = self.scratch
@@ -525,6 +531,8 @@ class BlastUtil:
             feature_ids_by_genome_ref = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
             if len(list(feature_ids_by_genome_ref.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
+            feature_id_to_function = FeatureSetToFASTA_retVal['feature_id_to_function']
+            genome_ref_to_sci_name = FeatureSetToFASTA_retVal['genome_ref_to_sci_name']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -560,6 +568,8 @@ class BlastUtil:
             feature_ids = GenomeToFASTA_retVal['feature_ids']
             if len(feature_ids) > 0:
                 appropriate_sequence_found_in_many_input = True
+            feature_id_to_function = GenomeToFASTA_retVal['feature_id_to_function']
+            genome_ref_to_sci_name = GenomeToFASTA_retVal['genome_ref_to_sci_name']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -597,6 +607,8 @@ class BlastUtil:
             feature_ids_by_genome_id = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
             if len(list(feature_ids_by_genome_id.keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
+            feature_id_to_function = GenomeToFASTA_retVal['feature_id_to_function']
+            genome_ref_to_sci_name = GenomeToFASTA_retVal['genome_ref_to_sci_name']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -615,6 +627,8 @@ class BlastUtil:
                   'invalid_msgs': invalid_msgs,
                   'feature_ids': feature_ids,
                   'feature_ids_by_genome_ref': feature_ids_by_genome_ref,
-                  'feature_ids_by_genome_id': feature_ids_by_genome_id
+                  'feature_ids_by_genome_id': feature_ids_by_genome_id,
+                  'feature_id_to_function': feature_id_to_function,
+                  'genome_ref_to_sci_name': genome_ref_to_sci_name
               })
 
