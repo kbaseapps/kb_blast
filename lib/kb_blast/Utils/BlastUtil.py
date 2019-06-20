@@ -953,6 +953,379 @@ class BlastUtil:
         }
 
 
+
+    #### get_query_len()
+    ##
+    def get_query_len (self, query_fasta_file_path):
+        query_len = 0
+        with open(query_fasta_file_path, 'r') as query_file_handle:
+            for line in query_file_handle:
+                if line.startswith('>'):
+                    continue
+                query_len += len(re.sub(" ","", line.rstrip())) 
+
+        return query_len
+
+
+    #### parse_BLAST_tab_output()
+    ##
+    def parse_BLAST_tab_output (self, 
+                                output_aln_file_path = None, 
+                                search_tool_name = None,
+                                params = None, 
+                                query_len = None, 
+                                target_type_name = None,
+                                target_feature_info = None):
+        console = []
+        invalid_msgs = []
+
+        # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
+        #
+        self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
+        if not os.path.isfile(output_aln_file_path):
+            raise ValueError("failed to create BLAST output: "+output_aln_file_path)
+        elif not os.path.getsize(output_aln_file_path) > 0:
+            raise ValueError("created empty file for BLAST output: "+output_aln_file_path)
+        hit_seq_ids = dict()
+        accept_fids = dict()
+        output_aln_file_handle = open (output_aln_file_path, 'r')
+        output_aln_buf = output_aln_file_handle.readlines()
+        output_aln_file_handle.close()
+        hit_total = 0
+        high_bitscore_line = dict()
+        high_bitscore_score = dict()
+        high_bitscore_ident = dict()
+        high_bitscore_alnlen = dict()
+        hit_order = []
+        hit_buf = []
+        header_done = False
+        for line in output_aln_buf:
+            #self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
+
+            if line.startswith('#'):
+                if not header_done:
+                    hit_buf.append(line)
+                continue
+            header_done = True
+            hit_info = line.split("\t")
+            hit_seq_id     = hit_info[1]
+            hit_ident      = float(hit_info[2]) / 100.0
+            hit_aln_len    = hit_info[3]
+            hit_mismatches = hit_info[4]
+            hit_gaps       = hit_info[5]
+            hit_q_beg      = hit_info[6]
+            hit_q_end      = hit_info[7]
+            hit_t_beg      = hit_info[8]
+            hit_t_end      = hit_info[9]
+            hit_e_value    = hit_info[10]
+            hit_bitscore   = hit_info[11]
+
+            # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
+            if hit_seq_id.startswith('gnl\|'):
+                hit_seq_id = hit_seq_id[4:]
+
+            try:
+                if float(hit_bitscore) > float(high_bitscore_score[hit_seq_id]):
+                    high_bitscore_score[hit_seq_id] = hit_bitscore
+                    high_bitscore_ident[hit_seq_id] = hit_ident
+                    high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                    high_bitscore_line[hit_seq_id] = line
+            except:
+                hit_order.append(hit_seq_id)
+                high_bitscore_score[hit_seq_id] = hit_bitscore
+                high_bitscore_ident[hit_seq_id] = hit_ident
+                high_bitscore_alnlen[hit_seq_id] = hit_aln_len
+                high_bitscore_line[hit_seq_id] = line
+
+        filtering_fields = dict()
+        for hit_seq_id in hit_order:
+            hit_buf.append(high_bitscore_line[hit_seq_id])
+            filtering_fields[hit_seq_id] = dict()
+
+            filter = False
+            if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
+                filter = True
+                filtering_fields[hit_seq_id]['ident_thresh'] = True
+            if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
+                filter = True
+                filtering_fields[hit_seq_id]['bitscore'] = True
+            if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+                filter = True
+                filtering_fields[hit_seq_id]['overlap_fraction'] = True
+
+            if filter:
+                continue
+            
+            hit_total += 1
+            hit_seq_ids[hit_seq_id] = True
+            self.log(console, "HIT: '"+hit_seq_id+"'")  # DEBUG
+        
+
+        self.log(console, 'EXTRACTING HITS FROM INPUT')
+        #self.log(console, 'MANY_TYPE_NAME: '+many_type_name)  # DEBUG
+
+
+        # Not handling SequenceSet nor SingleEndLibrary at this time
+        #
+        """
+        # SequenceSet input -> SequenceSet output
+        #
+        if target_type_name == 'SequenceSet':
+            seq_total = len(input_many_sequenceSet['sequences'])
+
+            output_sequenceSet = dict()
+
+            if 'sequence_set_id' in input_many_sequenceSet and input_many_sequenceSet['sequence_set_id'] != None:
+                output_sequenceSet['sequence_set_id'] = input_many_sequenceSet['sequence_set_id'] + "."+search_tool_name+"_Search_filtered"
+            else:
+                output_sequenceSet['sequence_set_id'] = search_tool_name+"_Search_filtered"
+            if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] != None:
+                output_sequenceSet['description'] = input_many_sequenceSet['description'] + " - "+search_tool_name+"_Search filtered"
+            else:
+                output_sequenceSet['description'] = search_tool_name+"_Search filtered"
+
+            self.log(console,"ADDING SEQUENCES TO SEQUENCESET")
+            output_sequenceSet['sequences'] = []
+
+            for seq_obj in input_many_sequenceSet['sequences']:
+                header_id = seq_obj['sequence_id']
+                #header_desc = seq_obj['description']
+                #sequence_str = seq_obj['sequence']
+
+                id_untrans = header_id
+                id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                    #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
+                    accept_fids[id_untrans] = True
+                    output_sequenceSet['sequences'].append(seq_obj)
+
+        # SingleEndLibrary input -> SingleEndLibrary output
+        #
+        elif target_type_name == 'SingleEndLibrary':
+
+            #  Note: don't use SeqIO.parse because loads everything into memory
+            #
+#            with open(target_fasta_file_path, 'r', -1) as target_fasta_file_handle, open(output_filtered_fasta_file_path, 'w', -1) as output_filtered_fasta_file_handle:
+            output_filtered_fasta_file_handle = open(output_filtered_fasta_file_path, 'w', -1)
+            if target_fasta_file_compression == 'gz':
+                target_fasta_file_handle = gzip.open(target_fasta_file_path, 'r', -1)
+            else:
+                target_fasta_file_handle = open(target_fasta_file_path, 'r', -1)
+
+            seq_total = 0;
+            filtered_seq_total = 0
+            last_seq_buf = []
+            last_seq_id = None
+            last_header = None
+            pattern = re.compile('^\S*')
+            for line in target_fasta_file_handle:
+                if line.startswith('>'):
+                    #self.log(console, 'LINE: '+line)  # DEBUG
+                    seq_total += 1
+                    seq_id = line[1:]  # removes '>'
+                    seq_id = pattern.findall(seq_id)[0]
+
+                    if last_seq_id != None:
+                        #self.log(console, 'ID: '+last_seq_id)  # DEBUG
+                        id_untrans = last_seq_id
+                        id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                        if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                            #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
+                            accept_fids[id_untrans] = True
+                            filtered_seq_total += 1
+                            output_filtered_fasta_file_handle.write(last_header)
+                            output_filtered_fasta_file_handle.writelines(last_seq_buf)
+                    last_seq_buf = []
+                    last_seq_id = seq_id
+                    last_header = line
+                else:
+                    last_seq_buf.append(line)
+
+            if last_seq_id != None:
+                #self.log(console, 'ID: '+last_seq_id)  # DEBUG
+                id_untrans = last_seq_id
+                id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                    #self.log(console, 'FOUND HIT '+header_id)  # DEBUG
+                    accept_fids[id_untrans] = True
+                    filtered_seq_total += 1
+                    output_filtered_fasta_file_handle.write(last_header)
+                    output_filtered_fasta_file_handle.writelines(last_seq_buf)
+            last_seq_buf = []
+            last_seq_id = None
+            last_header = None
+
+            target_fasta_file_handle.close()
+            output_filtered_fasta_file_handle.close()
+
+            if filtered_seq_total != hit_total:
+                self.log(console,'hits in BLAST alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
+                raise ValueError('hits in BLAST alignment output '+str(hit_total)+' != '+str(filtered_seq_total)+' matched sequences in input file')
+        """
+
+
+        # FeatureSet input -> FeatureSet output
+        #
+        #elif target_type_name == 'FeatureSet':
+        if target_type_name == 'FeatureSet':
+            seq_total = len(list(input_many_featureSet['elements'].keys()))
+
+            output_featureSet = dict()
+            if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
+                output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
+            else:
+                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+
+            fId_list = list(input_many_featureSet['elements'].keys())
+            self.log(console,"ADDING FEATURES TO FEATURESET")
+            for fId in sorted(fId_list):
+                for genome_ref in input_many_featureSet['elements'][fId]:
+                    id_untrans = genome_ref+genome_id_feature_id_delim+fId
+                    id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                    if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
+                        accept_fids[id_untrans] = True
+                        #fId = id_untrans  # don't change fId for output FeatureSet
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][fId]
+                        except:
+                            output_featureSet['elements'][fId] = []
+                            output_featureSet['element_ordering'].append(fId)
+                        output_featureSet['elements'][fId].append(genome_ref)
+
+        # Parse Genome hits into FeatureSet
+        #
+        elif target_type_name == 'Genome':
+            seq_total = 0
+            output_featureSet = dict()
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - "+search_tool_name+"_Search filtered"
+#            else:
+#                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+            for fid in target_feature_info['feature_ids']:
+                seq_total += 1
+                id_untrans = fid
+                id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                    #self.log(console, 'FOUND HIT '+fid)  # DEBUG
+                    #output_featureSet['element_ordering'].append(fid)
+                    accept_fids[id_untrans] = True
+                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
+                    genome_ref = params['input_many_ref']
+                    output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [genome_ref]
+
+        # Parse GenomeSet hits into FeatureSet
+        #
+        elif target_type_name == 'GenomeSet':
+            seq_total = 0
+
+            output_featureSet = dict()
+            if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
+                output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
+            else:
+                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+
+            self.log(console,"READING HITS FOR GENOMES")  # DEBUG
+            for genome_id in list(target_feature_info['feature_ids_by_genome_id'].keys()):
+                self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                for feature_id in target_feature_info['feature_ids_by_genome_id'][genome_id]:
+                    seq_total += 1
+                    id_untrans = genome_ref+genome_id_feature_id_delim+feature_id
+                    id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                    if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                        #self.log(console, 'FOUND HIT '+fId)  # DEBUG
+                        accept_fids[id_untrans] = True
+                        #feature_id = id_untrans  # don't change fId for output FeatureSet
+                        try:
+                            this_genome_ref_list = output_featureSet['elements'][feature_id]
+                        except:
+                            output_featureSet['elements'][feature_id] = []
+                            output_featureSet['element_ordering'].append(feature_id)
+                        output_featureSet['elements'][feature_id].append(genome_ref)
+
+
+        # load the method provenance from the context object
+        #
+        self.log(console,"SETTING PROVENANCE")  # DEBUG
+        provenance = [{}]
+        if 'provenance' in self.ctx:
+            provenance = self.ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects'] = []
+        provenance[0]['input_ws_objects'].append(params['input_one_ref'])
+        provenance[0]['input_ws_objects'].append(params['input_many_ref'])
+        provenance[0]['service'] = 'kb_blast'
+        provenance[0]['method'] = search_tool_name+'_Search'
+
+
+        # Upload results
+        #
+        if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
+            self.log(console,"UPLOADING RESULTS")  # DEBUG
+
+            """
+            # input many SingleEndLibrary -> upload SingleEndLibrary
+            #
+            if target_type_name == 'SingleEndLibrary':
+            
+                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
+                                                          console,  # DEBUG
+                                                          params['workspace_name'],
+                                                          params['output_filtered_name'],
+                                                          output_filtered_fasta_file_path,
+                                                          provenance,
+                                                          sequencing_tech
+                                                         )
+
+            # input many SequenceSet -> save SequenceSet
+            #
+            elif target_type_name == 'SequenceSet':
+                new_obj_info = wsClient.save_objects({
+                            'workspace': params['workspace_name'],
+                            'objects':[{
+                                    'type': 'KBaseSequences.SequenceSet',
+                                    'data': output_sequenceSet,
+                                    'name': params['output_filtered_name'],
+                                    'meta': {},
+                                    'provenance': provenance
+                                }]
+                        })[0]
+
+            else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
+            """
+
+            if True:
+                new_obj_info = self.wsClient.save_objects({
+                            'workspace': params['workspace_name'],
+                            'objects':[{
+                                    'type': 'KBaseCollections.FeatureSet',
+                                    'data': output_featureSet,
+                                    'name': params['output_filtered_name'],
+                                    'meta': {},
+                                    'provenance': provenance
+                                }]
+                        })[0]
+
+
+        return {
+            'accept_fids': accept_fids,
+            'filtering_fields': filtering_fields,
+            'seq_total': seq_total,
+            'hit_order': hit_order,
+            'hit_total': hit_total,
+            'hit_buf': hit_buf
+        }
+
+
     # _write_HTML_report()
     #
     def _write_HTML_report(self,
@@ -1160,13 +1533,18 @@ class BlastUtil:
                             target_feature_info = None,
                             base_bulk_save_info = None,
                             extra_bulk_save_info = None,
-                            accept_fids = None,
-                            filtering_fields = None,
                             query_len = None,
-                            seq_total = None,
-                            hit_order = None,
-                            hit_total = None,
-                            hit_buf = None):
+                            parsed_BLAST_results = None):
+
+        # pass args
+        accept_fids = parsed_BLAST_results['accept_fids']
+        filtering_fields = parsed_BLAST_results['filtering_fields']
+        seq_total = parsed_BLAST_results['seq_total']
+        hit_order = parsed_BLAST_results['hit_order']
+        hit_total = parsed_BLAST_results['hit_total']
+        hit_buf = parsed_BLAST_results['hit_buf']
+
+        # init
         console = []
         report = ''
         self.log(console,"BUILDING REPORT")  # DEBUG
@@ -1194,7 +1572,7 @@ class BlastUtil:
                 }
 
             reportName = 'blast_report_'+str(uuid.uuid4())
-            report_obj_info = wsClient.save_objects({
+            report_obj_info = self.wsClient.save_objects({
                     #                'id':info[6],
                     'workspace':params['workspace_name'],
                     'objects':[
