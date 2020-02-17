@@ -76,7 +76,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTn
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
+    @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
     def test_kb_blast_BLASTn_Search_01(self):
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
@@ -127,12 +127,12 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
-    # Test BLASTp
+    # Test BLASTp: Genome Target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01")
-    def test_kb_blast_BLASTp_Search_01(self):
-        obj_basename = 'BLASTp'
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
+    def test_kb_blast_BLASTp_Search_01_Genome(self):
+        obj_basename = 'BLASTp_Genome'
         obj_out_name = obj_basename+".test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
 
@@ -171,10 +171,177 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test BLASTp: GenomeSet
+    #
+    # Uncomment to skip this test
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_02_GenomeSet")
+    def test_kb_blast_BLASTp_Search_02_GenomeSet(self):
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+
+        obj_basename = 'BLASTp_GenomeSet'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
+        reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
+        genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
+        genome_ref_2 = 'ReferenceDataManager/GCF_002936495.2/1'  # E. coli
+        genome_ref_3 = 'ReferenceDataManager/GCF_002936145.2/1'  # E. coli
+        genome_ref_list = [genome_ref_1, genome_ref_2, genome_ref_3]
+        genome_scinames = ['FOO', 'BAR', 'FOOBAR']
+
+        # create GenomeSet
+        testGS = {
+            'description': 'three genomes',
+            'elements': dict()
+        }
+        for genome_i, genome_ref in enumerate(genome_ref_list): 
+            testGS['elements'][genome_scinames[genome_i]] = { 'ref': genome_ref }
+
+        obj_info = self.getWsClient().save_objects({'workspace': self.getWsName(),       
+                                                    'objects': [
+                                                        {
+                                                            'type':'KBaseSearch.GenomeSet',
+                                                            'data':testGS,
+                                                            'name':'test_genomeset',
+                                                            'meta':{},
+                                                            'provenance':[
+                                                                {
+                                                                    'service':'kb_blast',
+                                                                    'method':'BLASTp_Search'
+                                                                }
+                                                            ]
+                                                        }]
+                                                })[0]
+
+        #pprint(obj_info)
+        target_genomeSet_ref = "/".join([str(obj_info[WORKSPACE_I]),
+                                         str(obj_info[OBJID_I]),
+                                         str(obj_info[VERSION_I])])
+
+
+        # E. coli K-12 MG1655 dnaA
+        query_seq_prot = 'MSLSLWQQCLARLQDELPATEFSMWIRPLQAELSDNTLALYAPNRFVLDWVRDKYLNNINGLLTSFCGADAPQLRFEVGTKPVTQTPQAAVTSNVAAPAQVAQTQPQRAAPSTRSGWDNVPAPAEPTYRSNVNVKHTFDNFVEGKSNQLARAAARQVADNPGGAYNPLFLYGGTGLGKTHLLHAVGNGIMARKPNAKVVYMHSERFVQDMVKALQNNAIEEFKRYYRSVDALLIDDIQFFANKERSQEEFFHTFNALLEGNQQIILTSDRYPKEINGVEDRLKSRFGWGLTVAIEPPELETRVAILMKKADENDIRLPGEVAFFIAKRLRSNVRELEGALNRVIANANFTGRAITIDFVREALRDLLALQEKLVTIDNIQKTVAEYYKIKVADLLSKRRSRSVARPRQMAMALAKELTNHSLPEIGDAFGGRDHTTVLHACRKIEQLREESHDIKEDFSNLIRTLSS'
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       'input_one_sequence': query_seq_prot,
+                       #'input_one_ref': "",
+                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_ref': target_genomeSet_ref,
+                       'output_filtered_name': obj_out_name,
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "40.0",
+                       'overlap_fraction': "50.0",
+                       'maxaccepts': "1000",
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+        pass
+
+
+    # Test BLASTp: FeatureSet
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_FeatureSet")
+    def test_kb_blast_BLASTp_Search_03_FeatureSet(self):
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+
+        obj_basename = 'BLASTp_FeatureSet'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
+        reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
+        genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
+        genome_ref_2 = 'ReferenceDataManager/GCF_002936495.2/1'  # E. coli
+        genome_ref_3 = 'ReferenceDataManager/GCF_002936145.2/1'  # E. coli
+
+        # build FeatureSet obj
+        feature_id_1_0 = 'AWN69_RS07145'  # dnaA 
+        feature_id_1_1 = 'AWN69_RS00105'
+        feature_id_2_0 = 'C4Y65_RS22325'  # dnaA
+        feature_id_2_1 = 'C4Y65_RS12355'
+        feature_id_3_0 = 'C4Z16_RS14220'  # dnaA
+        feature_id_3_1 = 'C4Z16_RS24900'
+        testFS = {
+            'description': 'a few features',
+            'elements': { feature_id_1_0: [genome_ref_1],
+                          feature_id_1_1: [genome_ref_1],
+                          feature_id_2_0: [genome_ref_2],
+                          feature_id_2_1: [genome_ref_2],
+                          feature_id_3_0: [genome_ref_3],
+                          feature_id_3_1: [genome_ref_3]
+                      }
+        }
+
+        obj_info = self.getWsClient().save_objects({'workspace': self.getWsName(),
+                                                    'objects': [
+                                                        {
+                                                            'type':'KBaseCollections.FeatureSet',
+                                                            'data':testFS,
+                                                            'name':obj_basename+'.test_FeatureSet',
+                                                            'meta':{},
+                                                            'provenance':[
+                                                                {
+                                                                    'service':'kb_blast',
+                                                                    'method':'BLASTp_Search'
+                                                                }
+                                                            ]
+                                                        }]
+                                                })[0]
+        #pprint(obj_info)
+        target_featureSet_ref = "/".join([str(obj_info[WORKSPACE_I]),
+                                          str(obj_info[OBJID_I]),
+                                          str(obj_info[VERSION_I])])
+
+
+        # E. coli K-12 MG1655 dnaA
+        query_seq_prot = 'MSLSLWQQCLARLQDELPATEFSMWIRPLQAELSDNTLALYAPNRFVLDWVRDKYLNNINGLLTSFCGADAPQLRFEVGTKPVTQTPQAAVTSNVAAPAQVAQTQPQRAAPSTRSGWDNVPAPAEPTYRSNVNVKHTFDNFVEGKSNQLARAAARQVADNPGGAYNPLFLYGGTGLGKTHLLHAVGNGIMARKPNAKVVYMHSERFVQDMVKALQNNAIEEFKRYYRSVDALLIDDIQFFANKERSQEEFFHTFNALLEGNQQIILTSDRYPKEINGVEDRLKSRFGWGLTVAIEPPELETRVAILMKKADENDIRLPGEVAFFIAKRLRSNVRELEGALNRVIANANFTGRAITIDFVREALRDLLALQEKLVTIDNIQKTVAEYYKIKVADLLSKRRSRSVARPRQMAMALAKELTNHSLPEIGDAFGGRDHTTVLHACRKIEQLREESHDIKEDFSNLIRTLSS'
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       'input_one_sequence': query_seq_prot,
+                       #'input_one_ref': "",
+                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_ref': target_featureSet_ref,
+                       'output_filtered_name': obj_out_name,
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "40.0",
+                       'overlap_fraction': "50.0",
+                       'maxaccepts': "1000",
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+        pass
+
+
     # Test BLASTx
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
+    @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
     def test_kb_blast_BLASTx_Search_01(self):
         obj_basename = 'BLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -195,7 +362,7 @@ class kb_blastTest(unittest.TestCase):
                        'e_value': ".001",
                        'bitscore': "50",
                        'ident_thresh': "40.0",
-                       'overlap_fraction': "50.0",
+                       'overlap_fraction': "25.0",   # 50.0 is too high for this query
                        'maxaccepts': "1000",
                        'output_extra_format': "none"
                      }
@@ -218,7 +385,7 @@ class kb_blastTest(unittest.TestCase):
     # Test tBLASTx
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTx_Search_01")
+    @unittest.skip("skipped test_kb_blast_tBLASTx_Search_01")
     def test_kb_blast_tBLASTx_Search_01(self):
         obj_basename = 'tBLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -262,7 +429,7 @@ class kb_blastTest(unittest.TestCase):
     # Test tBLASTn
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
+    @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
     def test_kb_blast_tBLASTn_Search_01(self):
         obj_basename = 'tBLASTn'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -306,7 +473,7 @@ class kb_blastTest(unittest.TestCase):
     # Test psiBLAST
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_01")
+    @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_01")
     def test_kb_blast_psiBLAST_msa_start_Search_01(self):
         obj_basename = 'psiBLAST_msa_start'
         obj_out_name = obj_basename+'.'+"test_output.FS"
@@ -368,7 +535,7 @@ class kb_blastTest(unittest.TestCase):
 
 
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_02_nuc_MSA")
+    @unittest.skip("skipped test_kb_blast_psiBLAST_msa_start_Search_02_nuc_MSA")
     def test_kb_blast_psiBLAST_msa_start_Search_02_nuc_MSA(self):
         obj_basename = 'psiBLAST_msa_start'
         obj_out_name = obj_basename+'.'+"test_output.FS"

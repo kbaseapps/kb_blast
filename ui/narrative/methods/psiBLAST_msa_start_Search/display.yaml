@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: PSI-BLAST MSA prot-prot Search - v2.8.1
+name: PSI-BLAST MSA prot-prot Search - v2.10.0
 tooltip: |
     Search for protein sequence matches to a protein Multiple Sequence Alignment (MSA).
 screenshots:
@@ -71,7 +71,7 @@ parameters :
             Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-    <p>This App performs a protein-protein (protein sequence alignment) PSI-BLAST Search that uses the input protein MSA as the profile with which to search using NCBI's BLAST+ (version 2.8.1).</p>
+    <p>This App performs a protein-protein (protein sequence alignment) PSI-BLAST Search that uses the input protein MSA as the profile with which to search using NCBI's BLAST+ (version 2.10.0).</p>
 
     <p>PSI-BLAST MSA is a protein profile search based on a multiple sequence alignment (MSA) against a protein sequence database. Iteration is not currently implemented, and therefore, an MSA must first be generated using an App such as MUSCLE or HMMER, and potentially trimmed with GBLOCKS, to build an MSA from a FeatureSet object. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, or a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 

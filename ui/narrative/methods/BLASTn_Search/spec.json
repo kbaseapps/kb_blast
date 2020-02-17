@@ -1,5 +1,5 @@
 {
-    "ver": "1.1.0",
+    "ver": "1.3.0",
     "authors": [
         "dylan"
     ],
@@ -30,7 +30,7 @@
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ "KBaseSequences.SequenceSet","KBaseGenomes.Feature" ]
+                "valid_ws_types": [ "KBaseSequences.SequenceSet" ]
             }
         },
         {

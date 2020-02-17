@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTx nuc-prot Search - v2.8.1
+name: BLASTx nuc-prot Search - v2.10.0
 tooltip: |
     Search for protein matches to an input nucleotide sequence.
 screenshots:
@@ -90,7 +90,7 @@ parameters :
             Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-    <p>This App performs a nucleotide-protein (translated protein sequence alignment) BLASTx Search using NCBI's BLAST+ (version 2.8.1).</p>
+    <p>This App performs a nucleotide-protein (translated protein sequence alignment) BLASTx Search using NCBI's BLAST+ (version 2.10.0).</p>
 
     <p>BLASTx is a translated nucleotide sequence (the query) search against a protein sequence database (the subject, a.k.a. target, sequences). The KBase implementation permits single nucleotide queries against subjects that are protein-coding genes in a Genome object, in the Genome members of a GenomeSet, or in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 
