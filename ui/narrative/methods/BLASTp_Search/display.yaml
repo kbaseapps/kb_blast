@@ -1,6 +1,6 @@
 # define display information
 #
-name: BLASTp prot-prot Search - v2.9.0
+name: BLASTp prot-prot Search - v2.10.0
 tooltip: |
     Search for protein matches to an input protein sequence.
 screenshots:
@@ -89,7 +89,7 @@ parameters :
             Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-  <p>This method performs a protein-protein (protein sequence alignment) BLASTp Search using NCBI's BLAST+ (version 2.8.1).</p>
+  <p>This method performs a protein-protein (protein sequence alignment) BLASTp Search using NCBI's BLAST+ (version 2.10.0).</p>
 
   <p>BLASTp is a protein sequence search against a protein sequence database. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, or a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 

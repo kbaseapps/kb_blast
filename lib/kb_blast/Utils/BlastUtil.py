@@ -99,8 +99,31 @@ class BlastUtil:
         except:
             raise ValueError ("Failed to connect to workspace service")
 
+        self.genome_id_feature_id_delim = '.f:'
+
+
         #END_CONSTRUCTOR
         pass
+
+
+    # _instantiate_provenance()
+    #
+    def _instantiate_provenance(self, 
+                                method_name=None,
+                                input_obj_refs=None):
+        service = 'kb_blast'
+
+        provenance = [{}]
+        if 'provenance' in self.ctx:
+            provenance = self.ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects'] = []
+        if input_obj_refs:
+            provenance[0]['input_ws_objects'].extend(input_obj_refs)
+        provenance[0]['service'] = service
+        provenance[0]['method'] = method_name
+
+        return provenance
 
 
     #### Sequence Validation
@@ -169,6 +192,7 @@ class BlastUtil:
     def objectify_text_query (self, params, seq_type, search_tool_name):
         console = []
         invalid_msgs = []
+        method_name = search_tool_name+'_Search'
 
         # Write the input_one_sequence to a SequenceSet object
         #
@@ -189,17 +213,6 @@ class BlastUtil:
             sequence_str_buf = ParseFastaStr_retVal['seq']
 
 
-            # load the method provenance from the context object
-            #
-            self.log(console,"SETTING PROVENANCE")  # DEBUG
-            provenance = [{}]
-            if 'provenance' in self.ctx:
-                provenance = self.ctx['provenance']
-            # add additional info to provenance here, in this case the input data object reference
-            provenance[0]['input_ws_objects'] = []
-            provenance[0]['service'] = 'kb_blast'
-            provenance[0]['method'] = search_tool_name
-                
             # Upload query
             #
             self.log(console,"UPLOADING OUTPUT QUERY OBJECT")  # DEBUG
@@ -221,7 +234,7 @@ class BlastUtil:
                                     'data': output_one_sequenceSet,
                                     'name': params['output_one_name'],
                                     'meta': {},
-                                    'provenance': provenance
+                                    'provenance': self._instantiate_provenance (method_name=method_name)
                                     }]
                             })[0]
                 output_one_ref = str(new_obj_info[6])+'/'+str(new_obj_info[0])+'/'+str(new_obj_info[4])
@@ -312,7 +325,7 @@ class BlastUtil:
                 'invalid_msgs':        invalid_msgs,
                 'residue_type':        seq_type,
                 'feature_type':        'ALL',
-                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_id_pattern':   '%%genome_ref%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
@@ -349,7 +362,8 @@ class BlastUtil:
                                 'feature_ids_by_genome_ref': None,
                                 'feature_ids_by_genome_id': None,
                                 'feature_id_to_function': None,
-                                'genome_ref_to_sci_name': None
+                                'genome_ref_to_sci_name': None,
+                                'genome_id_to_genome_ref': None
         }
         target_fasta_file_compression = None
         sequencing_tech = 'N/A'
@@ -519,9 +533,9 @@ class BlastUtil:
                 'dir':                 target_fasta_file_dir,
                 'console':             console,
                 'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
+                'residue_type':        seq_type,
                 'feature_type':        'ALL',
-                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_id_pattern':   '%%genome_ref%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
@@ -557,7 +571,7 @@ class BlastUtil:
                 'dir':                 target_fasta_file_dir,
                 'console':             console,
                 'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
+                'residue_type':        seq_type,
                 'feature_type':        'ALL',
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
@@ -574,6 +588,7 @@ class BlastUtil:
                 appropriate_sequence_found_in_many_input = True
             target_feature_info['feature_id_to_function'] = GenomeToFASTA_retVal['feature_id_to_function']
             target_feature_info['genome_ref_to_sci_name'] = GenomeToFASTA_retVal['genome_ref_to_sci_name']
+            
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -595,9 +610,9 @@ class BlastUtil:
                 'dir':                 target_fasta_file_dir,
                 'console':             console,
                 'invalid_msgs':        invalid_msgs,
-                'residue_type':        'nucleotide',
+                'residue_type':        seq_type,
                 'feature_type':        'ALL',
-                'record_id_pattern':   '%%genome_ref%%'+genome_id_feature_id_delim+'%%feature_id%%',
+                'record_id_pattern':   '%%genome_ref%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
@@ -611,8 +626,13 @@ class BlastUtil:
             target_feature_info['feature_ids_by_genome_id'] = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
             if len(list(target_feature_info['feature_ids_by_genome_id'].keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
-            target_feature_info['feature_id_to_function'] = GenomeToFASTA_retVal['feature_id_to_function']
-            target_feature_info['genome_ref_to_sci_name'] = GenomeToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['feature_id_to_function'] = GenomeSetToFASTA_retVal['feature_id_to_function']
+            target_feature_info['genome_ref_to_sci_name'] = GenomeSetToFASTA_retVal['genome_ref_to_sci_name']
+
+            target_feature_info['genome_id_to_genome_ref'] = dict()
+            for genome_id in input_many_genomeSet['elements'].keys():
+                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                target_feature_info['genome_id_to_genome_ref'][genome_id] = genome_ref
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -638,20 +658,6 @@ class BlastUtil:
     def save_error_report_with_invalid_msgs (self, invalid_msgs, input_one_ref, input_many_ref, method_name):
         console = []
 
-        # load the method provenance from the context object
-        #
-        self.log(console,"SETTING PROVENANCE")  # DEBUG
-        provenance = [{}]
-        if 'provenance' in self.ctx:
-            provenance = self.ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference
-        provenance[0]['input_ws_objects'] = []
-        provenance[0]['input_ws_objects'].append(input_one_ref)
-        provenance[0]['input_ws_objects'].append(input_many_ref)
-        provenance[0]['service'] = 'kb_blast'
-        provenance[0]['method'] = method_name
-
-
         # build output report object
         #
         self.log(console,"BUILDING REPORT")  # DEBUG
@@ -672,7 +678,8 @@ class BlastUtil:
                     'name':reportName,
                     'meta':{},
                     'hidden':1,
-                    'provenance':provenance  # DEBUG
+                    'provenance': self._instantiate_provenance(method_name = method_name,
+                                                               input_obj_refs = [input_one_ref, input_many_ref])
                 }
             ]
         })[0]
@@ -978,6 +985,7 @@ class BlastUtil:
                                 target_feature_info = None):
         console = []
         invalid_msgs = []
+        method_name = search_tool_name+'_Search'
 
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
@@ -1046,12 +1054,15 @@ class BlastUtil:
             if 'ident_thresh' in params and float(params['ident_thresh']) > 100*float(high_bitscore_ident[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['ident_thresh'] = True
+                self.log (console, "FILTERING "+hit_seq_id+" on IDENT")  # DEBUG
             if 'bitscore' in params and float(params['bitscore']) > float(high_bitscore_score[hit_seq_id]):
                 filter = True
                 filtering_fields[hit_seq_id]['bitscore'] = True
+                self.log (console, "FILTERING "+hit_seq_id+" on BITSCORE")  # DEBUG
             if 'overlap_fraction' in params and float(params['overlap_fraction']) > 100*float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
                 filter = True
                 filtering_fields[hit_seq_id]['overlap_fraction'] = True
+                self.log (console, "FILTERING "+hit_seq_id+" on OVERLAP")  # DEBUG
 
             if filter:
                 continue
@@ -1168,21 +1179,26 @@ class BlastUtil:
         #
         #elif target_type_name == 'FeatureSet':
         if target_type_name == 'FeatureSet':
-            seq_total = len(list(input_many_featureSet['elements'].keys()))
+            #seq_total = len(list(input_many_featureSet['elements'].keys()))
+            seq_total = 0
+            for genome_ref in target_feature_info['feature_ids_by_genome_ref'].keys():
+                for fId in target_feature_info['feature_ids_by_genome_ref'][genome_ref]:
+                    seq_total += 1
 
             output_featureSet = dict()
-            if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
-                output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
-            else:
-                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            #if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
+            #    output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
+            #else:
+            #    output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
-            fId_list = list(input_many_featureSet['elements'].keys())
+            #fId_list = list(input_many_featureSet['elements'].keys())
             self.log(console,"ADDING FEATURES TO FEATURESET")
-            for fId in sorted(fId_list):
-                for genome_ref in input_many_featureSet['elements'][fId]:
-                    id_untrans = genome_ref+genome_id_feature_id_delim+fId
+            for genome_ref in target_feature_info['feature_ids_by_genome_ref'].keys():
+                for fId in target_feature_info['feature_ids_by_genome_ref'][genome_ref]:
+                    id_untrans = genome_ref+self.genome_id_feature_id_delim+fId
                     id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
@@ -1208,14 +1224,16 @@ class BlastUtil:
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
             for fid in target_feature_info['feature_ids']:
+                #if fid == 'AWN69_RS07145' or fid == 'AWN69_RS13375':
+                #    self.log(console, 'CHECKING FID '+fid)  # DEBUG
                 seq_total += 1
                 id_untrans = fid
                 id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
-                    #self.log(console, 'FOUND HIT '+fid)  # DEBUG
+                    self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
-                    #fid = input_many_ref+genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
+                    #fid = input_many_ref+self.genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
                     genome_ref = params['input_many_ref']
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [genome_ref]
@@ -1226,20 +1244,22 @@ class BlastUtil:
             seq_total = 0
 
             output_featureSet = dict()
-            if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
-                output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
-            else:
-                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            #if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
+            #    output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
+            #else:
+            #    output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['description'] = search_tool_name+"_Search filtered"
             output_featureSet['element_ordering'] = []
             output_featureSet['elements'] = dict()
 
             self.log(console,"READING HITS FOR GENOMES")  # DEBUG
             for genome_id in list(target_feature_info['feature_ids_by_genome_id'].keys()):
                 self.log(console,"READING HITS FOR GENOME "+genome_id)  # DEBUG
-                genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                #genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
+                genome_ref = target_feature_info['genome_id_to_genome_ref'][genome_id]
                 for feature_id in target_feature_info['feature_ids_by_genome_id'][genome_id]:
                     seq_total += 1
-                    id_untrans = genome_ref+genome_id_feature_id_delim+feature_id
+                    id_untrans = genome_ref+self.genome_id_feature_id_delim+feature_id
                     id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
                     if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                         #self.log(console, 'FOUND HIT '+fId)  # DEBUG
@@ -1251,20 +1271,6 @@ class BlastUtil:
                             output_featureSet['elements'][feature_id] = []
                             output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
-
-
-        # load the method provenance from the context object
-        #
-        self.log(console,"SETTING PROVENANCE")  # DEBUG
-        provenance = [{}]
-        if 'provenance' in self.ctx:
-            provenance = self.ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference
-        provenance[0]['input_ws_objects'] = []
-        provenance[0]['input_ws_objects'].append(params['input_one_ref'])
-        provenance[0]['input_ws_objects'].append(params['input_many_ref'])
-        provenance[0]['service'] = 'kb_blast'
-        provenance[0]['method'] = search_tool_name+'_Search'
 
 
         # Upload results
@@ -1311,7 +1317,8 @@ class BlastUtil:
                                     'data': output_featureSet,
                                     'name': params['output_filtered_name'],
                                     'meta': {},
-                                    'provenance': provenance
+                                    'provenance': self._instantiate_provenance (method_name=method_name,
+                                                                                input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
                                 }]
                         })[0]
 
@@ -1403,7 +1410,7 @@ class BlastUtil:
                  target_type_name == 'FeatureSet':
 
                 if target_type_name != 'Genome':
-                    [genome_ref, hit_fid] = hit_id.split(genome_id_feature_id_delim)
+                    [genome_ref, hit_fid] = hit_id.split(self.genome_id_feature_id_delim)
                 else:
                     genome_ref = input_many_ref
                     hit_fid = hit_id
@@ -1421,7 +1428,7 @@ class BlastUtil:
                         if target_type_name == 'Genome':
                             accept_id = fid
                         elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
-                            accept_id = genome_ref+genome_id_feature_id_delim+fid
+                            accept_id = genome_ref+self.genome_id_feature_id_delim+fid
                         if accept_id in accept_fids:
                             row_color = accept_row_color
                         else:
@@ -1545,7 +1552,9 @@ class BlastUtil:
         hit_buf = parsed_BLAST_results['hit_buf']
 
         # init
+        method_name = search_tool_name+'_Search'
         console = []
+        invalid_msgs = []
         report = ''
         self.log(console,"BUILDING REPORT")  # DEBUG
 
@@ -1582,7 +1591,8 @@ class BlastUtil:
                             'name':reportName,
                             'meta':{},
                             'hidden':1,
-                            'provenance':provenance
+                            'provenance':self._instantiate_provenance(method_name=method_name,
+                                                                      input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
                             }
                         ]
                     })[0]
@@ -1671,3 +1681,167 @@ class BlastUtil:
         report_info = reportClient.create_extended_report(reportObj)
 
         return report_info
+
+
+    #### run_BLAST_App(): top-level method
+    ##
+    def run_BLAST_App (self, search_tool_name, params):
+        console = []
+        invalid_msgs = []
+        method_name = search_tool_name+'_Search()'
+        self.log(console,'Running '+search_tool_name+'_Search with params=')
+        self.log(console, "\n"+pformat(params))
+        report = ''
+#        report = 'Running '+search_tool_name+'_Search with params='
+#        report += "\n"+pformat(params)
+        appropriate_sequence_found_in_one_input = False
+        appropriate_sequence_found_in_many_input = False
+        base_BLAST_output_format = '7'
+
+
+        # set seq type
+        query_seq_type = { 'BLASTn': 'NUC',
+                           'BLASTp': 'PRO',
+                           'BLASTx': 'NUC',
+                           'tBLASTn': 'PRO',
+                           'tBLASTx': 'NUC',
+                           'psiBLAST': 'PRO'
+                       }
+        target_seq_type = { 'BLASTn': 'NUC',
+                            'BLASTp': 'PRO',
+                            'BLASTx': 'PRO',
+                            'tBLASTn': 'NUC',
+                            'tBLASTx': 'NUC',
+                            'psiBLAST': 'PRO'
+                        }
+        q_seq_type = query_seq_type[search_tool_name]
+        t_seq_type = target_seq_type[search_tool_name]
+
+
+        #### Validate App input params
+        #
+        if not self.validate_BLAST_app_params (params, method_name):
+            raise ValueError('App input validation failed in CheckBlastParams() for App ' + method_name)
+
+
+        # Get input obj refs
+        #
+        input_many_ref = params['input_many_ref']
+
+        if 'input_one_sequence' in params \
+                and params['input_one_sequence'] != None \
+                and not params['input_one_sequence'].startswith("Optionally enter"):
+            input_one_ref = self.objectify_text_query (params, q_seq_type, method_name)
+            params['input_one_ref'] = input_one_ref
+        else:
+            input_one_ref = params['input_one_ref']
+
+
+        # Write query obj to fasta file (can be Feature, SequenceSet, or FeatureSet)
+        #
+        write_query_obj_to_file_result = self.write_query_obj_to_file (params, input_one_ref, q_seq_type)
+        query_type_name = write_query_obj_to_file_result['query_type_name']
+        query_fasta_file_path = write_query_obj_to_file_result['query_fasta_file_path']
+        appropriate_sequence_found_in_one_input = write_query_obj_to_file_result['appropriate_sequence_found_in_one_input']
+        invalid_msgs.extend(write_query_obj_to_file_result['invalid_msgs'])
+
+
+        # Write target obj to fasta file (can be Feature, SequenceSet, or FeatureSet)
+        #
+        write_target_obj_to_file_result = self.write_target_obj_to_file (params, input_many_ref, t_seq_type)
+        target_type_name = write_target_obj_to_file_result['target_type_name']
+        target_fasta_file_path = write_target_obj_to_file_result['target_fasta_file_path']
+        appropriate_sequence_found_in_many_input = write_target_obj_to_file_result['appropriate_sequence_found_in_many_input']
+        invalid_msgs.extend(write_target_obj_to_file_result['invalid_msgs'])
+
+        target_feature_info = write_target_obj_to_file_result['target_feature_info']
+        
+
+        # check for failed input file creation
+        #
+        if not appropriate_sequence_found_in_one_input:
+            self.log(invalid_msgs,"no "+q_seq_type+" sequence found in '"+input_one_name+"'")
+        if not appropriate_sequence_found_in_many_input:
+            self.log(invalid_msgs,"no "+t_seq_type+" sequences found in '"+input_many_name+"'")
+
+        if len(invalid_msgs) > 0:
+            error_report_info = self.save_error_report_with_invalid_msgs (invalid_msgs, input_one_ref, input_many_ref, method_name)
+            returnVal = { 'report_name': report_info['name'],
+                          'report_ref': report_info['ref']
+                      }        
+            return [returnVal]
+
+
+        #### FORMAT DB
+        ##
+        if not self.format_BLAST_db (search_tool_name, target_fasta_file_path):
+            raise ValueError ("failed to format BLAST db")
+            
+
+        #### Run BLAST for base format
+        ##
+        BLAST_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
+                                               query_fasta_file_path = query_fasta_file_path, 
+                                               target_fasta_file_path = target_fasta_file_path, 
+                                               e_value = str(params['e_value']),
+                                               maxaccepts = str(params['maxaccepts']),
+                                               BLAST_output_format_str = str(base_BLAST_output_format)
+        )
+        output_aln_file_path = BLAST_output_results['output_aln_file_path']
+        base_bulk_save_info = BLAST_output_results['bulk_save_info']
+
+
+        #### Run BLAST for extra format
+        ##
+        extra_bulk_save_info = None
+        if str(params.get('output_extra_format')) and str(params.get('output_extra_format')) != 'none':
+
+            BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
+                                                       query_fasta_file_path = query_fasta_file_path, 
+                                                       target_fasta_file_path = target_fasta_file_path, 
+                                                       e_value = str(params['e_value']),
+                                                       maxaccepts = str(params['maxaccepts']),
+                                                       BLAST_output_format_str = str(params['output_extra_format'])
+            )
+
+            output_extra_aln_file_path = BLAST_extra_output_results['output_aln_file_path']
+            extra_bulk_save_info = BLAST_extra_output_results['bulk_save_info']
+
+
+        # get query_len for filtering and reporting later
+        #
+        query_len = self.get_query_len (query_fasta_file_path)
+
+
+        # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
+        #
+        parsed_BLAST_results = self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_path,
+                                                            search_tool_name = search_tool_name,
+                                                            params = params,
+                                                            query_len = query_len, 
+                                                            target_type_name = target_type_name,
+                                                            target_feature_info = target_feature_info)
+
+
+        # build output report object
+        #
+        if len(invalid_msgs) == 0:
+            report_info = self.build_BLAST_report (search_tool_name = search_tool_name,
+                                                   params = params,
+                                                   target_type_name = target_type_name,
+                                                   target_feature_info = target_feature_info,
+                                                   base_bulk_save_info = base_bulk_save_info,
+                                                   extra_bulk_save_info = extra_bulk_save_info,
+                                                   query_len = query_len, 
+                                                   parsed_BLAST_results = parsed_BLAST_results)
+        else:
+            report_info = error_report_info
+
+
+        # return
+        #
+        self.log(console,search_tool_name+"_Search DONE")
+        returnVal = { 'report_name': report_info['name'],
+                      'report_ref': report_info['ref']
+                      }
+        return returnVal

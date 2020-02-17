@@ -1,3 +1,12 @@
+### Version 1.3.0
+__Changes__
+- updated BLAST to 2.10.0
+- disabled psiBLAST until debugged
+- disabled tBLASTn (only makes sense if searching scaffold directly)
+- disabled tBLASTx (only makes sense if searching scaffold directly)
+- added AnnotatedMetagenomeAssembly as valid target type
+- added more unit tests
+
 ### Version 1.2.0
 __Changes__
 - updated BLAST to 2.9.0
