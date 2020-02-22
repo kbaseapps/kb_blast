@@ -200,7 +200,8 @@ class BlastUtil:
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
 
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'release'
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
                 'fasta_str':    params['input_one_sequence'],
                 'residue_type': seq_type,
@@ -333,7 +334,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'beta'
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
@@ -543,7 +545,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'beta'
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             target_feature_info['feature_ids_by_genome_ref'] = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
@@ -580,7 +583,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'release'
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
             target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
             target_feature_info['feature_ids'] = GenomeToFASTA_retVal['feature_ids']
@@ -620,7 +624,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'beta'
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             target_feature_info['feature_ids_by_genome_id'] = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
@@ -637,6 +642,49 @@ class BlastUtil:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # AnnotatedMetagenomeAssembly
+        #
+        elif target_type_name == 'AnnotatedMetagenomeAssembly':
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            AnnotatedMetagenomeAssemblyToFASTA_params = {
+                'ama_ref':             input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        seq_type,
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%feature_id%%',
+                'record_desc_pattern': '[%%genome_id%%]',
+                'case':                'upper',
+                'linewrap':            50
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
+            target_fasta_file_path = AnnotatedMetagenomeAssemblyToFASTA_retVal['fasta_file_path']
+            target_feature_info['feature_ids'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_ids']
+            if len(target_feature_info['feature_ids']) > 0:
+                appropriate_sequence_found_in_many_input = True
+            target_feature_info['feature_id_to_function'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_id_to_function']
+            target_feature_info['ama_ref_to_obj_name'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['ama_ref_to_obj_name']
+
+            # DEBUG
+            #with open (target_fasta_file_path, 'r') as fasta_handle:
+            #    for fasta_line in fasta_handle.readlines():
+            #        print ("FASTA_LINE: '"+fasta_line)
+            
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "Genome2Fasta() took "+str(end_time-beg_time)+" secs")
 
 
         # Missing proper input_target_type
@@ -1272,6 +1320,33 @@ class BlastUtil:
                             output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
+        # Parse AnnotatedMetagenomeAssembly hits into FeatureSet
+        #
+        elif target_type_name == 'AnnotatedMetagenomeAssembly':
+            seq_total = 0
+            output_featureSet = dict()
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#                output_featureSet['description'] = input_many_genome['scientific_name'] + " - "+search_tool_name+"_Search filtered"
+#            else:
+#                output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+            for fid in target_feature_info['feature_ids']:
+                #if fid == 'AWN69_RS07145' or fid == 'AWN69_RS13375':
+                #    self.log(console, 'CHECKING FID '+fid)  # DEBUG
+                seq_total += 1
+                id_untrans = fid
+                id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
+                    self.log(console, 'FOUND HIT '+fid)  # DEBUG
+                    #output_featureSet['element_ordering'].append(fid)
+                    accept_fids[id_untrans] = True
+                    #fid = input_many_ref+self.genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
+                    ama_ref = params['input_many_ref']
+                    output_featureSet['element_ordering'].append(fid)
+                    output_featureSet['elements'][fid] = [ama_ref]
+
 
         # Upload results
         #
@@ -1309,6 +1384,8 @@ class BlastUtil:
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
             """
 
+            # TODO: restore FeatureSet
+            """
             if True:
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
@@ -1321,7 +1398,7 @@ class BlastUtil:
                                                                                 input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
                                 }]
                         })[0]
-
+            """
 
         return {
             'accept_fids': accept_fids,
@@ -1671,8 +1748,10 @@ class BlastUtil:
                             
                             
         # complete report
-        reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
-        #reportObj['message'] = report
+        # TODO: restore FeatureSet
+        #reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+
+        ##reportObj['message'] = report
 
         # save report object
         SERVICE_VER = 'release'
