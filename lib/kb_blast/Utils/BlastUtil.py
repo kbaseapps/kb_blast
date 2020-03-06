@@ -883,7 +883,7 @@ class BlastUtil:
 
         html_file_path = os.path.join (html_output_dir, html_file)
 
-        return html_file_path
+        return (html_output_dir, html_file_path)
 
 
     # _build_BLAST_cmd()
@@ -1006,7 +1006,6 @@ class BlastUtil:
             'output_aln_file_path': output_aln_file_path,
             'bulk_save_info': bulk_save_info
         }
-
 
 
     #### get_query_len()
@@ -1384,8 +1383,6 @@ class BlastUtil:
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
             """
 
-            # TODO: restore FeatureSet
-            """
             if True:
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
@@ -1398,7 +1395,6 @@ class BlastUtil:
                                                                                 input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
                                 }]
                         })[0]
-            """
 
         return {
             'accept_fids': accept_fids,
@@ -1601,11 +1597,11 @@ class BlastUtil:
         # write html to file and upload
         html_report_str = "\n".join(html_report_lines)
         html_file = search_tool_name+'_Search.html'
-        html_path = self._set_HTML_file_path (html_file)
+        (html_dir, html_path) = self._set_HTML_file_path (html_file)
         with open (html_path, 'w') as html_handle:
             html_handle.write(html_report_str)
 
-        return html_path
+        return (html_dir, html_path)
 
 
     #### build output report
@@ -1681,7 +1677,7 @@ class BlastUtil:
 
 
         # build html report
-        html_file_path = self._write_HTML_report (search_tool_name = search_tool_name,
+        (html_dir, html_file_path) = self._write_HTML_report (search_tool_name = search_tool_name,
                                                   input_many_ref = params['input_many_ref'],
                                                   target_type_name = target_type_name,
                                                   target_feature_info = target_feature_info,
@@ -1696,7 +1692,7 @@ class BlastUtil:
         # upload html report
         dfu = DFUClient(self.callbackURL)
         try:
-            html_upload_ret = dfu.file_to_shock({'file_path': html_file_path,
+            html_upload_ret = dfu.file_to_shock({'file_path': html_dir,
                                                  'make_handle': 0,
                                                  'pack': 'zip'})
         except:
@@ -1720,8 +1716,8 @@ class BlastUtil:
         #    reportObj['direct_html'] = html_report_str
         #else:
         #    reportObj['direct_html_link_index'] = 0
-        reportObj['direct_html_link_index'] = 0
 
+        reportObj['direct_html_link_index'] = 0
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
                                     'name': html_file_path,
                                     'label': search_tool_name+' Results'}
@@ -1748,8 +1744,7 @@ class BlastUtil:
                             
                             
         # complete report
-        # TODO: restore FeatureSet
-        #reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
+        reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
 
         ##reportObj['message'] = report
 
