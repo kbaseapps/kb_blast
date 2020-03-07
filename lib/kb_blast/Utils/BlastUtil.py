@@ -1601,7 +1601,7 @@ class BlastUtil:
         with open (html_path, 'w') as html_handle:
             html_handle.write(html_report_str)
 
-        return (html_dir, html_path)
+        return (html_dir, html_file)
 
 
     #### build output report
@@ -1677,7 +1677,7 @@ class BlastUtil:
 
 
         # build html report
-        (html_dir, html_file_path) = self._write_HTML_report (search_tool_name = search_tool_name,
+        (html_dir, html_file_name) = self._write_HTML_report (search_tool_name = search_tool_name,
                                                   input_many_ref = params['input_many_ref'],
                                                   target_type_name = target_type_name,
                                                   target_feature_info = target_feature_info,
@@ -1719,7 +1719,7 @@ class BlastUtil:
 
         reportObj['direct_html_link_index'] = 0
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
-                                    'name': html_file_path,
+                                    'name': html_file_name,
                                     'label': search_tool_name+' Results'}
         ]
         reportObj['file_links'] = [{'shock_id': base_bulk_save_info['shock_id'],
