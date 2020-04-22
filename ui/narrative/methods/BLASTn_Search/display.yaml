@@ -43,11 +43,6 @@ parameters :
             Must enter either a query DNA sequence or an input query object. This is a data object with a single DNA (nucleotide) sequence to use as the search query. The data object is a SequenceSet with one sequence.
         placeholder : |
             ...or select DNA Query Object
-    output_one_name:
-        ui-name : |
-            Output Query Object
-        short-hint : |
-            Mandatory if the input query DNA sequence was used. The name of the new output data object containing the query DNA sequence saved as a SequenceSet (with one sequence).
     input_many_ref:
         ui-name : |
             Search Database

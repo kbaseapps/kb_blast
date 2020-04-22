@@ -1,3 +1,7 @@
+### Version 1.3.1
+__Changes__
+- removed output_one_name arg.  set name automatically now
+
 ### Version 1.3.0
 __Changes__
 - updated BLAST to 2.10.0
