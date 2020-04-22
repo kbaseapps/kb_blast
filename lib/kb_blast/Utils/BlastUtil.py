@@ -1795,7 +1795,9 @@ class BlastUtil:
         #### Validate App input params
         #
         if not params.get('output_one_name'):
-            params['output_one_name'] = 'query-'+params['output_filtered_name']
+            if not params.get('input_one_ref'):
+                params['output_one_name'] = 'query-'+params['output_filtered_name']
+                
         if not self.validate_BLAST_app_params (params, method_name):
             raise ValueError('App input validation failed in CheckBlastParams() for App ' + method_name)
 
