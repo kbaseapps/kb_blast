@@ -47,9 +47,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.2.0"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
-    GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
+    VERSION = "1.3.1"
+    GIT_URL = "https://github.com/kbaseapps/kb_blast"
+    GIT_COMMIT_HASH = "0d3a16fd4fc6d00ad8df93d1331013251026a875"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -129,8 +129,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
@@ -169,8 +168,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
@@ -209,8 +207,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
@@ -249,8 +246,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
@@ -289,8 +285,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,
@@ -329,8 +324,7 @@ class kb_blast:
            parameter "input_one_sequence" of type "sequence", parameter
            "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
            of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_one_name" of type
-           "data_obj_name", parameter "output_filtered_name" of type
+           "data_obj_ref", parameter "output_filtered_name" of type
            "data_obj_name", parameter "ident_thresh" of Double, parameter
            "e_value" of Double, parameter "bitscore" of Double, parameter
            "overlap_fraction" of Double, parameter "maxaccepts" of Double,

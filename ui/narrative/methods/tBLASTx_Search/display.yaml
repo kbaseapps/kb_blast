@@ -43,11 +43,6 @@ parameters :
             Query with single DNA sequence to use as query.  Data types may be Feature or SequenceSet (with one sequence).
         placeholder : |
             ...or select DNA Query Object
-    output_one_name:
-        ui-name : |
-            Output Query Object (if Query Seq)
-        short-hint : |
-            Created if sequence entered above.  Data type is SequenceSet (with one sequence).
     input_many_ref:
         ui-name : |
             Targets Object
