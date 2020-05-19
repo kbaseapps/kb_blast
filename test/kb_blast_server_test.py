@@ -506,7 +506,6 @@ class kb_blastTest(unittest.TestCase):
 
     # Test tBLASTn
     #
-    # Uncomment to skip this test
     # SKIPPING tBLASTn test because App disabled
     @unittest.skip("skipped test_kb_blast_tBLASTn_Search_01")
     def test_kb_blast_tBLASTn_Search_01(self):
