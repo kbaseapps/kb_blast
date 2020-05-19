@@ -334,7 +334,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            SERVICE_VER = 'beta'
+            SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
@@ -545,7 +545,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            SERVICE_VER = 'beta'
+            SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
@@ -624,7 +624,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            SERVICE_VER = 'beta'
+            SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
@@ -667,7 +667,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'])
+            SERVICE_VER = 'beta'  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
             target_fasta_file_path = AnnotatedMetagenomeAssemblyToFASTA_retVal['fasta_file_path']
             target_feature_info['feature_ids'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_ids']
