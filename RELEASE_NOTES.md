@@ -1,4 +1,4 @@
-### Version 1.3.2
+### Version 1.3.3
 __Changes__
 - set KBaseDataObjectToFileUtils to beta so can access AnnotatedMetagenomeAssemblyToFASTA() method for testing
 

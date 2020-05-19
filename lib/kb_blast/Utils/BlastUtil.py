@@ -200,7 +200,8 @@ class BlastUtil:
                 and params['input_one_sequence'] != None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
 
-            SERVICE_VER = 'release'
+            #SERVICE_VER = 'release'
+            SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
                 'fasta_str':    params['input_one_sequence'],
@@ -334,6 +335,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #SERVICE_VER = 'release'
             SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
@@ -545,6 +547,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #SERVICE_VER = 'release'
             SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
@@ -583,7 +586,8 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            SERVICE_VER = 'release'
+            #SERVICE_VER = 'release'
+            SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
             target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
@@ -624,6 +628,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #SERVICE_VER = 'release'
             SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
@@ -667,6 +672,7 @@ class BlastUtil:
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #SERVICE_VER = 'release'
             SERVICE_VER = 'beta'  # DEBUG
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
