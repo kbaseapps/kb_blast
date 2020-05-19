@@ -1,3 +1,7 @@
+### Version 1.3.2
+__Changes__
+- set KBaseDataObjectToFileUtils to beta so can access AnnotatedMetagenomeAssemblyToFASTA() method for testing
+
 ### Version 1.3.1
 __Changes__
 - removed output_one_name arg.  set name automatically now
