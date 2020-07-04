@@ -1392,8 +1392,9 @@ class BlastUtil:
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
             """
 
-            #if True:
-            if target_type_name != 'AnnotatedMetagenomeAssembly':  # not making FeatureSets with AMA feature yet
+            # we are now making FeatureSets with AMA feature
+            #if target_type_name != 'AnnotatedMetagenomeAssembly':  
+            if True:
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
