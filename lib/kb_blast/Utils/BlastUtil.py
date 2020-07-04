@@ -1344,6 +1344,8 @@ class BlastUtil:
                 seq_total += 1
                 id_untrans = fid
                 id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
+                #print ("TESTING FEATURES: ID_UNTRANS: '"+id_untrans+"'")  # DEBUG
+                #print ("TESTING FEATURES: ID_TRANS: '"+id_trans+"'")  # DEBUG
                 if id_trans in hit_seq_ids or id_untrans in hit_seq_ids:
                     self.log(console, 'FOUND HIT '+fid)  # DEBUG
                     #output_featureSet['element_ordering'].append(fid)
@@ -1390,6 +1392,8 @@ class BlastUtil:
             else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
             """
 
+            # we are now making FeatureSets with AMA feature
+            #if target_type_name != 'AnnotatedMetagenomeAssembly':  
             if True:
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],

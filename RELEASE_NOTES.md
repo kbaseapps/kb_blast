@@ -1,3 +1,7 @@
+### Version 1.3.4
+__Changes__
+- updated BLAST+ to 2.10.1
+
 ### Version 1.3.3
 __Changes__
 - set KBaseDataObjectToFileUtils to beta so can access AnnotatedMetagenomeAssemblyToFASTA() method for testing
