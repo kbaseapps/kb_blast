@@ -1,3 +1,7 @@
+### Version 1.3.5
+__Changes__
+- added HTML report to BLASTx
+
 ### Version 1.3.4
 __Changes__
 - updated BLAST+ to 2.10.1
