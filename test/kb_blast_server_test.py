@@ -133,7 +133,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: Genome Target
     #
     # Uncomment to skip this test
-    @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
     def test_kb_blast_BLASTp_Search_01_Genome(self):
         obj_basename = 'BLASTp_Genome'
         obj_out_name = obj_basename+".test_output.FS"
@@ -177,7 +177,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: GenomeSet
     #
     # Uncomment to skip this test
-    @unittest.skip("skipped test_kb_blast_BLASTp_Search_02_GenomeSet")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_02_GenomeSet")
     def test_kb_blast_BLASTp_Search_02_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -257,7 +257,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: FeatureSet
     #
     # Uncomment to skip this test
-    @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_FeatureSet")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_FeatureSet")
     def test_kb_blast_BLASTp_Search_03_FeatureSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -344,7 +344,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: AnnotatedMetagenomeAssembly Target
     #
     # Uncomment to skip this test
-    @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly")
     def test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly(self):
         obj_basename = 'BLASTp_AnnotatedMetagenomeAssembly'
         obj_out_name = obj_basename+".test_output.FS"
@@ -419,7 +419,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTx
     #
     # Uncomment to skip this test
-    @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
     def test_kb_blast_BLASTx_Search_01(self):
         obj_basename = 'BLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"

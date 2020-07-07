@@ -1,3 +1,7 @@
+### Version 1.4.0
+__Changes__
+- Added support for AnnotatedMetagenomeAssembly as target and output hits as FeatureSet
+
 ### Version 1.3.5
 __Changes__
 - fixed 3*pro_len bug that was overfiltering BLASTx hits
