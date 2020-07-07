@@ -1,6 +1,6 @@
 ### Version 1.3.5
 __Changes__
-- added HTML report to BLASTx
+- fixed 3*pro_len bug that was overfiltering BLASTx hits
 
 ### Version 1.3.4
 __Changes__
