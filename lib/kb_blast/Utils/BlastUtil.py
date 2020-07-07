@@ -35,7 +35,7 @@ class BlastUtil:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.1.0"
+    VERSION = "1.4.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
     GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
 
@@ -1072,6 +1072,11 @@ class BlastUtil:
         output_aln_file_handle = open (output_aln_file_path, 'r')
         output_aln_buf = output_aln_file_handle.readlines()
         output_aln_file_handle.close()
+
+        # DEBUG
+        self.log(console, "BLAST_OUTPUT:")
+        self.log(console, "".join(output_aln_buf))
+
         hit_total = 0
         high_bitscore_line = dict()
         high_bitscore_score = dict()
@@ -1081,7 +1086,6 @@ class BlastUtil:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
 
             if line.startswith('#'):
                 if not header_done:
@@ -1455,7 +1459,8 @@ class BlastUtil:
                            hit_buf = None):
         html_file_path = None
         console = []
-        
+        (q_seq_type, t_seq_type) = self._set_BLAST_seq_types (search_tool_name)
+
         # config
         head_color = "#eeeeff"
         border_head_color = "#ffccff"
@@ -1502,7 +1507,10 @@ class BlastUtil:
 
             [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
 
-            aln_len_perc = round (100.0*float(aln_len)/float(query_len), 1)
+            aln_len_calc = aln_len
+            if q_seq_type != t_seq_type:
+                aln_len_calc *= 3
+            aln_len_perc = round (100.0*float(aln_len_calc)/float(query_len), 1)
             identity = str(round(float(identity), 1))
             if identity == '100.0':  identity = '100'
 
@@ -1513,9 +1521,10 @@ class BlastUtil:
                 pass
             elif target_type_name == 'Genome' or \
                  target_type_name == 'GenomeSet' or \
-                 target_type_name == 'FeatureSet':
+                 target_type_name == 'FeatureSet' or \
+                 target_type_name == 'AnnotatedMetagenomeAssembly':
 
-                if target_type_name != 'Genome':
+                if target_type_name != 'Genome' and target_type_name != 'AnnotatedMetagenomeAssembly':
                     [genome_ref, hit_fid] = hit_id.split(self.genome_id_feature_id_delim)
                 else:
                     genome_ref = input_many_ref
@@ -1531,7 +1540,7 @@ class BlastUtil:
 
                     if id_untrans == hit_fid or id_trans == hit_fid:
                         #self.log (console, "GOT ONE!")  # DEBUG
-                        if target_type_name == 'Genome':
+                        if target_type_name == 'Genome' or target_type_name == 'AnnotatedMetagenomeAssembly':
                             accept_id = fid
                         elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
                             accept_id = genome_ref+self.genome_id_feature_id_delim+fid
@@ -1549,7 +1558,10 @@ class BlastUtil:
                 fid_disp = re.sub (r"^.*\.([^\.]+)\.([^\.]+)$", r"\1.\2", fid_lookup)
 
                 func_disp = target_feature_info['feature_id_to_function'][genome_ref][fid_lookup]
-                genome_sci_name = target_feature_info['genome_ref_to_sci_name'][genome_ref]
+                if target_type_name == 'AnnotatedMetagenomeAssembly':
+                    genome_name_disp = target_feature_info['ama_ref_to_obj_name'][genome_ref]
+                else:
+                    genome_name_disp = target_feature_info['genome_ref_to_sci_name'][genome_ref]
 
                 #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
@@ -1594,7 +1606,7 @@ class BlastUtil:
                 # func
                 html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
                 # sci name
-                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_sci_name+'</font></td>']
+                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_name_disp+'</font></td>']
                 # ident
                 if 'ident_thresh' in filtering_fields[hit_id]:
                     this_cell_color = reject_cell_color
@@ -1806,7 +1818,7 @@ class BlastUtil:
         #
         if not params.get('output_one_name'):
             if not params.get('input_one_ref'):
-                params['output_one_name'] = 'query-'+params['output_filtered_name']
+                params['output_one_name'] = 'query-'+params['output_filtered_name']+'.Seq'
                 
         if not self.validate_BLAST_app_params (params, method_name):
             raise ValueError('App input validation failed in CheckBlastParams() for App ' + method_name)
