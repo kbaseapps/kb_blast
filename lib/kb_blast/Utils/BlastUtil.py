@@ -863,7 +863,25 @@ class BlastUtil:
 
         return blast_bin[search_tool_name]
 
-
+    # _set_BLAST_seq_types()
+    #
+    def _set_BLAST_seq_types (self, search_tool_name):
+        query_seq_type = { 'BLASTn': 'NUC',
+                           'BLASTp': 'PRO',
+                           'BLASTx': 'NUC',
+                           'tBLASTn': 'PRO',
+                           'tBLASTx': 'NUC',
+                           'psiBLAST': 'PRO'
+                       }
+        target_seq_type = { 'BLASTn': 'NUC',
+                            'BLASTp': 'PRO',
+                            'BLASTx': 'PRO',
+                            'tBLASTn': 'NUC',
+                            'tBLASTx': 'NUC',
+                            'psiBLAST': 'PRO'
+                        }
+        return (query_seq_type[search_tool_name], target_seq_type[search_tool_name])
+        
     # _set_BLAST_output_path()
     #
     def _set_BLAST_output_path (self, BLAST_output_format_str):
@@ -1040,7 +1058,8 @@ class BlastUtil:
         console = []
         invalid_msgs = []
         method_name = search_tool_name+'_Search'
-
+        (q_seq_type, t_seq_type) = self._set_BLAST_seq_types (search_tool_name)
+        
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
         self.log(console, 'PARSING BLAST ALIGNMENT OUTPUT')
@@ -1062,7 +1081,7 @@ class BlastUtil:
         hit_buf = []
         header_done = False
         for line in output_aln_buf:
-            #self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
+            self.log(console, "HIT_LINE: '"+line+"'")  # DEBUG
 
             if line.startswith('#'):
                 if not header_done:
@@ -1082,6 +1101,9 @@ class BlastUtil:
             hit_e_value    = hit_info[10]
             hit_bitscore   = hit_info[11]
 
+            if q_seq_type != t_seq_type:
+                hit_aln_len *= 3
+            
             # BLAST SOMETIMES ADDS THIS TO IDs.  NO IDEA WHY, BUT GET RID OF IT!
             if hit_seq_id.startswith('gnl\|'):
                 hit_seq_id = hit_seq_id[4:]
@@ -1653,12 +1675,8 @@ class BlastUtil:
 
 
         # don't waste time if no hits
-        if hit_total == 0:
-            if len(hit_order) == 0:  # no hits
-                report += "No hits were found\n"
-            else:  # data validation error
-                report += "FAILURE\n\n"+"\n".join(invalid_msgs)+"\n"
-
+        if hit_total == 0 and len(hit_order) == 0:
+            report += "No hits were found\n"
             reportObj = {
                 'objects_created':[],
                 'text_message':report
@@ -1782,27 +1800,8 @@ class BlastUtil:
         appropriate_sequence_found_in_one_input = False
         appropriate_sequence_found_in_many_input = False
         base_BLAST_output_format = '7'
-
-
-        # set seq type
-        query_seq_type = { 'BLASTn': 'NUC',
-                           'BLASTp': 'PRO',
-                           'BLASTx': 'NUC',
-                           'tBLASTn': 'PRO',
-                           'tBLASTx': 'NUC',
-                           'psiBLAST': 'PRO'
-                       }
-        target_seq_type = { 'BLASTn': 'NUC',
-                            'BLASTp': 'PRO',
-                            'BLASTx': 'PRO',
-                            'tBLASTn': 'NUC',
-                            'tBLASTx': 'NUC',
-                            'psiBLAST': 'PRO'
-                        }
-        q_seq_type = query_seq_type[search_tool_name]
-        t_seq_type = target_seq_type[search_tool_name]
-
-
+        (q_seq_type, t_seq_type) = self._set_BLAST_seq_types (search_tool_name)
+        
         #### Validate App input params
         #
         if not params.get('output_one_name'):
@@ -1811,7 +1810,6 @@ class BlastUtil:
                 
         if not self.validate_BLAST_app_params (params, method_name):
             raise ValueError('App input validation failed in CheckBlastParams() for App ' + method_name)
-
 
         # Get input obj refs
         #
