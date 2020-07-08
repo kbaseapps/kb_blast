@@ -1,3 +1,7 @@
+### Version 1.4.1
+__Changes__
+- Added genome obj name as output display option in addition to genome sci name
+
 ### Version 1.4.0
 __Changes__
 - Added support for AnnotatedMetagenomeAssembly as target and output hits as FeatureSet
