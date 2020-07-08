@@ -161,6 +161,8 @@ class BlastUtil:
             raise ValueError('input_many_ref parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
+        if 'genome_disp_name_config' not in params:
+            raise ValueError('genome_disp_name_config parameter is required')
 
         # check query
         if search_tool_name == 'psiBLAST':
@@ -367,6 +369,7 @@ class BlastUtil:
                                 'feature_ids_by_genome_id': None,
                                 'feature_id_to_function': None,
                                 'genome_ref_to_sci_name': None,
+                                'genome_ref_to_obj_name': None,
                                 'genome_id_to_genome_ref': None
         }
         target_fasta_file_compression = None
@@ -557,6 +560,7 @@ class BlastUtil:
                 appropriate_sequence_found_in_many_input = True
             target_feature_info['feature_id_to_function'] = FeatureSetToFASTA_retVal['feature_id_to_function']
             target_feature_info['genome_ref_to_sci_name'] = FeatureSetToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['genome_ref_to_obj_name'] = FeatureSetToFASTA_retVal['genome_ref_to_obj_name']
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
@@ -596,6 +600,7 @@ class BlastUtil:
                 appropriate_sequence_found_in_many_input = True
             target_feature_info['feature_id_to_function'] = GenomeToFASTA_retVal['feature_id_to_function']
             target_feature_info['genome_ref_to_sci_name'] = GenomeToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['genome_ref_to_obj_name'] = GenomeToFASTA_retVal['genome_ref_to_obj_name']
             
 
             # DEBUG
@@ -638,6 +643,7 @@ class BlastUtil:
                 appropriate_sequence_found_in_many_input = True
             target_feature_info['feature_id_to_function'] = GenomeSetToFASTA_retVal['feature_id_to_function']
             target_feature_info['genome_ref_to_sci_name'] = GenomeSetToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['genome_ref_to_obj_name'] = GenomeSetToFASTA_retVal['genome_ref_to_obj_name']
 
             target_feature_info['genome_id_to_genome_ref'] = dict()
             for genome_id in input_many_genomeSet['elements'].keys():
@@ -1450,6 +1456,7 @@ class BlastUtil:
                            input_many_ref = None,
                            target_type_name = None,
                            target_feature_info = None,
+                           genome_disp_name_config = None,
                            accept_fids = None,
                            filtering_fields = None,
                            query_len = None,
@@ -1558,10 +1565,23 @@ class BlastUtil:
                 fid_disp = re.sub (r"^.*\.([^\.]+)\.([^\.]+)$", r"\1.\2", fid_lookup)
 
                 func_disp = target_feature_info['feature_id_to_function'][genome_ref][fid_lookup]
+
+                # set genome_disp_name
                 if target_type_name == 'AnnotatedMetagenomeAssembly':
-                    genome_name_disp = target_feature_info['ama_ref_to_obj_name'][genome_ref]
+                    genome_disp_name = target_feature_info['ama_ref_to_obj_name'][genome_ref]
                 else:
-                    genome_name_disp = target_feature_info['genome_ref_to_sci_name'][genome_ref]
+                    genome_obj_name = target_feature_info['genome_ref_to_obj_name'][genome_ref]
+                    genome_sci_name = target_feature_info['genome_ref_to_sci_name'][genome_ref]
+                    [ws_id, obj_id, genome_obj_version] = genome_ref.split('/')
+                    genome_disp_name = ''
+                    if 'obj_name' in genome_disp_name_config:
+                        genome_disp_name += genome_obj_name
+                    if 'ver' in genome_disp_name_config:
+                        genome_disp_name += '.v'+str(genome_obj_version)
+                    if 'sci_name' in genome_disp_name_config:
+                        genome_disp_name += ': '+genome_sci_name
+                    else:
+                        genome_disp_name = genome_sci_name
 
                 #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
@@ -1606,7 +1626,7 @@ class BlastUtil:
                 # func
                 html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
                 # sci name
-                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_name_disp+'</font></td>']
+                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_disp_name+'</font></td>']
                 # ident
                 if 'ident_thresh' in filtering_fields[hit_id]:
                     this_cell_color = reject_cell_color
@@ -1722,6 +1742,7 @@ class BlastUtil:
                                                   input_many_ref = params['input_many_ref'],
                                                   target_type_name = target_type_name,
                                                   target_feature_info = target_feature_info,
+                                                  genome_disp_name_config = params['genome_disp_name_config'],
                                                   accept_fids = accept_fids,
                                                   filtering_fields = filtering_fields,
                                                   query_len = query_len,
