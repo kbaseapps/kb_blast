@@ -1,3 +1,7 @@
+### Version 1.5.0
+__Changes__
+- updated BLAST to 2.11.0
+
 ### Version 1.4.1
 __Changes__
 - Added genome obj name as output display option in addition to genome sci name
