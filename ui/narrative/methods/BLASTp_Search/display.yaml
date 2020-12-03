@@ -1,6 +1,6 @@
 # define display information
 #
-name: BLASTp prot-prot Search - v2.10.1
+name: BLASTp prot-prot Search - v2.11.0
 tooltip: |
     Search for protein matches to an input protein sequence.
 screenshots:

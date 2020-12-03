@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTn nuc-nuc Search - v2.10.1
+name: BLASTn nuc-nuc Search - v2.11.0
 tooltip: |
     Search for untranslated feature matches to a nucleotide query sequence.
 screenshots:

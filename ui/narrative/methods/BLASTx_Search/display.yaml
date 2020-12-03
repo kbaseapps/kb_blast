@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTx nuc-prot Search - v2.10.1
+name: BLASTx nuc-prot Search - v2.11.0
 tooltip: |
     Search for protein matches to an input nucleotide sequence.
 screenshots:
