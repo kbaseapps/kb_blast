@@ -1818,11 +1818,13 @@ class BlastUtil:
 
         reportObj['direct_html_link_index'] = 0
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
-                                    'name': search_tool_name+'_results.html',
+                                    #'name': search_tool_name+'_results.html',
+                                    'name': search_tool_name+'_html_results'+'.zip',
                                     'label': search_tool_name+' Results'}
         ]
         reportObj['file_links'] = []
         for input_many_ref in input_many_refs:
+            target_name = targets_name[input_many_ref]
             base_bulk_save_info = base_bulk_save_infos[input_many_ref]
             if input_many_ref in extra_bulk_save_infos:
                 extra_bulk_save_info = extra_bulk_save_infos[input_many_ref]
@@ -1830,8 +1832,8 @@ class BlastUtil:
                 extra_bulk_save_info = None
                 
             reportObj['file_links'].append({'shock_id': base_bulk_save_info['shock_id'],
-                                            'name': search_tool_name+'_Search-m'+'7'+'.txt',
-                                            'label': search_tool_name+' Results: m'+'7'})
+                                            'name': target_name+'-'+search_tool_name+'_Search-m'+'7'+'.txt',
+                                            'label': target_name+'-'+search_tool_name+' Results: m'+'7'})
 
             if extra_bulk_save_info != None:
                 extension = 'txt'
@@ -1846,8 +1848,8 @@ class BlastUtil:
                 elif params['output_extra_format'] == '11':
                     extension = 'asn1arc'
                 reportObj['file_links'].append({'shock_id': extra_bulk_save_info['shock_id'],
-                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
-                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
+                                                'name': target_name+'-'+search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': target_name+'-'+search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
                             
         # complete report
