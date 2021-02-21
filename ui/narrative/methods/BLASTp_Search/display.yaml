@@ -42,11 +42,11 @@ parameters :
             Must enter either a query protein sequence or an input query object. This is a data object with a single protein (amino acid) sequence to use as query. Data objects must be a SequenceSet with only one sequence.
         placeholder : |
             ...or select PROTEIN Query Object
-    input_many_ref:
+    input_many_refs:
         ui-name : |
-            Search Target
+            Search Targets
         short-hint : |
-            The KBase data object with proteins to be searched. Objects may be FeatureSet, Genome, or GenomeSet.
+            The KBase data objects with proteins to be searched. Objects may be FeatureSet, Genome, GenomeSet, or Annotated Metagenome Assembly.
     genome_disp_name_config :
         ui-name : |
             Display genome as

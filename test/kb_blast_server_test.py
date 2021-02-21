@@ -90,7 +90,8 @@ class kb_blastTest(unittest.TestCase):
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
-
+        
+        target_1 = 'GCF_001566335.1'
         obj_basename = 'BLASTn'
         obj_out_name = obj_basename+".test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
@@ -105,7 +106,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_nuc,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'obj_name',
                        'e_value': ".001",
@@ -126,7 +127,7 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], target_1+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
@@ -136,6 +137,7 @@ class kb_blastTest(unittest.TestCase):
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
     def test_kb_blast_BLASTp_Search_01_Genome(self):
+        target_1 = 'GCF_001566335.1'
         obj_basename = 'BLASTp_Genome'
         obj_out_name = obj_basename+".test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
@@ -150,7 +152,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_prot,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'sci_name',
                        'e_value': ".001",
@@ -171,7 +173,7 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], target_1+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
@@ -183,6 +185,7 @@ class kb_blastTest(unittest.TestCase):
     def test_kb_blast_BLASTp_Search_02_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
+        target_1 = 'test_genomeset'
         obj_basename = 'BLASTp_GenomeSet'
         obj_out_name = obj_basename+".test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
@@ -231,7 +234,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_prot,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': target_genomeSet_ref,
+                       'input_many_refs': [target_genomeSet_ref],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'obj_name_sci_name',
                        'e_value': ".001",
@@ -252,7 +255,7 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], target_1+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
@@ -267,6 +270,7 @@ class kb_blastTest(unittest.TestCase):
         obj_basename = 'BLASTp_FeatureSet'
         obj_out_name = obj_basename+".test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
+        target_1 = obj_basename+'.test_FeatureSet'
 
         reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
         genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
@@ -319,7 +323,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_prot,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': target_featureSet_ref,
+                       'input_many_refs': [target_featureSet_ref],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'obj_name_ver_sci_name',
                        'e_value': ".001",
@@ -340,7 +344,7 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], target_1+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
@@ -395,7 +399,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_prot,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': ama_ref_1,
+                       'input_many_refs': [ama_ref_1],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'obj_name_ver_sci_name',
                        'e_value': ".001",
@@ -416,8 +420,124 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], ama_name+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+        pass
+
+
+    # Test BLASTp: Multiple targets of differnet types
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_MultipleTargets")
+    def test_kb_blast_BLASTp_Search_05_MultipleTargets(self):
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
+        obj_basename = 'BLASTp_MultipleTargets'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+
+        reference_prok_genomes_WS = 'ReferenceDataManager'  # PROD and CI
+        genome_ref_1 = 'ReferenceDataManager/GCF_001566335.1/1'  # E. coli K-12 MG1655
+        genome_ref_2 = 'ReferenceDataManager/GCF_002936495.2/1'  # E. coli
+        genome_ref_3 = 'ReferenceDataManager/GCF_002936145.2/1'  # E. coli
+        genome_ref_list = [genome_ref_1, genome_ref_2, genome_ref_3]
+        genome_scinames = ['FOO', 'BAR', 'FOOBAR']
+
+        # create GenomeSet
+        testGS = {
+            'description': 'three genomes',
+            'elements': dict()
+        }
+        for genome_i, genome_ref in enumerate(genome_ref_list): 
+            testGS['elements'][genome_scinames[genome_i]] = { 'ref': genome_ref }
+
+        obj_info = self.getWsClient().save_objects({'workspace': self.getWsName(),       
+                                                    'objects': [
+                                                        {
+                                                            'type':'KBaseSearch.GenomeSet',
+                                                            'data':testGS,
+                                                            'name':'test_genomeset',
+                                                            'meta':{},
+                                                            'provenance':[
+                                                                {
+                                                                    'service':'kb_blast',
+                                                                    'method':'BLASTp_Search'
+                                                                }
+                                                            ]
+                                                        }]
+                                                })[0]
+
+        #pprint(obj_info)
+        target_genomeSet_ref = "/".join([str(obj_info[WORKSPACE_I]),
+                                         str(obj_info[OBJID_I]),
+                                         str(obj_info[VERSION_I])])
+
+
+        # upload test AMA
+        ama_name = "ama_test.AMA"
+        ama_feature_cnt = 888
+        ama_contigs_file_src = "data/AnnotatedMetagenomeAssembly/ama_contigs.fasta"
+        ama_genes_file_src   = "data/AnnotatedMetagenomeAssembly/ama_genes.gff"
+        shared_dir = "/kb/module/work/tmp"
+        ama_contigs_file_upload = os.path.join (shared_dir, os.path.basename(ama_contigs_file_src))
+        ama_genes_file_upload = os.path.join (shared_dir, os.path.basename(ama_genes_file_src))
+        shutil.copy (ama_contigs_file_src, ama_contigs_file_upload)
+        shutil.copy (ama_genes_file_src, ama_genes_file_upload)
+
+        ama_upload_params = {
+            "workspace_name": self.getWsName(),
+            "genome_name": ama_name,
+            "fasta_file": {"path": ama_contigs_file_upload},
+            "gff_file": {"path": ama_genes_file_upload},
+            "source": "GFF",
+            "scientific_name": "TEST AMA",
+            "generate_missing_genes": "True"
+        }
+        try:
+            SERVICE_VER = 'dev'
+            GFU = GenomeFileUtil(os.environ['SDK_CALLBACK_URL'],
+                                 token=self.getContext()['token'],
+                                 service_ver=SERVICE_VER
+                             )
+
+            print ("UPLOADING AMA: "+ama_name+" to WORKSPACE "+self.getWsName()+" ...")
+            ama_upload_result = GFU.fasta_gff_to_metagenome (ama_upload_params)
+        except:
+            raise ValueError("unable to upload test AMA data object")
+        pprint (ama_upload_result)
+        ama_ref_1 = ama_upload_result['metagenome_ref']
+
+        # gene 5_267 from ama_test.AMA
+        query_seq_prot = 'MDRDALTKLVTDLVSIPSVNPLEGPVGNGRGEAELAAFIHSRLTEAGVVCELKEALPGRPNIIARLPGQSEEMIWFDAHMDTVSGEGMAFPPFEPLIEGDRLLGRGSSDNKGSIATMMAALMEVAKSGERPPLTVVFTATADEEYMMRGMLSLFEAGLTAKAGIVAEPTALEIVIAHKGVARFKISTTGKAAHSSRPEEGVNAIYRMGKVLGAIEAYAKRGVGRETHPLLGKGTLSVGIIRGGEYVNVVPDQCEVDVDRRLLPGEDPRRAVSDVRDYLSNALQEEVGLKVSGPTLTVPGLAVSAESPLVQAVAAAVREVTGKAPLTGMQGATHAGQMAAVDIPALVFGPGQMGQAHTATEELDLTQLERAAAVYERLMRTGL'
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       'input_one_sequence': query_seq_prot,
+                       #'input_one_ref': "",
+                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_refs': [ama_ref_1, target_genomeSet_ref],
+                       'output_filtered_name': obj_out_name,
+                       'genome_disp_name_config': 'obj_name_ver_sci_name',
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "10.0",
+                       'overlap_fraction': "25.0",
+                       'maxaccepts': "1000",
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        self.assertEqual(created_obj_0_info[NAME_I], ama_name+'-'+obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+        created_obj_1_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][1]['ref']}]})[0]
+        self.assertEqual(created_obj_1_info[NAME_I], 'test_genomeset'+'-'+obj_out_name)
+        self.assertEqual(created_obj_1_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
 
@@ -426,6 +546,7 @@ class kb_blastTest(unittest.TestCase):
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
     def test_kb_blast_BLASTx_Search_01(self):
+        target_1 = 'GCF_001566335.1'
         obj_basename = 'BLASTx'
         obj_out_name = obj_basename+'.'+"test_output.FS"
         obj_out_type = "KBaseCollections.FeatureSet"
@@ -440,7 +561,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_nuc,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'obj_name_ver',
                        'e_value': ".001",
@@ -461,7 +582,7 @@ class kb_blastTest(unittest.TestCase):
 
         created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
-        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[NAME_I], target_1+'-'+obj_out_name)
         self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
         pass
 
@@ -485,7 +606,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_nuc,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
@@ -529,7 +650,7 @@ class kb_blastTest(unittest.TestCase):
                        'input_one_sequence': query_seq_prot,
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
@@ -593,7 +714,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'input_msa_ref': MSA_ref,
                        #'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",
@@ -655,7 +776,7 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'input_msa_ref': MSA_ref,
                        #'output_one_name': obj_basename+'.'+"test_query.SS",
-                       'input_many_ref': genome_ref_1,
+                       'input_many_refs': [genome_ref_1],
                        'output_filtered_name': obj_out_name,
                        'e_value': ".001",
                        'bitscore': "50",

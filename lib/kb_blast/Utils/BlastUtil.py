@@ -18,6 +18,7 @@ from requests_toolbelt import MultipartEncoder
 # SDK Utils
 from installed_clients.AbstractHandleClient import AbstractHandle
 from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
+from installed_clients.kb_SetUtilitiesClient import kb_SetUtilities
 from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.WorkspaceClient import Workspace as workspaceService
@@ -157,8 +158,8 @@ class BlastUtil:
         # do some basic checks
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-        if 'input_many_ref' not in params:
-            raise ValueError('input_many_ref parameter is required')
+        if 'input_many_refs' not in params:
+            raise ValueError('input_many_refs parameter is required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
         if 'genome_disp_name_config' not in params:
@@ -706,7 +707,8 @@ class BlastUtil:
             raise ValueError('Cannot yet handle input_many type of: '+target_type_name)
 
 
-        return ({ 'target_type_name': target_type_name,
+        return ({ 'target_name': input_many_name,
+                  'target_type_name': target_type_name,
                   'target_fasta_file_path': target_fasta_file_path,
                   'appropriate_sequence_found_in_many_input': appropriate_sequence_found_in_many_input,
                   'invalid_msgs': invalid_msgs,
@@ -716,7 +718,7 @@ class BlastUtil:
 
     # input data failed validation.  Need to return
     #
-    def save_error_report_with_invalid_msgs (self, invalid_msgs, input_one_ref, input_many_ref, method_name):
+    def save_error_report_with_invalid_msgs (self, invalid_msgs, input_one_ref, input_many_refs, method_name):
         console = []
 
         # build output report object
@@ -740,7 +742,7 @@ class BlastUtil:
                     'meta':{},
                     'hidden':1,
                     'provenance': self._instantiate_provenance(method_name = method_name,
-                                                               input_obj_refs = [input_one_ref, input_many_ref])
+                                                               input_obj_refs = [input_one_ref]+input_many_refs)
                 }
             ]
         })[0]
@@ -1059,12 +1061,16 @@ class BlastUtil:
                                 search_tool_name = None,
                                 params = None, 
                                 query_len = None, 
+                                target_ref = None,
+                                target_name = None,
                                 target_type_name = None,
                                 target_feature_info = None):
         console = []
         invalid_msgs = []
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
         method_name = search_tool_name+'_Search'
         (q_seq_type, t_seq_type) = self._set_BLAST_seq_types (search_tool_name)
+        output_featureSet_ref = None
         
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
@@ -1320,7 +1326,7 @@ class BlastUtil:
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
                     #fid = input_many_ref+self.genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
-                    genome_ref = params['input_many_ref']
+                    genome_ref = target_ref
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [genome_ref]
 
@@ -1383,13 +1389,14 @@ class BlastUtil:
                     #output_featureSet['element_ordering'].append(fid)
                     accept_fids[id_untrans] = True
                     #fid = input_many_ref+self.genome_id_feature_id_delim+id_untrans  # don't change fId for output FeatureSet
-                    ama_ref = params['input_many_ref']
+                    ama_ref = target_ref
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [ama_ref]
 
 
         # Upload results
         #
+        output_featureSet_ref = None
         if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
@@ -1427,17 +1434,21 @@ class BlastUtil:
             # we are now making FeatureSets with AMA feature
             #if target_type_name != 'AnnotatedMetagenomeAssembly':  
             if True:
+                output_featureSet_name = target_name+'-'+params['output_filtered_name']
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
                                     'type': 'KBaseCollections.FeatureSet',
                                     'data': output_featureSet,
-                                    'name': params['output_filtered_name'],
+                                    'name': output_featureSet_name,
                                     'meta': {},
                                     'provenance': self._instantiate_provenance (method_name=method_name,
-                                                                                input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
+                                                                                input_obj_refs=[params['input_one_ref'],target_ref])
                                 }]
                         })[0]
+                output_featureSet_ref = '/'.join([str(new_obj_info[WSID_I]),
+                                                  str(new_obj_info[OBJID_I]),
+                                                  str(new_obj_info[VERSION_I])])
 
         return {
             'accept_fids': accept_fids,
@@ -1445,7 +1456,8 @@ class BlastUtil:
             'seq_total': seq_total,
             'hit_order': hit_order,
             'hit_total': hit_total,
-            'hit_buf': hit_buf
+            'hit_buf': hit_buf,
+            'output_featureSet_ref': output_featureSet_ref
         }
 
 
@@ -1453,18 +1465,16 @@ class BlastUtil:
     #
     def _write_HTML_report(self,
                            search_tool_name = None,
-                           input_many_ref = None,
-                           target_type_name = None,
-                           target_feature_info = None,
+                           input_many_names = None,
+                           input_many_refs = None,
+                           targets_name = None,
+                           targets_type_name = None,
+                           targets_feature_info = None,
                            genome_disp_name_config = None,
-                           accept_fids = None,
-                           filtering_fields = None,
                            query_len = None,
-                           seq_total = None,
-                           hit_order = None,
-                           hit_total = None,
-                           hit_buf = None):
+                           all_parsed_BLAST_results = None):
         html_file_path = None
+        html_files = []
         console = []
         (q_seq_type, t_seq_type) = self._set_BLAST_seq_types (search_tool_name)
 
@@ -1488,185 +1498,203 @@ class BlastUtil:
         cellspacing = "2"
         border = "0"
 
-        # begin buffer and table header
-        html_report_lines = []
-        html_report_lines += ['<html>']
-        html_report_lines += ['<body bgcolor="white">']
-        html_report_lines += ['<table cellpadding='+cellpadding+' cellspacing = '+cellspacing+' border='+border+'>']
-        html_report_lines += ['<tr bgcolor="'+head_color+'">']
-        html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALIGNMENT COVERAGE'+'</font></td>']
-        html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENE ID'+'</font></td>']
-        html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
-        html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
-        html_report_lines += ['<td align=center style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'<nobr>Q_BEG-Q_END:</nobr> <nobr>H_BEG-H_END</nobr>'+'</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'MIS MATCH'+'</font></td>']
-        html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GAP OPEN'+'</font></td>']
-        html_report_lines += ['</tr>']
+        # build html page for each target 
+        for input_many_ref in input_many_refs:
+            
+            # set characteristics for this target
+            target_name = targets_name[input_many_ref]
+            target_type_name = targets_type_name[input_many_ref]
+            target_feature_info = targets_feature_info[input_many_ref]
+            
+            # get blast results for this target
+            accept_fids = all_parsed_BLAST_results[input_many_ref]['accept_fids']
+            filtering_fields = all_parsed_BLAST_results[input_many_ref]['filtering_fields']
+            seq_total = all_parsed_BLAST_results[input_many_ref]['seq_total']
+            hit_order = all_parsed_BLAST_results[input_many_ref]['hit_order']
+            hit_total = all_parsed_BLAST_results[input_many_ref]['hit_total']
+            hit_buf = all_parsed_BLAST_results[input_many_ref]['hit_buf']
+            
+            # begin buffer and table header
+            html_report_lines = []
+            html_report_lines += ['<html>']
+            html_report_lines += ['<body bgcolor="white">']
+            html_report_lines += ['<table cellpadding='+cellpadding+' cellspacing = '+cellspacing+' border='+border+'>']
+            html_report_lines += ['<tr bgcolor="'+head_color+'">']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALIGNMENT COVERAGE'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENE ID'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'FUNCTION'+'</font></td>']
+            html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GENOME'+'</font></td>']
+            html_report_lines += ['<td align=center style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'IDENT'+'%</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALN_LEN'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'E-VALUE'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'BIT SCORE'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'<nobr>Q_BEG-Q_END:</nobr> <nobr>H_BEG-H_END</nobr>'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'MIS MATCH'+'</font></td>']
+            html_report_lines += ['<td align=center  style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'GAP OPEN'+'</font></td>']
+            html_report_lines += ['</tr>']
 
-        for line in hit_buf:
-            line = line.strip()
-            if line == '' or line.startswith('#'):
-                continue
+            # add in hits
+            for line in hit_buf:
+                line = line.strip()
+                if line == '' or line.startswith('#'):
+                    continue
 
-            [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
+                [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
 
-            aln_len_calc = aln_len
-            if q_seq_type != t_seq_type:
-                aln_len_calc *= 3
-            aln_len_perc = round (100.0*float(aln_len_calc)/float(query_len), 1)
-            identity = str(round(float(identity), 1))
-            if identity == '100.0':  identity = '100'
+                aln_len_calc = aln_len
+                if q_seq_type != t_seq_type:
+                    aln_len_calc *= 3
+                aln_len_perc = round (100.0*float(aln_len_calc)/float(query_len), 1)
+                identity = str(round(float(identity), 1))
+                if identity == '100.0':  identity = '100'
 
-            #if target_type_name == 'SingleEndLibrary':
-            #    pass
-            #elif target_type_name == 'SequenceSet':
-            if target_type_name == 'SequenceSet':
-                pass
-            elif target_type_name == 'Genome' or \
-                 target_type_name == 'GenomeSet' or \
-                 target_type_name == 'FeatureSet' or \
-                 target_type_name == 'AnnotatedMetagenomeAssembly':
+                #if target_type_name == 'SingleEndLibrary':
+                #    pass
+                #elif target_type_name == 'SequenceSet':
+                if target_type_name == 'SequenceSet':
+                    pass
+                elif target_type_name == 'Genome' or \
+                     target_type_name == 'GenomeSet' or \
+                     target_type_name == 'FeatureSet' or \
+                     target_type_name == 'AnnotatedMetagenomeAssembly':
 
-                if target_type_name != 'Genome' and target_type_name != 'AnnotatedMetagenomeAssembly':
-                    [genome_ref, hit_fid] = hit_id.split(self.genome_id_feature_id_delim)
-                else:
-                    genome_ref = input_many_ref
-                    hit_fid = hit_id
-
-                # can't just use hit_fid because may have pipes translated and can't translate back
-                fid_lookup = None
-                for fid in list(target_feature_info['feature_id_to_function'][genome_ref].keys()):
-                    id_untrans = fid
-                    id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
-
-                    #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
-
-                    if id_untrans == hit_fid or id_trans == hit_fid:
-                        #self.log (console, "GOT ONE!")  # DEBUG
-                        if target_type_name == 'Genome' or target_type_name == 'AnnotatedMetagenomeAssembly':
-                            accept_id = fid
-                        elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
-                            accept_id = genome_ref+self.genome_id_feature_id_delim+fid
-                        if accept_id in accept_fids:
-                            row_color = accept_row_color
-                        else:
-                            row_color = reject_row_color
-                        fid_lookup = fid
-                        break
-                #self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
-                if fid_lookup == None:
-                    raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
-                elif fid_lookup not in target_feature_info['feature_id_to_function'][genome_ref]:
-                    raise ValueError ("unable to find function for fid: '"+str(fid_lookup))
-                fid_disp = re.sub (r"^.*\.([^\.]+)\.([^\.]+)$", r"\1.\2", fid_lookup)
-
-                func_disp = target_feature_info['feature_id_to_function'][genome_ref][fid_lookup]
-
-                # set genome_disp_name
-                if target_type_name == 'AnnotatedMetagenomeAssembly':
-                    genome_disp_name = target_feature_info['ama_ref_to_obj_name'][genome_ref]
-                else:
-                    genome_obj_name = target_feature_info['genome_ref_to_obj_name'][genome_ref]
-                    genome_sci_name = target_feature_info['genome_ref_to_sci_name'][genome_ref]
-                    [ws_id, obj_id, genome_obj_version] = genome_ref.split('/')
-                    genome_disp_name = ''
-                    if 'obj_name' in genome_disp_name_config:
-                        genome_disp_name += genome_obj_name
-                    if 'ver' in genome_disp_name_config:
-                        genome_disp_name += '.v'+str(genome_obj_version)
-                    if 'sci_name' in genome_disp_name_config:
-                        genome_disp_name += ': '+genome_sci_name
+                    if target_type_name != 'Genome' and target_type_name != 'AnnotatedMetagenomeAssembly':
+                        [genome_ref, hit_fid] = hit_id.split(self.genome_id_feature_id_delim)
                     else:
-                        genome_disp_name = genome_sci_name
+                        genome_ref = input_many_ref
+                        hit_fid = hit_id
 
-                #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+                    # can't just use hit_fid because may have pipes translated and can't translate back
+                    fid_lookup = None
+                    for fid in list(target_feature_info['feature_id_to_function'][genome_ref].keys()):
+                        id_untrans = fid
+                        id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
 
-                html_report_lines += ['<tr bgcolor="'+row_color+'">']
-                #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
-                # add overlap bar
+                        #self.log (console, "SCANNING FIDS.  HIT_FID: '"+str(hit_fid)+"' FID: '"+str(fid)+"' TRANS: '"+str(id_trans)+"'")  # DEBUG
 
-                # coverage graphic
-                html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
-                html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
-                full_len_pos = bar_width
-                aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
-                aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
-                cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
+                        if id_untrans == hit_fid or id_trans == hit_fid:
+                            #self.log (console, "GOT ONE!")  # DEBUG
+                            if target_type_name == 'Genome' or target_type_name == 'AnnotatedMetagenomeAssembly':
+                                accept_id = fid
+                            elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
+                                accept_id = genome_ref+self.genome_id_feature_id_delim+fid
+                            if accept_id in accept_fids:
+                                row_color = accept_row_color
+                            else:
+                                row_color = reject_row_color
+                            fid_lookup = fid
+                            break
+                    #self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
+                    if fid_lookup == None:
+                        raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
+                    elif fid_lookup not in target_feature_info['feature_id_to_function'][genome_ref]:
+                        raise ValueError ("unable to find function for fid: '"+str(fid_lookup))
+                    fid_disp = re.sub (r"^.*\.([^\.]+)\.([^\.]+)$", r"\1.\2", fid_lookup)
 
-                cell_color = ['','','']
-                cell_width = []
-                cell_width.append(aln_beg_pos)
-                cell_width.append(aln_end_pos-aln_beg_pos)
-                cell_width.append(bar_width-aln_end_pos)
+                    func_disp = target_feature_info['feature_id_to_function'][genome_ref][fid_lookup]
 
-                for row_i in range(3):
-                    html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
-                    unalign_color = row_color
-                    if row_i == 1:
-                        unalign_color = bar_line_color
-                    cell_color[0] = unalign_color
-                    cell_color[1] = bar_color
-                    cell_color[2] = unalign_color
+                    # set genome_disp_name
+                    if target_type_name == 'AnnotatedMetagenomeAssembly':
+                        genome_disp_name = target_feature_info['ama_ref_to_obj_name'][genome_ref]
+                    else:
+                        genome_obj_name = target_feature_info['genome_ref_to_obj_name'][genome_ref]
+                        genome_sci_name = target_feature_info['genome_ref_to_sci_name'][genome_ref]
+                        [ws_id, obj_id, genome_obj_version] = genome_ref.split('/')
+                        genome_disp_name = ''
+                        if 'obj_name' in genome_disp_name_config:
+                            genome_disp_name += genome_obj_name
+                        if 'ver' in genome_disp_name_config:
+                            genome_disp_name += '.v'+str(genome_obj_version)
+                        if 'sci_name' in genome_disp_name_config:
+                            genome_disp_name += ': '+genome_sci_name
+                        else:
+                            genome_disp_name = genome_sci_name
 
-                    for col_i in range(3):
-                        cell_pix_width = str(cell_width[col_i])
-                        cell_pix_color = cell_color[col_i]
-                        html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
+                    #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
+
+                    html_report_lines += ['<tr bgcolor="'+row_color+'">']
+                    #html_report_lines += ['<tr bgcolor="'+'white'+'">']  # DEBUG
+                    # add overlap bar
+
+                    # coverage graphic
+                    html_report_lines += ['<td valign=middle align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'">']
+                    html_report_lines += ['<table style="height:'+str(bar_height)+'px; width:'+str(bar_width)+'px" border=0 cellpadding=0 cellspacing=0>']
+                    full_len_pos = bar_width
+                    aln_beg_pos = int (float(bar_width) * float(int(q_beg)-1)/float(int(query_len)-1))
+                    aln_end_pos = int (float(bar_width) * float(int(q_end)-1)/float(int(query_len)-1))
+                    cell_pix_height = str(int(round(float(bar_height)/3.0, 0)))
+
+                    cell_color = ['','','']
+                    cell_width = []
+                    cell_width.append(aln_beg_pos)
+                    cell_width.append(aln_end_pos-aln_beg_pos)
+                    cell_width.append(bar_width-aln_end_pos)
+
+                    for row_i in range(3):
+                        html_report_lines += ['<tr style="height:'+cell_pix_height+'px">']
+                        unalign_color = row_color
+                        if row_i == 1:
+                            unalign_color = bar_line_color
+                        cell_color[0] = unalign_color
+                        cell_color[1] = bar_color
+                        cell_color[2] = unalign_color
+
+                        for col_i in range(3):
+                            cell_pix_width = str(cell_width[col_i])
+                            cell_pix_color = cell_color[col_i]
+                            html_report_lines += ['<td style="height:'+cell_pix_height+'px; width:'+cell_pix_width+'px" bgcolor="'+cell_pix_color+'"></td>']
+                        html_report_lines += ['</tr>']
+                    html_report_lines += ['</table>']
+                    html_report_lines += ['</td>']
+
+                    # add other cells
+                    # fid
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(fid_disp)+'</font></td>']
+                    # func
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
+                    # sci name
+                    html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_disp_name+'</font></td>']
+                    # ident
+                    if 'ident_thresh' in filtering_fields[hit_id]:
+                        this_cell_color = reject_cell_color
+                    else:
+                        this_cell_color = row_color
+                    html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
+                    # aln len
+                    if 'overlap_fraction' in filtering_fields[hit_id]:
+                        this_cell_color = reject_cell_color
+                    else:
+                        this_cell_color = row_color
+                    html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
+                    # evalue
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
+                    # bitscore
+                    if 'bitscore' in filtering_fields[hit_id]:
+                        this_cell_color = reject_cell_color
+                    else:
+                        this_cell_color = row_color
+                    html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
+                    # aln coords
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
+                    # mismatches
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
+                    # gaps
+                    html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
                     html_report_lines += ['</tr>']
-                html_report_lines += ['</table>']
-                html_report_lines += ['</td>']
 
-                # add other cells
-                # fid
-                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(fid_disp)+'</font></td>']
-                # func
-                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+func_disp+'</font></td>']
-                # sci name
-                html_report_lines += ['<td style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+genome_disp_name+'</font></td>']
-                # ident
-                if 'ident_thresh' in filtering_fields[hit_id]:
-                    this_cell_color = reject_cell_color
-                else:
-                    this_cell_color = row_color
-                html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(identity)+'%</font></td>']
-                # aln len
-                if 'overlap_fraction' in filtering_fields[hit_id]:
-                    this_cell_color = reject_cell_color
-                else:
-                    this_cell_color = row_color
-                html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(aln_len)+' ('+str(aln_len_perc)+'%)</font></td>']
-                # evalue
-                html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(e_value)+'</nobr></font></td>']
-                # bitscore
-                if 'bitscore' in filtering_fields[hit_id]:
-                    this_cell_color = reject_cell_color
-                else:
-                    this_cell_color = row_color
-                html_report_lines += ['<td align=center bgcolor="'+this_cell_color+'" style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(bit_score)+'</font></td>']
-                # aln coords
-                html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'><nobr>'+str(q_beg)+'-'+str(q_end)+':</nobr> <nobr>'+str(h_beg)+'-'+str(h_end)+'</nobr></font></td>']
-                # mismatches
-                html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(mismatches)+'</font></td>']
-                # gaps
-                html_report_lines += ['<td align=center style="border-right:solid 1px '+border_body_color+'; border-bottom:solid 1px '+border_body_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+str(gap_openings)+'</font></td>']
-                html_report_lines += ['</tr>']
+            html_report_lines += ['</table>']
+            html_report_lines += ['</body>']
+            html_report_lines += ['</html>']
 
-        html_report_lines += ['</table>']
-        html_report_lines += ['</body>']
-        html_report_lines += ['</html>']
-
-        # write html to file and upload
-        html_report_str = "\n".join(html_report_lines)
-        html_file = search_tool_name+'_Search.html'
-        (html_dir, html_path) = self._set_HTML_file_path (html_file)
-        with open (html_path, 'w') as html_handle:
-            html_handle.write(html_report_str)
-
-        return (html_dir, html_file)
+            # write html to file and upload
+            html_report_str = "\n".join(html_report_lines)
+            html_file = target_name+'-'+search_tool_name+'_Search.html'
+            (html_dir, html_path) = self._set_HTML_file_path (html_file)
+            with open (html_path, 'w') as html_handle:
+                html_handle.write(html_report_str)
+            html_files.append(html_file)
+            
+        return (html_dir, html_files)
 
 
     #### build output report
@@ -1674,20 +1702,14 @@ class BlastUtil:
     def build_BLAST_report (self, 
                             search_tool_name = None,
                             params = None,
-                            target_type_name = None,
-                            target_feature_info = None,
-                            base_bulk_save_info = None,
-                            extra_bulk_save_info = None,
+                            targets_name = None,
+                            targets_type_name = None,
+                            targets_feature_info = None,
+                            base_bulk_save_infos = None,
+                            extra_bulk_save_infos = None,
                             query_len = None,
-                            parsed_BLAST_results = None):
-
-        # pass args
-        accept_fids = parsed_BLAST_results['accept_fids']
-        filtering_fields = parsed_BLAST_results['filtering_fields']
-        seq_total = parsed_BLAST_results['seq_total']
-        hit_order = parsed_BLAST_results['hit_order']
-        hit_total = parsed_BLAST_results['hit_total']
-        hit_buf = parsed_BLAST_results['hit_buf']
+                            all_parsed_BLAST_results = None,
+                            objects_created = None):
 
         # init
         method_name = search_tool_name+'_Search'
@@ -1696,18 +1718,38 @@ class BlastUtil:
         report = ''
         self.log(console,"BUILDING REPORT")  # DEBUG
 
-        # text report
-        report += 'sequences in search db: '+str(seq_total)+"\n"
-        report += 'sequences in hit set: '+str(len(hit_order))+"\n"
-        report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
-        report += "\n"
-        for line in hit_buf:
-            report += line
-        self.log (console, report)
+        input_many_refs = params['input_many_refs']
 
+        # check output before proceeding
+        all_hit_total = 0
+        all_hit_order = []
+        for input_many_ref in input_many_refs:
+
+            target_name = targets_name[input_many_ref]
+            
+            # pass args
+            accept_fids = all_parsed_BLAST_results[input_many_ref]['accept_fids']
+            filtering_fields = all_parsed_BLAST_results[input_many_ref]['filtering_fields']
+            seq_total = all_parsed_BLAST_results[input_many_ref]['seq_total']
+            hit_order = all_parsed_BLAST_results[input_many_ref]['hit_order']
+            hit_total = all_parsed_BLAST_results[input_many_ref]['hit_total']
+            hit_buf   = all_parsed_BLAST_results[input_many_ref]['hit_buf']
+
+            all_hit_total += hit_total
+            all_hit_order.extend(hit_order)
+            
+            # text report
+            report += 'TARGET: '+target_name+"\n"
+            report += 'sequences in search db: '+str(seq_total)+"\n"
+            report += 'sequences in hit set: '+str(len(hit_order))+"\n"
+            report += 'sequences in accepted hit set: '+str(hit_total)+"\n"
+            report += "\n"
+            for line in hit_buf:
+                report += line
+            self.log (console, report)
 
         # don't waste time if no hits
-        if hit_total == 0 and len(hit_order) == 0:
+        if all_hit_total == 0 and len(all_hit_order) == 0:
             report += "No hits were found\n"
             reportObj = {
                 'objects_created':[],
@@ -1726,7 +1768,7 @@ class BlastUtil:
                             'meta':{},
                             'hidden':1,
                             'provenance':self._instantiate_provenance(method_name=method_name,
-                                                                      input_obj_refs=[params['input_one_ref'],params['input_many_ref']])
+                                                                      input_obj_refs=[params['input_one_ref']]+params['input_many_refs'])
                             }
                         ]
                     })[0]
@@ -1736,20 +1778,15 @@ class BlastUtil:
             
             return report_info
 
-
         # build html report
-        (html_dir, html_file_name) = self._write_HTML_report (search_tool_name = search_tool_name,
-                                                  input_many_ref = params['input_many_ref'],
-                                                  target_type_name = target_type_name,
-                                                  target_feature_info = target_feature_info,
-                                                  genome_disp_name_config = params['genome_disp_name_config'],
-                                                  accept_fids = accept_fids,
-                                                  filtering_fields = filtering_fields,
-                                                  query_len = query_len,
-                                                  seq_total = seq_total,
-                                                  hit_order = hit_order,
-                                                  hit_total = hit_total,
-                                                  hit_buf = hit_buf)
+        (html_dir, html_file_names) = self._write_HTML_report (search_tool_name = search_tool_name,
+                                                input_many_refs = params['input_many_refs'],
+                                                targets_name = targets_name,
+                                                targets_type_name = targets_type_name,
+                                                targets_feature_info = targets_feature_info,
+                                                genome_disp_name_config = params['genome_disp_name_config'],
+                                                query_len = query_len,
+                                                all_parsed_BLAST_results = all_parsed_BLAST_results)
 
         # upload html report
         dfu = DFUClient(self.callbackURL)
@@ -1781,33 +1818,41 @@ class BlastUtil:
 
         reportObj['direct_html_link_index'] = 0
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
-                                    'name': html_file_name,
+                                    'name': search_tool_name+'_results.html',
                                     'label': search_tool_name+' Results'}
         ]
-        reportObj['file_links'] = [{'shock_id': base_bulk_save_info['shock_id'],
-                                    'name': search_tool_name+'_Search-m'+'7'+'.txt',
-                                    'label': search_tool_name+' Results: m'+'7'}
-        ]
-        if extra_bulk_save_info != None:
-            extension = 'txt'
-            if params['output_extra_format'] == '5':
-                extension = 'xml'
-            elif params['output_extra_format'] == '8':
-                extension = 'asn1txt'
-            elif params['output_extra_format'] == '9':
-                extension = 'asn1bin'
-            elif params['output_extra_format'] == '10':
-                extension = 'csv'
-            elif params['output_extra_format'] == '11':
-                extension = 'asn1arc'
-            reportObj['file_links'].append({'shock_id': extra_bulk_save_info['shock_id'],
-                                            'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
-                                            'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
+        reportObj['file_links'] = []
+        for input_many_ref in input_many_refs:
+            base_bulk_save_info = base_bulk_save_infos[input_many_ref]
+            if input_many_ref in extra_bulk_save_infos:
+                extra_bulk_save_info = extra_bulk_save_infos[input_many_ref]
+            else:
+                extra_bulk_save_info = None
+                
+            reportObj['file_links'].append({'shock_id': base_bulk_save_info['shock_id'],
+                                            'name': search_tool_name+'_Search-m'+'7'+'.txt',
+                                            'label': search_tool_name+' Results: m'+'7'})
+
+            if extra_bulk_save_info != None:
+                extension = 'txt'
+                if params['output_extra_format'] == '5':
+                    extension = 'xml'
+                elif params['output_extra_format'] == '8':
+                    extension = 'asn1txt'
+                elif params['output_extra_format'] == '9':
+                    extension = 'asn1bin'
+                elif params['output_extra_format'] == '10':
+                    extension = 'csv'
+                elif params['output_extra_format'] == '11':
+                    extension = 'asn1arc'
+                reportObj['file_links'].append({'shock_id': extra_bulk_save_info['shock_id'],
+                                                'name': search_tool_name+'_Search-m'+str(params['output_extra_format'])+'.'+extension,
+                                                'label': search_tool_name+' Results: m'+str(params['output_extra_format'])})
                             
                             
         # complete report
-        reportObj['objects_created'].append({'ref':str(params['workspace_name'])+'/'+params['output_filtered_name'],'description':search_tool_name+' hits'})
-
+        reportObj['objects_created'] = objects_created
+        
         ##reportObj['message'] = report
 
         # save report object
@@ -1846,7 +1891,7 @@ class BlastUtil:
 
         # Get input obj refs
         #
-        input_many_ref = params['input_many_ref']
+        input_many_refs = params['input_many_refs']
 
         if 'input_one_sequence' in params \
                 and params['input_one_sequence'] != None \
@@ -1868,24 +1913,32 @@ class BlastUtil:
 
         # Write target obj to fasta file (can be Feature, SequenceSet, or FeatureSet)
         #
-        write_target_obj_to_file_result = self.write_target_obj_to_file (params, input_many_ref, t_seq_type)
-        target_type_name = write_target_obj_to_file_result['target_type_name']
-        target_fasta_file_path = write_target_obj_to_file_result['target_fasta_file_path']
-        appropriate_sequence_found_in_many_input = write_target_obj_to_file_result['appropriate_sequence_found_in_many_input']
-        invalid_msgs.extend(write_target_obj_to_file_result['invalid_msgs'])
+        targets_name = dict()
+        targets_type_name = dict()
+        targets_fasta_file_path = dict()
+        appropriate_sequence_found_in_many_inputs = dict()
+        targets_feature_info = dict()
+        for input_many_ref in input_many_refs:
+            write_target_obj_to_file_result = self.write_target_obj_to_file (params, input_many_ref, t_seq_type)
+            targets_name[input_many_ref] = write_target_obj_to_file_result['target_name']
+            targets_type_name[input_many_ref] = write_target_obj_to_file_result['target_type_name']
+            targets_fasta_file_path[input_many_ref] = write_target_obj_to_file_result['target_fasta_file_path']
+            appropriate_sequence_found_in_many_inputs[input_many_ref] = write_target_obj_to_file_result['appropriate_sequence_found_in_many_input']
+            invalid_msgs.extend(write_target_obj_to_file_result['invalid_msgs'])
 
-        target_feature_info = write_target_obj_to_file_result['target_feature_info']
+            targets_feature_info[input_many_ref] = write_target_obj_to_file_result['target_feature_info']
         
 
         # check for failed input file creation
         #
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no "+q_seq_type+" sequence found in '"+input_one_name+"'")
-        if not appropriate_sequence_found_in_many_input:
-            self.log(invalid_msgs,"no "+t_seq_type+" sequences found in '"+input_many_name+"'")
+        for input_many_ref in input_many_refs:
+            if not appropriate_sequence_found_in_many_inputs[input_many_ref]:
+                self.log(invalid_msgs,"no "+t_seq_type+" sequences found in '"+input_many_name+"'")
 
         if len(invalid_msgs) > 0:
-            error_report_info = self.save_error_report_with_invalid_msgs (invalid_msgs, input_one_ref, input_many_ref, method_name)
+            error_report_info = self.save_error_report_with_invalid_msgs (invalid_msgs, input_one_ref, input_many_refs, method_name)
             returnVal = { 'report_name': report_info['name'],
                           'report_ref': report_info['ref']
                       }        
@@ -1894,38 +1947,44 @@ class BlastUtil:
 
         #### FORMAT DB
         ##
-        if not self.format_BLAST_db (search_tool_name, target_fasta_file_path):
-            raise ValueError ("failed to format BLAST db")
+        for input_many_ref in input_many_refs:
+            if not self.format_BLAST_db (search_tool_name, targets_fasta_file_path[input_many_ref]):
+                raise ValueError ("failed to format BLAST db for "+input_many_ref)
             
 
         #### Run BLAST for base format
         ##
-        BLAST_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
-                                               query_fasta_file_path = query_fasta_file_path, 
-                                               target_fasta_file_path = target_fasta_file_path, 
-                                               e_value = str(params['e_value']),
-                                               maxaccepts = str(params['maxaccepts']),
-                                               BLAST_output_format_str = str(base_BLAST_output_format)
-        )
-        output_aln_file_path = BLAST_output_results['output_aln_file_path']
-        base_bulk_save_info = BLAST_output_results['bulk_save_info']
+        output_aln_file_paths = dict()
+        base_bulk_save_infos = dict()
+        for input_many_ref in input_many_refs:
+            BLAST_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
+                                                   query_fasta_file_path = query_fasta_file_path, 
+                                                   target_fasta_file_path = targets_fasta_file_path[input_many_ref], 
+                                                   e_value = str(params['e_value']),
+                                                   maxaccepts = str(params['maxaccepts']),
+                                                   BLAST_output_format_str = str(base_BLAST_output_format)
+            )
+            output_aln_file_paths[input_many_ref] = BLAST_output_results['output_aln_file_path']
+            base_bulk_save_infos[input_many_ref] = BLAST_output_results['bulk_save_info']
 
 
         #### Run BLAST for extra format
         ##
-        extra_bulk_save_info = None
-        if str(params.get('output_extra_format')) and str(params.get('output_extra_format')) != 'none':
+        output_extra_aln_file_paths = dict()
+        extra_bulk_save_infos = dict()
+        for input_many_ref in input_many_refs:
+            if str(params.get('output_extra_format')) and str(params.get('output_extra_format')) != 'none':
 
-            BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
-                                                       query_fasta_file_path = query_fasta_file_path, 
-                                                       target_fasta_file_path = target_fasta_file_path, 
-                                                       e_value = str(params['e_value']),
-                                                       maxaccepts = str(params['maxaccepts']),
-                                                       BLAST_output_format_str = str(params['output_extra_format'])
-            )
+                BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
+                                                             query_fasta_file_path = query_fasta_file_path, 
+                                                             target_fasta_file_path = targets_fasta_file_path[input_many_ref], 
+                                                             e_value = str(params['e_value']),
+                                                             maxaccepts = str(params['maxaccepts']),
+                                                             BLAST_output_format_str = str(params['output_extra_format'])
+                )
 
-            output_extra_aln_file_path = BLAST_extra_output_results['output_aln_file_path']
-            extra_bulk_save_info = BLAST_extra_output_results['bulk_save_info']
+                output_extra_aln_file_paths[input_many_ref] = BLAST_extra_output_results['output_aln_file_path']
+                extra_bulk_save_infos[input_many_ref] = BLAST_extra_output_results['bulk_save_info']
 
 
         # get query_len for filtering and reporting later
@@ -1935,25 +1994,58 @@ class BlastUtil:
 
         # Parse the BLAST tabular output and store ids to filter many set to make filtered object to save back to KBase
         #
-        parsed_BLAST_results = self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_path,
-                                                            search_tool_name = search_tool_name,
-                                                            params = params,
-                                                            query_len = query_len, 
-                                                            target_type_name = target_type_name,
-                                                            target_feature_info = target_feature_info)
+        all_parsed_BLAST_results = dict()
+        objects_created = []
+        output_featureSet_refs = []
+        for input_many_ref in input_many_refs:
+            this_parsed_BLAST_results = \
+                self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_paths[input_many_ref],
+                                             search_tool_name = search_tool_name,
+                                             params = params,
+                                             query_len = query_len,
+                                             target_ref = input_many_ref,
+                                             target_name = targets_name[input_many_ref],
+                                             target_type_name = targets_type_name[input_many_ref],
+                                             target_feature_info = targets_feature_info[input_many_ref])
 
+            all_parsed_BLAST_results[input_many_ref] = this_parsed_BLAST_results
+            if this_parsed_BLAST_results.get('output_featureSet_ref'):
+                objects_created.append({'ref':this_parsed_BLAST_results['output_featureSet_ref'],'description':targets_name[input_many_ref]+" "+search_tool_name+' hits'})
+                output_featureSet_refs.append(this_parsed_BLAST_results['output_featureSet_ref'])
 
+        # Merge FeatureSets into one output
+        if len(output_featureSet_refs) > 1:
+            self.log(console, "CREATING MERGED OUTPUT FEATURESET")
+            try:
+                SERVICE_VER = 'release'
+                set_util_Client = kb_SetUtilities(url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
+                #set_util_Client = kb_SetUtilities(url=self.serviceWizardURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
+            except:
+                raise ValueError("unable to instantiate kb_SetUtilities")
+            merge_featureSet_params = {'workspace_name': params['workspace_name'],
+                                       'input_refs': output_featureSet_refs,
+                                       'desc': 'Merged FeatureSets from '+search_tool_name+' Search',
+                                       'output_name': params['output_filtered_name']
+                                       }
+            merge_retVal = set_util_Client.KButil_Merge_FeatureSet_Collection(merge_featureSet_params)
+            merge_report_obj = self.wsClient.get_objects2({'objects':[{'ref':merge_retVal['report_ref']}]})['data'][0]['data']
+            merged_featureSet_ref = merge_report_obj['objects_created'][0]['ref']
+            objects_created.append({'ref': merged_featureSet_ref,'description':'ALL '+search_tool_name+' hits'})
+
+            
         # build output report object
         #
         if len(invalid_msgs) == 0:
             report_info = self.build_BLAST_report (search_tool_name = search_tool_name,
                                                    params = params,
-                                                   target_type_name = target_type_name,
-                                                   target_feature_info = target_feature_info,
-                                                   base_bulk_save_info = base_bulk_save_info,
-                                                   extra_bulk_save_info = extra_bulk_save_info,
+                                                   targets_name = targets_name,
+                                                   targets_type_name = targets_type_name,
+                                                   targets_feature_info = targets_feature_info,
+                                                   base_bulk_save_infos = base_bulk_save_infos,
+                                                   extra_bulk_save_infos = extra_bulk_save_infos,
                                                    query_len = query_len, 
-                                                   parsed_BLAST_results = parsed_BLAST_results)
+                                                   all_parsed_BLAST_results = all_parsed_BLAST_results,
+                                                   objects_created = objects_created)
         else:
             report_info = error_report_info
 

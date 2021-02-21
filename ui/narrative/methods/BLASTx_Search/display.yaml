@@ -43,11 +43,11 @@ parameters :
             Must enter either a query DNA sequence or an input query object. This is a data object with a single DNA (nucleotide) sequence to use as the search query. Data object is a SequenceSet with one nucleotide sequence.
         placeholder : |
             ...or select DNA Query Object
-    input_many_ref:
+    input_many_refs:
         ui-name : |
-            Search Target
+            Search Targets
         short-hint : |
-            KBase object with proteins to be searched. Objects may be FeatureSet, Genome, or GenomeSet.
+            KBase objects with proteins to be searched. Objects may be FeatureSet, Genome, GenomeSet, or Annotated Metagenome Assembly.
     genome_disp_name_config :
         ui-name : |
             Display genome as

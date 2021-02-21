@@ -1,3 +1,7 @@
+### Version 1.5.1
+__Changes__
+- allow multiple targets as input
+
 ### Version 1.5.0
 __Changes__
 - updated BLAST to 2.11.0
