@@ -1695,7 +1695,7 @@ class BlastUtil:
             html_report_str = "\n".join(html_report_lines)
             html_file = target_name+'-'+search_tool_name+'_Search.html'
             if not html_dir:
-                html_dir = self._set_HTML_dir()
+                html_dir = self._set_HTML_outdir()
             html_path = self._set_HTML_file_path (html_dir, html_file)
             with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
