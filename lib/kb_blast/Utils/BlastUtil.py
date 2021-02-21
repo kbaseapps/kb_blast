@@ -902,21 +902,25 @@ class BlastUtil:
         #output_filtered_fasta_file_path = os.path.join(output_dir, 'output_filtered.fna');  # only for SingleEndLibrary
 
 
-    # _set_HTML_file_path()
+    # _set_HTML_outdir()
     #
-    def _set_HTML_file_path (self, html_file):
-        html_file_path = None
+    def _set_HTML_outdir (self):
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
         output_dir = os.path.join(self.scratch,'output.'+str(timestamp))
-        html_output_dir = os.path.join(self.scratch,'output.'+str(timestamp),'html')
+        html_output_dir = os.path.join(output_dir,'html')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         if not os.path.exists(html_output_dir):
             os.makedirs(html_output_dir)
 
-        html_file_path = os.path.join (html_output_dir, html_file)
+        return (html_output_dir)
 
-        return (html_output_dir, html_file_path)
+
+    # _set_HTML_file_path()
+    #
+    def _set_HTML_file_path (self, html_output_dir, html_file):
+        html_file_path = os.path.join (html_output_dir, html_file)
+        return (html_file_path)
 
 
     # _build_BLAST_cmd()
@@ -1473,6 +1477,7 @@ class BlastUtil:
                            genome_disp_name_config = None,
                            query_len = None,
                            all_parsed_BLAST_results = None):
+        html_dir = None
         html_file_path = None
         html_files = []
         console = []
@@ -1689,7 +1694,9 @@ class BlastUtil:
             # write html to file and upload
             html_report_str = "\n".join(html_report_lines)
             html_file = target_name+'-'+search_tool_name+'_Search.html'
-            (html_dir, html_path) = self._set_HTML_file_path (html_file)
+            if not html_dir:
+                html_dir = self._set_HTML_dir()
+            html_path = self._set_HTML_file_path (html_dir, html_file)
             with open (html_path, 'w') as html_handle:
                 html_handle.write(html_report_str)
             html_files.append(html_file)
@@ -1819,7 +1826,7 @@ class BlastUtil:
         reportObj['direct_html_link_index'] = 0
         reportObj['html_links'] = [{'shock_id': html_upload_ret['shock_id'],
                                     #'name': search_tool_name+'_results.html',
-                                    'name': search_tool_name+'_html_results'+'.zip',
+                                    'name': html_file_names[0],
                                     'label': search_tool_name+' Results'}
         ]
         reportObj['file_links'] = []
