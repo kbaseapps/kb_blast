@@ -28,7 +28,7 @@ module kb_blast {
         workspace_name workspace_name;
 	sequence       input_one_sequence;
 	data_obj_ref   input_one_ref;
-	data_obj_ref   input_many_ref;
+	data_obj_ref   input_many_refs;
 	data_obj_ref   input_msa_ref;  /* for psiBLAST_msa_start */
         data_obj_name  output_filtered_name;
 	string         genome_disp_name_config;

@@ -47,9 +47,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.5.0"
-    GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "32a1bb326a2a92463136a7f9ad5e9daf3b7acaa2"
+    VERSION = "1.5.1"
+    GIT_URL = "https://github.com/dcchivian/kb_blast"
+    GIT_COMMIT_HASH = "e157d3e6796c067634ab4838a51715d0bcbbe74f"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -127,14 +127,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -166,14 +167,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -205,14 +207,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -244,14 +247,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -283,14 +287,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -322,14 +327,15 @@ class kb_blast:
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_one_sequence" of type "sequence", parameter
-           "input_one_ref" of type "data_obj_ref", parameter "input_many_ref"
-           of type "data_obj_ref", parameter "input_msa_ref" of type
-           "data_obj_ref", parameter "output_filtered_name" of type
-           "data_obj_name", parameter "ident_thresh" of Double, parameter
-           "e_value" of Double, parameter "bitscore" of Double, parameter
-           "overlap_fraction" of Double, parameter "maxaccepts" of Double,
-           parameter "output_extra_format" of String, parameter "rounds" of
-           Double
+           "input_one_ref" of type "data_obj_ref", parameter
+           "input_many_refs" of type "data_obj_ref", parameter
+           "input_msa_ref" of type "data_obj_ref", parameter
+           "output_filtered_name" of type "data_obj_name", parameter
+           "genome_disp_name_config" of String, parameter "ident_thresh" of
+           Double, parameter "e_value" of Double, parameter "bitscore" of
+           Double, parameter "overlap_fraction" of Double, parameter
+           "maxaccepts" of Double, parameter "output_extra_format" of String,
+           parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
