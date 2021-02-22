@@ -1543,6 +1543,7 @@ class BlastUtil:
             html_report_lines += ['<html>']
             html_report_lines += ['<body bgcolor="white">']
             html_report_lines += self._add_html_tabs (search_tool_name, targets_name, input_many_refs, input_many_ref)
+            html_report_lines += ['<p>']
 
             html_report_lines += ['<table cellpadding='+cellpadding+' cellspacing = '+cellspacing+' border='+border+'>']
             html_report_lines += ['<tr bgcolor="'+head_color+'">']
