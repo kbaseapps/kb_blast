@@ -1474,7 +1474,7 @@ class BlastUtil:
     def _add_html_tabs (self, search_tool_name, targets_name, input_many_refs, input_many_ref):
         html_tabs = []
         for this_input_ref in input_many_refs:
-            this_target_name = targets_name[input_many_ref]
+            this_target_name = targets_name[this_input_ref]
             if this_input_ref == input_many_ref:
                 html_tabs += [' <b>'+this_target_name+'</b> ' ]
             else:
