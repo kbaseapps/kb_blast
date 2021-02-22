@@ -1464,6 +1464,25 @@ class BlastUtil:
             'output_featureSet_ref': output_featureSet_ref
         }
 
+    # _get_html_file_name
+    #
+    def _get_html_file_name(self, this_target_name, search_tool_name):
+        return this_target_name+'-'+search_tool_name+'_Search.html'
+    
+    # _add_html_tabs()
+    #
+    def _add_html_tabs (self, search_tool_name, targets_name, input_many_refs, input_many_ref):
+        html_tabs = []
+        for this_input_ref in input_many_refs:
+            this_target_name = targets_name[input_many_ref]
+            if this_input_ref == input_many_ref:
+                html_tabs += [' <b>'+this_target_name+'</b> ' ]
+            else:
+                html_file_name = self._get_html_file_name(this_target_name, search_tool_name)
+                html_tabs += [' <a href="'+html_file_name+'">'+this_target_name+'</a> ']
+        
+        return [" | ".join(html_tabs)]
+    
 
     # _write_HTML_report()
     #
@@ -1523,6 +1542,8 @@ class BlastUtil:
             html_report_lines = []
             html_report_lines += ['<html>']
             html_report_lines += ['<body bgcolor="white">']
+            html_report_lines += self._add_html_tabs (search_tool_name, targets_name, input_many_refs, input_many_ref)
+
             html_report_lines += ['<table cellpadding='+cellpadding+' cellspacing = '+cellspacing+' border='+border+'>']
             html_report_lines += ['<tr bgcolor="'+head_color+'">']
             html_report_lines += ['<td style="border-right:solid 2px '+border_head_color+'; border-bottom:solid 2px '+border_head_color+'"><font color="'+text_color+'" size='+text_fontsize+'>'+'ALIGNMENT COVERAGE'+'</font></td>']
@@ -1693,7 +1714,7 @@ class BlastUtil:
 
             # write html to file and upload
             html_report_str = "\n".join(html_report_lines)
-            html_file = target_name+'-'+search_tool_name+'_Search.html'
+            html_file = self._get_html_file_name(target_name, search_tool_name)
             if not html_dir:
                 html_dir = self._set_HTML_outdir()
             html_path = self._set_HTML_file_path (html_dir, html_file)
