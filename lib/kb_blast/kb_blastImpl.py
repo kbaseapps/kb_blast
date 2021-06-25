@@ -48,8 +48,8 @@ class kb_blast:
     # the latter method is running.
     ######################################### noqa
     VERSION = "1.5.1"
-    GIT_URL = "https://github.com/dcchivian/kb_blast"
-    GIT_COMMIT_HASH = "e157d3e6796c067634ab4838a51715d0bcbbe74f"
+    GIT_URL = "https://github.com/kbaseapps/kb_blast"
+    GIT_COMMIT_HASH = "17d7565626f0abcba536cf02f4f0b037ffcce761"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
