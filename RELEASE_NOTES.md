@@ -1,3 +1,7 @@
+### Version 1.5.2
+__Changes__
+- tidied up App Docs
+
 ### Version 1.5.1
 __Changes__
 - allow multiple targets as input
