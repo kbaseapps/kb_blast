@@ -89,13 +89,13 @@ parameters :
             Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-  <p>This method performs a protein-protein (protein sequence alignment) BLASTp Search using NCBI's BLAST+ (version 2.10.1).</p>
+  <p>This method performs a protein-protein (protein sequence alignment) BLASTp Search using NCBI's BLAST+ (version 2.11.0).</p>
 
-  <p>BLASTp is a protein sequence search against a protein sequence database. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, or a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
+  <p>BLASTp is a protein sequence search against a protein sequence database. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, the genes in an Annotated Metagenome Assembly, or the features in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 
   <p>All output formats respect the e-value cutoff threshold. The on-screen table and downloadable files give the user the opportunity to examine the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the proteins that fail to pass one or more of these three thresholds will appear in a gray line with the specific threshold that was not met highlighted in red. The downloadable files give users the most flexibility for exploring alternative thresholds. All hits that are below the e-value threshold are included in the downloadable text files and users can examine all of the cutoffs without having to rerun the App. Several NCBI BLAST formats are supported in the downloadable files (discussed below under “Extra Text Output”).</p>
 
-  <p>KBase does not have a database equivalent of NR. Large GenomeSets for searching can be created through the insertion of genomes into a species tree, annotation of an AssemblySet, or adding to and/or merging GenomeSets. Several Apps are available to support these set operations.</p>
+  <p>At this time, KBase does not have a database equivalent of the NCBI's NR. Large GenomeSets for searching can be created through the insertion of genomes into a species tree, annotation of an AssemblySet, or adding to and/or merging GenomeSets. Several Apps are available to support these set operations.</p>
 
   <p>Your input must provide either a query protein sequence or an input query object, and it must contain a <b>single</b> protein amino acid sequence. At this time, KBase does not support multiple query protein sequences. The query can be in the form of a SequenceSet object (likely saved by a previous run of BLASTp) or a single amino acid sequence. A nucleotide sequence may produce output (given that ACGT are all viable amino acid characters), but more than likely it will produce an error message.</p>
 
@@ -104,7 +104,7 @@ description : |
 
   <p><b><i>Query Protein Sequence:</i></b> If you don't provide an input query object, you must copy-and-paste in a query protein sequence. The format can be with or without a Fasta header line. If this query protein sequence is used, you must also supply an output name for the single-element SequenceSet object that will be saved. The resulting SequenceSet can then be used in subsequent BLASTp runs.</p>
 
-  <p><b><i>Search Database:</i></b> The search database must be an object in your Narrative containing protein sequences. It may be a FeatureSet of genes, a Genome, or a GenomeSet. The App will automatically generate a database from the narrative object for BLASTp.</p>
+  <p><b><i>Search Targets:</i></b> The search database must be an object in your Narrative containing protein sequences. It may be a FeatureSet of genes, a Genome or a GenomeSet, or an Annotated Metagenome Assembly. More than one object may be added to the Search Targets. The App will automatically generate a database from the narrative objects for BLASTp.</p>
 
   <p><h3>Parameters:</h3></p>
   <p><b><i>E-value:</i></b> This sets the maximal e-value threshold for the reported search  hits. Hits with e-values above this threshold do not get reported in any of the output formats, i.e.,  the on-screen table, the text downloads, or the saved FeatureSet.</p>
@@ -139,11 +139,11 @@ description : |
 
   <p><b><i>Output HTML Table:</i></b> The on-screen table includes all the BLAST hits that meet the e-value cutoff threshold. It includes several columns commonly found in BLAST outputs and includes a graphic with the region of the query covered by the BLAST alignment. The table gives users the opportunity to explore the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the hits that exceed these thresholds are included but appear in a gray line with the threshold that was not met highlighted in red. This gives users the opportunity to refine their thresholds, rerun the App, and recreate the output FeatureSet.</p>
 
-  <p><b><i>Downloadable files:</i></b> The downloadable files include all the BLAST hits that meet the e-value cutoff threshold. This gives the user the opportunity to explore the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). After download, the thresholds can be explored without rerunning the App. By default, the BLAST output is automatically available for download in a tab-delimited (m=7) format. Up to one additional format can be selected. The additional formats are found in the advanced parameters as ‘Extra Text Output Format’. These formats are not altered from the direct output from the BLAST run.</p>
+  <p><b><i>Downloadable files:</i></b> The downloadable files include all the BLAST hits that meet the e-value cutoff threshold. This gives the user the opportunity to explore the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). After download, the thresholds can be explored without rerunning the App. By default, the BLAST output is automatically available for download in a tab-delimited (m=7, formerly m=8) format. Up to one additional format can be selected. The additional formats are found in the advanced parameters as ‘Extra Text Output Format’. These formats are not altered from the direct output from the BLAST run.</p>
 
   <p><b><i>Output Query Object:</i></b> If the query protein sequence was used above, it will be saved as SequenceSet object with a single amino acid sequence. You must supply a name for this new object.</p>
 
-  <p><strong>Team members who implemented App in KBase:</strong>Dylan Chivian. For questions, please <a href=”http://kbase.us/contact-us/”>contact us</a>.</p>
+  <p><strong>Team members who implemented App in KBase:</strong> <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a>. For questions, please <a href=”http://kbase.us/support/”>contact us</a>.</p>
 
 publications :
     -
