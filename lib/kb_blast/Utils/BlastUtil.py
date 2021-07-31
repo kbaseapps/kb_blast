@@ -651,6 +651,28 @@ class BlastUtil:
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 target_feature_info['genome_id_to_genome_ref'][genome_id] = genome_ref
 
+            """
+            # DEBUG
+            #line_limit = 1000
+            #line_cnt = 0
+            target_gene_ids = ['AWN69_RS07145', 'DVMF_RS00005', 'A6701_RS00005']
+            in_target_gene = False
+            with open (target_fasta_file_path, 'r') as fasta_handle:
+                for fasta_line in fasta_handle.readlines():
+                    #line_cnt += 1
+                    #if line_cnt > line_limit:
+                    #    break
+                    if fasta_line.startswith('>'):
+                        in_target_gene = False
+                        for gene_id in target_gene_ids:
+                            if gene_id in fasta_line:
+                                in_target_gene = True
+                                print ("FASTA_LINE: '"+fasta_line)
+                    elif in_target_gene:
+                        print ("FASTA_LINE: '"+fasta_line)
+            #sys.exit(0)
+            """
+                    
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
@@ -1064,7 +1086,8 @@ class BlastUtil:
                                 output_aln_file_path = None, 
                                 search_tool_name = None,
                                 params = None, 
-                                query_len = None, 
+                                query_len = None,
+                                num_targets = 1,
                                 target_ref = None,
                                 target_name = None,
                                 target_type_name = None,
@@ -1438,7 +1461,10 @@ class BlastUtil:
             # we are now making FeatureSets with AMA feature
             #if target_type_name != 'AnnotatedMetagenomeAssembly':  
             if True:
-                output_featureSet_name = target_name+'-'+params['output_filtered_name']
+                if num_targets == 1:
+                    output_featureSet_name = params['output_filtered_name']
+                else:
+                    output_featureSet_name = params['output_filtered_name']+'-'+target_name
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
@@ -1882,6 +1908,7 @@ class BlastUtil:
                             
                             
         # complete report
+        objects_created.reverse()  # want merged featureset at position 0
         reportObj['objects_created'] = objects_created
         
         ##reportObj['message'] = report
@@ -2028,12 +2055,14 @@ class BlastUtil:
         all_parsed_BLAST_results = dict()
         objects_created = []
         output_featureSet_refs = []
+        num_targets = len(input_many_refs)
         for input_many_ref in input_many_refs:
             this_parsed_BLAST_results = \
                 self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_paths[input_many_ref],
                                              search_tool_name = search_tool_name,
                                              params = params,
                                              query_len = query_len,
+                                             num_targets = num_targets,
                                              target_ref = input_many_ref,
                                              target_name = targets_name[input_many_ref],
                                              target_type_name = targets_type_name[input_many_ref],

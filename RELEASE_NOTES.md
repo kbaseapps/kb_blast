@@ -1,3 +1,9 @@
+### Version 1.6.0
+__Changes__
+- updated BLAST to 2.12.0
+- tidied up output FeatureSet obj names
+- made all test data be uploaded
+
 ### Version 1.5.2
 __Changes__
 - tidied up App Docs
