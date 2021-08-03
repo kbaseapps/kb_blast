@@ -1655,13 +1655,16 @@ class BlastUtil:
                         [ws_id, obj_id, genome_obj_version] = genome_ref.split('/')
                         genome_disp_name = ''
                         if 'obj_name' in genome_disp_name_config:
-                            genome_disp_name += genome_obj_name
+                            genome_disp_name = genome_obj_name
                         if 'ver' in genome_disp_name_config:
                             genome_disp_name += '.v'+str(genome_obj_version)
                         if 'sci_name' in genome_disp_name_config:
-                            genome_disp_name += ': '+genome_sci_name
-                        else:
-                            genome_disp_name = genome_sci_name
+                            if genome_disp_name != '':
+                                genome_disp_name += ': '+genome_sci_name
+                            else:
+                                genome_disp_name = genome_sci_name
+                        if genome_disp_name == '':
+                            genome_disp_name = genome_obj_name
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
