@@ -653,7 +653,7 @@ class BlastUtil:
 
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "GenomeSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # AnnotatedMetagenomeAssembly
@@ -1064,7 +1064,8 @@ class BlastUtil:
                                 output_aln_file_path = None, 
                                 search_tool_name = None,
                                 params = None, 
-                                query_len = None, 
+                                query_len = None,
+                                num_targets = 1,
                                 target_ref = None,
                                 target_name = None,
                                 target_type_name = None,
@@ -1404,41 +1405,12 @@ class BlastUtil:
         if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-            """
-            # input many SingleEndLibrary -> upload SingleEndLibrary
-            #
-            if target_type_name == 'SingleEndLibrary':
-            
-                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
-                                                          console,  # DEBUG
-                                                          params['workspace_name'],
-                                                          params['output_filtered_name'],
-                                                          output_filtered_fasta_file_path,
-                                                          provenance,
-                                                          sequencing_tech
-                                                         )
-
-            # input many SequenceSet -> save SequenceSet
-            #
-            elif target_type_name == 'SequenceSet':
-                new_obj_info = wsClient.save_objects({
-                            'workspace': params['workspace_name'],
-                            'objects':[{
-                                    'type': 'KBaseSequences.SequenceSet',
-                                    'data': output_sequenceSet,
-                                    'name': params['output_filtered_name'],
-                                    'meta': {},
-                                    'provenance': provenance
-                                }]
-                        })[0]
-
-            else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-            """
-
             # we are now making FeatureSets with AMA feature
-            #if target_type_name != 'AnnotatedMetagenomeAssembly':  
-            if True:
-                output_featureSet_name = target_name+'-'+params['output_filtered_name']
+            if target_type_name != 'SingleEndLibrary' and target_type_name != 'SequenceSet':  
+                if num_targets == 1:
+                    output_featureSet_name = params['output_filtered_name']
+                else:
+                    output_featureSet_name = params['output_filtered_name']+'-'+target_name
                 new_obj_info = self.wsClient.save_objects({
                             'workspace': params['workspace_name'],
                             'objects':[{
@@ -1453,7 +1425,9 @@ class BlastUtil:
                 output_featureSet_ref = '/'.join([str(new_obj_info[WSID_I]),
                                                   str(new_obj_info[OBJID_I]),
                                                   str(new_obj_info[VERSION_I])])
-
+            else:
+                raise ValueError ("Not currently supporting SingleEndLibrary nor SequenceSet as target type")
+                
         return {
             'accept_fids': accept_fids,
             'filtering_fields': filtering_fields,
@@ -1629,13 +1603,16 @@ class BlastUtil:
                         [ws_id, obj_id, genome_obj_version] = genome_ref.split('/')
                         genome_disp_name = ''
                         if 'obj_name' in genome_disp_name_config:
-                            genome_disp_name += genome_obj_name
+                            genome_disp_name = genome_obj_name
                         if 'ver' in genome_disp_name_config:
                             genome_disp_name += '.v'+str(genome_obj_version)
                         if 'sci_name' in genome_disp_name_config:
-                            genome_disp_name += ': '+genome_sci_name
-                        else:
-                            genome_disp_name = genome_sci_name
+                            if genome_disp_name != '':
+                                genome_disp_name += ': '+genome_sci_name
+                            else:
+                                genome_disp_name = genome_sci_name
+                        if genome_disp_name == '':
+                            genome_disp_name = genome_obj_name
 
                     #if 'overlap_fraction' in params and float(params['overlap_fraction']) > float(high_bitscore_alnlen[hit_seq_id])/float(query_len):
 
@@ -1882,6 +1859,7 @@ class BlastUtil:
                             
                             
         # complete report
+        objects_created.reverse()  # want merged featureset at position 0
         reportObj['objects_created'] = objects_created
         
         ##reportObj['message'] = report
@@ -2028,12 +2006,14 @@ class BlastUtil:
         all_parsed_BLAST_results = dict()
         objects_created = []
         output_featureSet_refs = []
+        num_targets = len(input_many_refs)
         for input_many_ref in input_many_refs:
             this_parsed_BLAST_results = \
                 self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_paths[input_many_ref],
                                              search_tool_name = search_tool_name,
                                              params = params,
                                              query_len = query_len,
+                                             num_targets = num_targets,
                                              target_ref = input_many_ref,
                                              target_name = targets_name[input_many_ref],
                                              target_type_name = targets_type_name[input_many_ref],
