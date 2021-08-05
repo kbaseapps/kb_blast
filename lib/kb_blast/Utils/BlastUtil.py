@@ -651,31 +651,9 @@ class BlastUtil:
                 genome_ref = input_many_genomeSet['elements'][genome_id]['ref']
                 target_feature_info['genome_id_to_genome_ref'][genome_id] = genome_ref
 
-            """
-            # DEBUG
-            #line_limit = 1000
-            #line_cnt = 0
-            target_gene_ids = ['AWN69_RS07145', 'DVMF_RS00005', 'A6701_RS00005']
-            in_target_gene = False
-            with open (target_fasta_file_path, 'r') as fasta_handle:
-                for fasta_line in fasta_handle.readlines():
-                    #line_cnt += 1
-                    #if line_cnt > line_limit:
-                    #    break
-                    if fasta_line.startswith('>'):
-                        in_target_gene = False
-                        for gene_id in target_gene_ids:
-                            if gene_id in fasta_line:
-                                in_target_gene = True
-                                print ("FASTA_LINE: '"+fasta_line)
-                    elif in_target_gene:
-                        print ("FASTA_LINE: '"+fasta_line)
-            #sys.exit(0)
-            """
-                    
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
-            #self.log(console, "FeatureSetToFasta() took "+str(end_time-beg_time)+" secs")
+            #self.log(console, "GenomeSetToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # AnnotatedMetagenomeAssembly
@@ -1427,40 +1405,8 @@ class BlastUtil:
         if len(invalid_msgs) == 0 and len(list(hit_seq_ids.keys())) > 0:
             self.log(console,"UPLOADING RESULTS")  # DEBUG
 
-            """
-            # input many SingleEndLibrary -> upload SingleEndLibrary
-            #
-            if target_type_name == 'SingleEndLibrary':
-            
-                self.upload_SingleEndLibrary_to_shock_and_ws (ctx,
-                                                          console,  # DEBUG
-                                                          params['workspace_name'],
-                                                          params['output_filtered_name'],
-                                                          output_filtered_fasta_file_path,
-                                                          provenance,
-                                                          sequencing_tech
-                                                         )
-
-            # input many SequenceSet -> save SequenceSet
-            #
-            elif target_type_name == 'SequenceSet':
-                new_obj_info = wsClient.save_objects({
-                            'workspace': params['workspace_name'],
-                            'objects':[{
-                                    'type': 'KBaseSequences.SequenceSet',
-                                    'data': output_sequenceSet,
-                                    'name': params['output_filtered_name'],
-                                    'meta': {},
-                                    'provenance': provenance
-                                }]
-                        })[0]
-
-            else:  # input many FeatureSet, Genome, and GenomeSet -> upload FeatureSet output
-            """
-
             # we are now making FeatureSets with AMA feature
-            #if target_type_name != 'AnnotatedMetagenomeAssembly':  
-            if True:
+            if target_type_name != 'SingleEndLibrary' and target_type_name != 'SequenceSet':  
                 if num_targets == 1:
                     output_featureSet_name = params['output_filtered_name']
                 else:
@@ -1479,7 +1425,9 @@ class BlastUtil:
                 output_featureSet_ref = '/'.join([str(new_obj_info[WSID_I]),
                                                   str(new_obj_info[OBJID_I]),
                                                   str(new_obj_info[VERSION_I])])
-
+            else:
+                raise ValueError ("Not currently supporting SingleEndLibrary nor SequenceSet as target type")
+                
         return {
             'accept_fids': accept_fids,
             'filtering_fields': filtering_fields,

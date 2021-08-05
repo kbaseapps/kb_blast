@@ -10,10 +10,6 @@ MAINTAINER KBase Developer
 
 ENV BLAST_VERSION='2.12.0+'
 
-COPY ./ /kb/module
-RUN mkdir -p /kb/module/work
-RUN chmod -R a+rw /kb/module
-
 WORKDIR /kb/module
 RUN \
   curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz > ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz && \
@@ -36,8 +32,11 @@ RUN \
   rm -f blast/bin/update_blastdb.pl && \
   rm -f blast/bin/windowmasker
 
+COPY ./ /kb/module
+RUN mkdir -p /kb/module/work && \
+  chmod -R a+rw /kb/module && \
+  make all
 
-RUN make all
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
 CMD [ ]
