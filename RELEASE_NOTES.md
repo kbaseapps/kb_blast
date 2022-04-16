@@ -1,3 +1,7 @@
+### Version 1.7.0
+__Changes__
+- updated BLAST to 2.13.0
+
 ### Version 1.6.0
 __Changes__
 - updated BLAST to 2.12.0
