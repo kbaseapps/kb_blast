@@ -209,7 +209,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
-    def test_kb_blast_BLASTn_Search_01(self):
+    def test_kb_blast_BLASTn_Search_01_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTn'
@@ -259,8 +259,8 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTn: GenomeSet target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
-    def test_kb_blast_BLASTn_Search_01(self):
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01_GenomeSet")
+    def test_kb_blast_BLASTn_Search_02_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTn'
@@ -360,7 +360,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
-    def test_kb_blast_BLASTp_Search_01_Genome(self):
+    def test_kb_blast_BLASTp_Search_03_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTp_Genome'
@@ -411,7 +411,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_02_GenomeSet")
-    def test_kb_blast_BLASTp_Search_02_GenomeSet(self):
+    def test_kb_blast_BLASTp_Search_04_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
         obj_basename = 'BLASTp_GenomeSet'
@@ -502,7 +502,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_FeatureSet")
-    def test_kb_blast_BLASTp_Search_03_FeatureSet(self):
+    def test_kb_blast_BLASTp_Search_05_FeatureSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
         obj_basename = 'BLASTp_FeatureSet'
@@ -605,7 +605,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly")
-    def test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly(self):
+    def test_kb_blast_BLASTp_Search_06_AnnotatedMetagenomeAssembly(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTp_AnnotatedMetagenomeAssembly'
@@ -657,7 +657,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_MultipleTargets")
-    def test_kb_blast_BLASTp_Search_05_MultipleTargets(self):
+    def test_kb_blast_BLASTp_Search_07_MultipleTargets(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTp_MultipleTargets'
@@ -758,7 +758,7 @@ class kb_blastTest(unittest.TestCase):
     #
     # Uncomment to skip this test
     # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
-    def test_kb_blast_BLASTx_Search_01(self):
+    def test_kb_blast_BLASTx_Search_08_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTx'

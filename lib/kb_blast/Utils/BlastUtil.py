@@ -334,6 +334,7 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -343,6 +344,7 @@ class BlastUtil:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            query_short_id_to_rec_id = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
@@ -547,6 +549,7 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -556,6 +559,7 @@ class BlastUtil:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_ref'] = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
             if len(list(target_feature_info['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -587,7 +591,8 @@ class BlastUtil:
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
-                'linewrap':            50
+                'linewrap':            50,
+                'id_len_limit':        49
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
@@ -596,6 +601,7 @@ class BlastUtil:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
             target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = GenomeToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = GenomeToFASTA_retVal['feature_ids']
             if len(target_feature_info['feature_ids']) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -630,6 +636,7 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -639,6 +646,7 @@ class BlastUtil:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            target_feature_info['short_id_to_rec_id'] = GenomeSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_id'] = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
             if len(list(target_feature_info['feature_ids_by_genome_id'].keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -675,7 +683,8 @@ class BlastUtil:
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
-                'linewrap':            50
+                'linewrap':            50,
+                'id_len_limit':        49
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
@@ -684,6 +693,7 @@ class BlastUtil:
             DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
             AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
             target_fasta_file_path = AnnotatedMetagenomeAssemblyToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_ids']
             if len(target_feature_info['feature_ids']) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -1110,7 +1120,13 @@ class BlastUtil:
                 continue
             header_done = True
             hit_info = line.split("\t")
-            hit_seq_id     = hit_info[1]
+            sh_hit_seq_id  = hit_info[1]
+            try:
+                hit_seq_id = target_feature_info['short_id_to_rec_id'][sh_hit_seq_id]
+                hit_info[1] = hit_seq_id
+                line = "\t".join(hit_info)
+            except:
+                hit_seq_id = sh_hit_seq_id
             hit_ident      = float(hit_info[2]) / 100.0
             hit_aln_len    = hit_info[3]
             hit_mismatches = hit_info[4]
@@ -1541,7 +1557,6 @@ class BlastUtil:
                     continue
 
                 [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
-
                 aln_len_calc = aln_len
                 if q_seq_type != t_seq_type:
                     aln_len_calc *= 3
