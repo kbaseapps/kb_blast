@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import gzip
 import os
 import re
 import subprocess
@@ -10,14 +9,8 @@ import uuid
 from datetime import datetime
 from pprint import pformat
 
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-import requests
-from requests_toolbelt import MultipartEncoder
 
 # SDK Utils
-from installed_clients.AbstractHandleClient import AbstractHandle
 from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
 from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
 from installed_clients.KBaseReportClient import KBaseReport
