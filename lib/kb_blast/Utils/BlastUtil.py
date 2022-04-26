@@ -390,7 +390,7 @@ class BlastUtil:
             #to get the full stack trace: traceback.format_exc()
 
 
-        # Handle overloading (input_many can be FeatureSet, Genome, or GenomeSet - not SequenceSet or SingleEndLibrary at this time)
+        # Handle overloading (input_many can be FeatureSet, Genome, GenomeSet, or SpeciesTree - not SequenceSet or SingleEndLibrary at this time)
         #
         """
         if target_type_name == 'SequenceSet':
@@ -647,6 +647,55 @@ class BlastUtil:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # SpeciesTree
+        #
+        elif target_type_name == 'Tree':
+            input_many_speciesTree = input_many_data
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            SpeciesTreeToFASTA_params = {
+                'tree_ref':            input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        seq_type,
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'id_len_limit':        49,
+                'merge_fasta_files':   'TRUE'
+                }
+
+            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
+            #SERVICE_VER = 'release'
+            SERVICE_VER = 'beta'  # DEBUG
+            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
+            SpeciesTreeToFASTA_retVal = DOTFU.SpeciesTreeToFASTA (SpeciesTreeToFASTA_params)
+            target_fasta_file_path = SpeciesTreeToFASTA_retVal['fasta_file_path_list'][0]
+            target_feature_info['short_id_to_rec_id'] = SpeciesTreeToFASTA_retVal['short_id_to_rec_id']
+            target_feature_info['feature_ids_by_genome_id'] = SpeciesTreeToFASTA_retVal['feature_ids_by_genome_id']
+            if len(list(target_feature_info['feature_ids_by_genome_id'].keys())) > 0:
+                appropriate_sequence_found_in_many_input = True
+            target_feature_info['feature_id_to_function'] = SpeciesTreeToFASTA_retVal['feature_id_to_function']
+            target_feature_info['genome_ref_to_sci_name'] = SpeciesTreeToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['genome_ref_to_obj_name'] = SpeciesTreeToFASTA_retVal['genome_ref_to_obj_name']
+
+            target_feature_info['genome_id_to_genome_ref'] = dict()
+            for genome_id in input_many_speciesTree['ws_refs'].keys():
+                genome_ref = input_many_speciesTree['ws_refs'][genome_id]['g'][0]
+                target_feature_info['genome_id_to_genome_ref'][genome_id] = genome_ref
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "SpeciesTreeToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # AnnotatedMetagenomeAssembly
@@ -1336,9 +1385,10 @@ class BlastUtil:
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [genome_ref]
 
-        # Parse GenomeSet hits into FeatureSet
+
+        # Parse GenomeSet or SpeciesTree hits into FeatureSet
         #
-        elif target_type_name == 'GenomeSet':
+        elif target_type_name == 'GenomeSet' or target_type_name == 'Tree':
             seq_total = 0
 
             output_featureSet = dict()
@@ -1369,6 +1419,7 @@ class BlastUtil:
                             output_featureSet['elements'][feature_id] = []
                             output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
+
 
         # Parse AnnotatedMetagenomeAssembly hits into FeatureSet
         #
@@ -1556,6 +1607,7 @@ class BlastUtil:
                     pass
                 elif target_type_name == 'Genome' or \
                      target_type_name == 'GenomeSet' or \
+                     target_type_name == 'Tree' or \
                      target_type_name == 'FeatureSet' or \
                      target_type_name == 'AnnotatedMetagenomeAssembly':
 
@@ -1577,7 +1629,7 @@ class BlastUtil:
                             #self.log (console, "GOT ONE!")  # DEBUG
                             if target_type_name == 'Genome' or target_type_name == 'AnnotatedMetagenomeAssembly':
                                 accept_id = fid
-                            elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
+                            elif target_type_name == 'GenomeSet' or target_type_name == 'Tree' or target_type_name == 'FeatureSet':
                                 accept_id = genome_ref+self.genome_id_feature_id_delim+fid
                             if accept_id in accept_fids:
                                 row_color = accept_row_color

@@ -46,7 +46,7 @@ parameters :
         ui-name : |
             Search Targets
         short-hint : |
-            The KBase data objects with proteins to be searched. Objects may be FeatureSet, Genome, GenomeSet, or Annotated Metagenome Assembly.
+            The KBase data objects with proteins to be searched. Objects may be FeatureSet, Genome, GenomeSet, SpeciesTree, or Annotated Metagenome Assembly.
     genome_disp_name_config :
         ui-name : |
             Display genome as
@@ -91,7 +91,7 @@ parameters :
 description : |
   <p>This method performs a protein-protein (protein sequence alignment) BLASTp Search using NCBI's BLAST+ (version 2.11.0).</p>
 
-  <p>BLASTp is a protein sequence search against a protein sequence database. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, the genes in an Annotated Metagenome Assembly, or the features in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
+  <p>BLASTp is a protein sequence search against a protein sequence database. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet or SpeciesTree, the genes in an Annotated Metagenome Assembly, or the features in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 
   <p>All output formats respect the e-value cutoff threshold. The on-screen table and downloadable files give the user the opportunity to examine the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the proteins that fail to pass one or more of these three thresholds will appear in a gray line with the specific threshold that was not met highlighted in red. The downloadable files give users the most flexibility for exploring alternative thresholds. All hits that are below the e-value threshold are included in the downloadable text files and users can examine all of the cutoffs without having to rerun the App. Several NCBI BLAST formats are supported in the downloadable files (discussed below under “Extra Text Output”).</p>
 
@@ -104,7 +104,7 @@ description : |
 
   <p><b><i>Query Protein Sequence:</i></b> If you don't provide an input query object, you must copy-and-paste in a query protein sequence. The format can be with or without a Fasta header line. If this query protein sequence is used, you must also supply an output name for the single-element SequenceSet object that will be saved. The resulting SequenceSet can then be used in subsequent BLASTp runs.</p>
 
-  <p><b><i>Search Targets:</i></b> The search database must be an object in your Narrative containing protein sequences. It may be a FeatureSet of genes, a Genome or a GenomeSet, or an Annotated Metagenome Assembly. More than one object may be added to the Search Targets. The App will automatically generate a database from the narrative objects for BLASTp.</p>
+  <p><b><i>Search Targets:</i></b> The search database must be an object in your Narrative containing protein sequences. It may be a FeatureSet of genes, a Genome or a GenomeSet, the Genomes in a SpeciesTree, or an Annotated Metagenome Assembly. More than one object may be added to the Search Targets. The App will automatically generate a database from the narrative objects for BLASTp.</p>
 
   <p><h3>Parameters:</h3></p>
   <p><b><i>E-value:</i></b> This sets the maximal e-value threshold for the reported search  hits. Hits with e-values above this threshold do not get reported in any of the output formats, i.e.,  the on-screen table, the text downloads, or the saved FeatureSet.</p>

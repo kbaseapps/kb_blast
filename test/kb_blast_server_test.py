@@ -200,6 +200,73 @@ class kb_blastTest(unittest.TestCase):
         self._save_stored_obj_info ('ama', new_obj_info, ama_basename, item_i)
         return new_obj_info
 
+
+    # call this method to get the WS object info of a Tree
+    #   (will upload the example data if this is the first time the method is called during tests)
+    def getTreeInfo(self, tree_basename, lib_i=0, genome_ref_map=None):
+        if hasattr(self.__class__, 'treeInfo_list'):
+            try:
+                info = self.__class__.treeInfo_list[lib_i]
+                name = self.__class__.treeName_list[lib_i]
+                if info != None:
+                    if name != tree_basename:
+                        self.__class__.treeInfo_list[lib_i] = None
+                        self.__class__.treeName_list[lib_i] = None
+                    else:
+                        return info
+            except:
+                pass
+
+        # 1) transform json to kbase Tree object and upload to ws
+        shared_dir = "/kb/module/work/tmp"
+        tree_data_file = 'data/trees/'+tree_basename+'.json'
+        tree_file = os.path.join(shared_dir, os.path.basename(tree_data_file))
+        shutil.copy(tree_data_file, tree_file)
+
+        # create object
+        with open (tree_file, 'r') as tree_fh:
+            tree_obj = json.load(tree_fh)
+
+        # update genome_refs
+        if genome_ref_map != None:
+            for label_id in tree_obj['default_node_labels']:
+                for old_genome_ref in genome_ref_map.keys():
+                    tree_obj['default_node_labels'][label_id] = tree_obj['default_node_labels'][label_id].replace(old_genome_ref, genome_ref_map[old_genome_ref])
+            for label_id in tree_obj['ws_refs'].keys():
+                new_genome_refs = []
+                for old_genome_ref in tree_obj['ws_refs'][label_id]['g']:
+                    new_genome_refs.append(genome_ref_map[old_genome_ref])
+                tree_obj['ws_refs'][label_id]['g'] = new_genome_refs
+
+        provenance = [{}]
+        new_obj_info = self.getWsClient().save_objects({
+            'workspace': self.getWsName(), 
+            'objects': [
+                {
+                    'type': 'KBaseTrees.Tree',
+                    'data': tree_obj,
+                    'name': tree_basename+'.test_TREE',
+                    'meta': {},
+                    'provenance': provenance
+                }
+            ]})[0]
+
+        # 2) store it
+        if not hasattr(self.__class__, 'treeInfo_list'):
+            self.__class__.treeInfo_list = []
+            self.__class__.treeName_list = []
+        for i in range(lib_i+1):
+            try:
+                assigned = self.__class__.treeInfo_list[i]
+            except:
+                self.__class__.treeInfo_list.append(None)
+                self.__class__.treeName_list.append(None)
+
+        self.__class__.treeInfo_list[lib_i] = new_obj_info
+        self.__class__.treeName_list[lib_i] = tree_basename
+        return new_obj_info
+    
+
     #
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     #
@@ -259,7 +326,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTn: GenomeSet target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01_GenomeSet")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_02_GenomeSet")
     def test_kb_blast_BLASTn_Search_02_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -359,7 +426,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: Single Genome target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_01_Genome")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_Genome")
     def test_kb_blast_BLASTp_Search_03_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -410,7 +477,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: GenomeSet target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_02_GenomeSet")
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_GenomeSet")
     def test_kb_blast_BLASTp_Search_04_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -498,11 +565,86 @@ class kb_blastTest(unittest.TestCase):
         pass
 
 
+    # Test BLASTp: SpeciesTree target
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_GenomeSet")
+    def test_kb_blast_BLASTp_Search_05_SpeciesTree(self):
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+
+        obj_basename = 'BLASTp_SpeciesTree'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+        speciesTree_name = 'test_genomeSet.BLASTp.SpeciesTree'
+        expected_hit_cnt = 3
+
+        load_genomes = [
+            { 'file': 'GCF_000287295.1_ASM28729v1_genomic',
+              'sciname': 'Candidatus Carsonella ruddii HT isolate Thao2000'
+            },
+            { 'file': 'GCF_000306885.1_ASM30688v1_genomic',
+              'sciname': 'Wolbachia endosymbiont of Onchocerca ochengi'
+            },
+            { 'file': 'GCF_001439985.1_wTPRE_1.0_genomic',
+              'sciname': 'Wolbachia endosymbiont of Trichogramma pretiosum'
+            },
+            { 'file': 'GCF_000022285.1_ASM2228v1_genomic',
+              'sciname': 'Wolbachia sp. wRi'
+            },
+        ]
+        for genome_i,genome in enumerate(load_genomes):
+            load_genomes[genome_i]['ref'] = self.get_obj_ref_from_obj_info(self.getGenomeInfo(genome['file'], genome_i+3))
+
+        # upload Tree
+        genome_refs_map = { '23880/3/1': load_genomes[0]['ref'],
+                            '23880/4/1': load_genomes[1]['ref'],
+                            '23880/5/1': load_genomes[2]['ref'],
+                            '23880/6/1': load_genomes[3]['ref']
+                          }
+        obj_info = self.getTreeInfo('Tiny_things.SpeciesTree', 0, genome_refs_map)
+        target_tree_ref = str(obj_info[WSID_I])+'/'+str(obj_info[OBJID_I])+'/'+str(obj_info[VERSION_I])
+
+        # Wolbachia sp. wRi dnaA
+        query_seq_prot = 'MNLTSPKVSTMFFDQIITVTDHNVTWEKIQNCLYNLYGEATYNSWLSSLKFVSSRNGEVLLSVSTRFIKEWITVHYMKKILSLWQSEDKSIRSIDIQVIEERNSNFNVILKNREESNHNLGSPLDPRFTFDNFVVGKPNELAFTAAKRVAESIDPILGSNPLFLYGGVGLGKTHLMHAIAWHIVNSPSAKRKVVYLSAEKFMYQYITALRSKDIMLFKEQFRSVDVLMVDDVQFISGKDSTQEEFFHTFNALIDQNKQLVISADRSPSDLDGVEERIKSRLGWGLVADINETTFELRLGILQAKVEQMNMYVPKDVLEFLARNIKSNIRELEGALNKVTHTSLIGRSMTVESASETLIDLLRSNHRSVTIEEIQKKVAEFFNIKVADMQSNRRLRSLARPRQIAMYFAKKFTQKSLPDIGRNFGGRDHATVIHAVKQVENFIKTDSKFADEINRLKKMFK'
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       'input_one_sequence': query_seq_prot,
+                       #'input_one_ref': "",
+                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_refs': [target_tree_ref],
+                       'output_filtered_name': obj_out_name,
+                       'genome_disp_name_config': 'obj_name_sci_name',
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "75.0",
+                       'overlap_fraction': "50.0",
+                       'maxaccepts': "1000",
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+
+        # check number of hits in featureSet output
+        featureSet_out_obj = self.getWsClient().get_objects([{'ref':report_obj['objects_created'][0]['ref']}])[0]['data']
+        self.assertEqual(expected_hit_cnt, len(featureSet_out_obj['element_ordering']))
+        pass
+
+
     # Test BLASTp: FeatureSet
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_FeatureSet")
-    def test_kb_blast_BLASTp_Search_05_FeatureSet(self):
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_06_FeatureSet")
+    def test_kb_blast_BLASTp_Search_06_FeatureSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
         obj_basename = 'BLASTp_FeatureSet'
@@ -604,8 +746,8 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: AnnotatedMetagenomeAssembly Target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_AnnotatedMetagenomeAssembly")
-    def test_kb_blast_BLASTp_Search_06_AnnotatedMetagenomeAssembly(self):
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_07_AnnotatedMetagenomeAssembly")
+    def test_kb_blast_BLASTp_Search_07_AnnotatedMetagenomeAssembly(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTp_AnnotatedMetagenomeAssembly'
@@ -656,8 +798,8 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: Multiple targets of different types
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_MultipleTargets")
-    def test_kb_blast_BLASTp_Search_07_MultipleTargets(self):
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_08_MultipleTargets")
+    def test_kb_blast_BLASTp_Search_08_MultipleTargets(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTp_MultipleTargets'
@@ -757,8 +899,8 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTx: Single Genome target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_01")
-    def test_kb_blast_BLASTx_Search_08_Genome(self):
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_09_Genome")
+    def test_kb_blast_BLASTx_Search_09_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
         obj_basename = 'BLASTx'

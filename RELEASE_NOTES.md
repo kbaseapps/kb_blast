@@ -2,6 +2,7 @@
 __Changes__
 - updated BLAST to 2.13.0
 - fixed bug with long feature IDs
+- added SpeciesTree as possible target
 
 ### Version 1.6.0
 __Changes__
