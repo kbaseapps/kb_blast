@@ -45,7 +45,8 @@ class KBaseDataObjectToFileUtils(object):
         **
         :param params: instance of type "TranslateNucToProtSeq_Params"
            (TranslateNucToProtSeq() Params) -> structure: parameter "nuc_seq"
-           of String, parameter "genetic_code" of String
+           of String, parameter "genetic_code" of String, parameter
+           "write_off_code_prot_seq" of type "bool"
         :returns: instance of type "TranslateNucToProtSeq_Output"
            (TranslateNucToProtSeq() Output) -> structure: parameter
            "prot_seq" of String
@@ -78,7 +79,8 @@ class KBaseDataObjectToFileUtils(object):
            "feature_type" of String, parameter "record_id_pattern" of type
            "pattern_type", parameter "record_desc_pattern" of type
            "pattern_type", parameter "case" of String, parameter "linewrap"
-           of Long, parameter "id_len_limit" of Long
+           of Long, parameter "id_len_limit" of Long, parameter
+           "write_off_code_prot_seq" of type "bool"
         :returns: instance of type "GenomeToFASTA_Output" (GenomeToFASTA()
            Output) -> structure: parameter "fasta_file_path" of type
            "path_type", parameter "feature_ids" of list of type "feature_id",
@@ -104,6 +106,7 @@ class KBaseDataObjectToFileUtils(object):
            of type "pattern_type", parameter "record_desc_pattern" of type
            "pattern_type", parameter "case" of String, parameter "linewrap"
            of Long, parameter "id_len_limit" of Long, parameter
+           "write_off_code_prot_seq" of type "bool", parameter
            "merge_fasta_files" of type "true_false"
         :returns: instance of type "GenomeSetToFASTA_Output"
            (GenomeSetToFASTA() Output) -> structure: parameter
@@ -131,6 +134,7 @@ class KBaseDataObjectToFileUtils(object):
            "pattern_type", parameter "record_desc_pattern" of type
            "pattern_type", parameter "case" of String, parameter "linewrap"
            of Long, parameter "id_len_limit" of Long, parameter
+           "write_off_code_prot_seq" of type "bool", parameter
            "merge_fasta_files" of type "true_false"
         :returns: instance of type "SpeciesTreeToFASTA_Output"
            (SpeciesTreeToFASTA() Output) -> structure: parameter
@@ -157,7 +161,8 @@ class KBaseDataObjectToFileUtils(object):
            parameter "feature_type" of String, parameter "record_id_pattern"
            of type "pattern_type", parameter "record_desc_pattern" of type
            "pattern_type", parameter "case" of String, parameter "linewrap"
-           of Long, parameter "id_len_limit" of Long
+           of Long, parameter "id_len_limit" of Long, parameter
+           "write_off_code_prot_seq" of type "bool"
         :returns: instance of type "FeatureSetToFASTA_Output"
            (FeatureSetToFASTA() Output) -> structure: parameter
            "fasta_file_path" of type "path_type", parameter
@@ -184,7 +189,8 @@ class KBaseDataObjectToFileUtils(object):
            parameter "feature_type" of String, parameter "record_id_pattern"
            of type "pattern_type", parameter "record_desc_pattern" of type
            "pattern_type", parameter "case" of String, parameter "linewrap"
-           of Long, parameter "id_len_limit" of Long
+           of Long, parameter "id_len_limit" of Long, parameter
+           "write_off_code_prot_seq" of type "bool"
         :returns: instance of type
            "AnnotatedMetagenomeAssemblyToFASTA_Output"
            (AnnotatedMetagenomeAssemblyToFASTA() Output) -> structure:

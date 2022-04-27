@@ -302,6 +302,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "97.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -402,6 +403,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "10.0",
                        'overlap_fraction': "10.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -453,6 +455,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "40.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -544,6 +547,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "40.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -619,6 +623,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "75.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -722,6 +727,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "40.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -774,6 +780,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "40.0",
                        'overlap_fraction': "50.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -869,6 +876,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "10.0",
                        'overlap_fraction': "25.0",
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 
@@ -926,6 +934,7 @@ class kb_blastTest(unittest.TestCase):
                        'ident_thresh': "40.0",
                        'overlap_fraction': "25.0",   # 50.0 is too high for this query
                        'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
                        'output_extra_format': "none"
                      }
 

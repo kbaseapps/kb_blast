@@ -82,6 +82,11 @@ parameters :
             Max Accepts
         short-hint : |
             Hard limit for the maximum number of hits in the result (default is 1000).
+    write_off_code_prot_seq:
+        ui-name : |
+            Allow Mistranslation
+        short-hint : |
+            Write protein translation for target even if wrong genetic code (e.g. internal TER)
     output_extra_format:
         ui-name : |
             Extra Text Output Format
@@ -118,6 +123,8 @@ description : |
   </p>
 
   <p><b><i>Max Accepts</i></b>(advanced): Hard limit on how many hits to report. The default is 1000.</p>
+
+  <p><b><i>Allow Mistranslation</i></b>(advanced): It sometimes happens that a eukaryotic contig is mixed in with bacterial or archaeal contigs, such as in a metagenome assembly.  Some methods will annotate these genes correctly but the correct genetic code (e.g. 1 or 4) is not passed through to generation of the BLAST database of the target genes and the Bacterial and Archael code 11 will be used instead.  For example, if it should be genetic code 4, this can lead to an internal STOP (aka TER) codon instead of the correct tryptophan (W).  This flag will suppress translation and inclusion of such genes from the BLAST search database if an internal STOP is found.  The default is to write mistranslations.  Note: if an input gene length is not a multiple of 3, such genes are never translated.  Such frameshifts or intron splicing must be handled upstream of this App.</p>
 
   <p><b><i>Extra Text Output format</i></b>(advanced) <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> has several defined output formats (in the section called outfmt). Among them, the BLAST m=7 (tab-delimited table) text output format is automatically generated and is available for download, so it should not be redundantly included here. A user may request up to one extra format to be generated and made downloadable. These include:
     <ul>

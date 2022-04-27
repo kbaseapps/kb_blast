@@ -246,6 +246,11 @@ class BlastUtil:
         appropriate_sequence_found_in_one_input = False
         feature_ids_by_genome_ref = None
 
+        # defaults
+        if not params.get('write_off_code_prot_seq'):
+            params['write_off_code_prot_seq'] = 1
+        params['write_off_code_prot_seq'] = int(params['write_off_code_prot_seq'])
+        
         # determine query object type
         #
         try:
@@ -320,6 +325,7 @@ class BlastUtil:
                 'case':                'upper',
                 'linewrap':            50,
                 'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -363,6 +369,11 @@ class BlastUtil:
         target_fasta_file_compression = None
         sequencing_tech = 'N/A'
 
+        # defaults
+        if not params.get('write_off_code_prot_seq'):
+            params['write_off_code_prot_seq'] = 1
+        params['write_off_code_prot_seq'] = int(params['write_off_code_prot_seq'])
+        
         try:
             #objects = ws.get_objects([{'ref': input_many_ref}])
             objects = self.wsClient.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
@@ -535,6 +546,7 @@ class BlastUtil:
                 'case':                'upper',
                 'linewrap':            50,
                 'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -577,7 +589,8 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
                 'linewrap':            50,
-                'id_len_limit':        49
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq']
                 }
 
             #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
@@ -622,6 +635,7 @@ class BlastUtil:
                 'case':                'upper',
                 'linewrap':            50,
                 'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -671,6 +685,7 @@ class BlastUtil:
                 'case':                'upper',
                 'linewrap':            50,
                 'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
@@ -718,6 +733,7 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'id_len_limit':        49
                 }
 
