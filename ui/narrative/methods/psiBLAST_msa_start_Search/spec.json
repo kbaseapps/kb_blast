@@ -23,7 +23,7 @@
             }
         },
         {
-            "id": "input_many_ref",
+            "id": "input_many_refs",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -190,9 +190,9 @@
 		    "target_type_transform": "resolved-ref"
                 },
                 {
-                    "input_parameter": "input_many_ref",
-                    "target_property": "input_many_ref",
-		    "target_type_transform": "resolved-ref"
+                    "input_parameter": "input_many_refs",
+                    "target_property": "input_many_refs",
+		    "target_type_transform": "list<resolved-ref>"
                 },
                 {
                     "input_parameter": "output_filtered_name",

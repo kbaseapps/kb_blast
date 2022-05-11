@@ -161,30 +161,6 @@
             }
         },
         {
-            "id": "write_off_code_prot_seq",
-            "optional": true,
-            "advanced": true,
-            "allow_multiple": false,
-            "default_values": [ "1" ],
-            "field_type": "dropdown",
-            "dropdown_options": {
-                "options": [
-                                {
-                                        "value": "0",
-                                        "display": "DON'T write off-genetic-code protein translation",
-                                        "id": "write_off_code_prot_seq-0",
-                                        "ui-name": "write_off_code_prot_seq-0"
-                                },
-                                {
-                                        "value": "1",
-                                        "display": "DO write off-genetic-code protein translation",
-                                        "id": "write_off_code_prot_seq-1",
-                                        "ui-name": "write_off_code_prot_seq-1"
-                                }
-                ]
-            }
-        },
-        {
             "id": "output_extra_format",
             "optional": false,
             "advanced": true,
@@ -315,10 +291,6 @@
                 {
                     "input_parameter": "maxaccepts",
                     "target_property": "maxaccepts"
-                },
-                {
-                    "input_parameter": "write_off_code_prot_seq",
-                    "target_property": "write_off_code_prot_seq"
                 },
                 {
                     "input_parameter": "output_extra_format",
