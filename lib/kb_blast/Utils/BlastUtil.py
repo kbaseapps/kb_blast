@@ -28,7 +28,7 @@ class BlastUtil:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.4.0"
+    VERSION = "1.7.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
     GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
 
@@ -91,6 +91,23 @@ class BlastUtil:
             self.wsClient = workspaceService(self.workspaceURL, token=self.ctx['token'])
         except:
             raise ValueError ("Failed to connect to workspace service")
+        try:
+            REPORT_SERVICE_VER = 'release'
+            self.reportClient = KBaseReport(self.callbackURL, token=self.ctx['token'], service_ver=REPORT_SERVICE_VER)
+        except:
+            raise ValueError ("Failed to instantiate KBaseReport client")
+        try:
+            SU_SERVICE_VER = 'release'
+            self.set_util_Client = kb_SetUtilities(url=self.callbackURL, token=self.ctx['token'], service_ver=SU_SERVICE_VER)  # SDK Local
+            #self.set_util_Client = kb_SetUtilities(url=self.serviceWizardURL, token=self.ctx['token'], service_ver=SU_SERVICE_VER)  # Service
+        except:
+            raise ValueError("unable to instantiate kb_SetUtilities client")
+        try:
+            #DOTFU_SERVICE_VER = 'release'
+            DOTFU_SERVICE_VER = 'beta'  # DEBUG
+            self.DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=DOTFU_SERVICE_VER)
+        except:
+            raise ValueError ("Failed to instantiate DataObjectToFileUtils client")
 
         self.genome_id_feature_id_delim = '.f:'
 
@@ -189,10 +206,7 @@ class BlastUtil:
         if params.get('input_one_sequence') is not None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
 
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
+            ParseFastaStr_retVal = self.DOTFU.ParseFastaStr ({
                 'fasta_str':    params['input_one_sequence'],
                 'residue_type': seq_type,
                 'case':         'UPPER',
@@ -329,11 +343,7 @@ class BlastUtil:
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            FeatureSetToFASTA_retVal = self.DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             #query_short_id_to_rec_id = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
@@ -550,11 +560,7 @@ class BlastUtil:
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            FeatureSetToFASTA_retVal = self.DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
             target_feature_info['short_id_to_rec_id'] = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_ref'] = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
@@ -593,11 +599,7 @@ class BlastUtil:
                 'write_off_code_prot_seq': params['write_off_code_prot_seq']
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            GenomeToFASTA_retVal = self.DOTFU.GenomeToFASTA (GenomeToFASTA_params)
             target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
             target_feature_info['short_id_to_rec_id'] = GenomeToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = GenomeToFASTA_retVal['feature_ids']
@@ -639,11 +641,7 @@ class BlastUtil:
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            GenomeSetToFASTA_retVal = self.DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
             target_feature_info['short_id_to_rec_id'] = GenomeSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_id'] = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
@@ -689,11 +687,7 @@ class BlastUtil:
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            SpeciesTreeToFASTA_retVal = DOTFU.SpeciesTreeToFASTA (SpeciesTreeToFASTA_params)
+            SpeciesTreeToFASTA_retVal = self.DOTFU.SpeciesTreeToFASTA (SpeciesTreeToFASTA_params)
             target_fasta_file_path = SpeciesTreeToFASTA_retVal['fasta_file_path_list'][0]
             target_feature_info['short_id_to_rec_id'] = SpeciesTreeToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_id'] = SpeciesTreeToFASTA_retVal['feature_ids_by_genome_id']
@@ -737,11 +731,7 @@ class BlastUtil:
                 'id_len_limit':        49
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
+            AnnotatedMetagenomeAssemblyToFASTA_retVal = self.DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
             target_fasta_file_path = AnnotatedMetagenomeAssemblyToFASTA_retVal['fasta_file_path']
             target_feature_info['short_id_to_rec_id'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_ids']
@@ -1933,10 +1923,7 @@ class BlastUtil:
         ##reportObj['message'] = report
 
         # save report object
-        SERVICE_VER = 'release'
-        reportClient = KBaseReport(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-        #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
-        report_info = reportClient.create_extended_report(reportObj)
+        report_info = self.reportClient.create_extended_report(reportObj)
 
         return report_info
 
@@ -2094,18 +2081,12 @@ class BlastUtil:
         # Merge FeatureSets into one output
         if len(output_featureSet_refs) > 1:
             self.log(console, "CREATING MERGED OUTPUT FEATURESET")
-            try:
-                SERVICE_VER = 'release'
-                set_util_Client = kb_SetUtilities(url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
-                #set_util_Client = kb_SetUtilities(url=self.serviceWizardURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
-            except:
-                raise ValueError("unable to instantiate kb_SetUtilities")
             merge_featureSet_params = {'workspace_name': params['workspace_name'],
                                        'input_refs': output_featureSet_refs,
                                        'desc': 'Merged FeatureSets from '+search_tool_name+' Search',
                                        'output_name': params['output_filtered_name']
                                        }
-            merge_retVal = set_util_Client.KButil_Merge_FeatureSet_Collection(merge_featureSet_params)
+            merge_retVal = self.set_util_Client.KButil_Merge_FeatureSet_Collection(merge_featureSet_params)
             merge_report_obj = self.wsClient.get_objects2({'objects':[{'ref':merge_retVal['report_ref']}]})['data'][0]['data']
             merged_featureSet_ref = merge_report_obj['objects_created'][0]['ref']
             objects_created.append({'ref': merged_featureSet_ref,'description':'ALL '+search_tool_name+' hits'})

@@ -4,6 +4,7 @@ __Changes__
 - fixed bug with long feature IDs
 - added SpeciesTree as possible target
 - add option to write off-genetic-code protein translations
+- tightened up client instantiation
 
 ### Version 1.6.0
 __Changes__
