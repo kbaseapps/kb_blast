@@ -103,8 +103,8 @@ class BlastUtil:
         except:
             raise ValueError("unable to instantiate kb_SetUtilities client")
         try:
-            #DOTFU_SERVICE_VER = 'release'
-            DOTFU_SERVICE_VER = 'beta'  # DEBUG
+            DOTFU_SERVICE_VER = 'release'
+            #DOTFU_SERVICE_VER = 'beta'  # DEBUG
             self.DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=DOTFU_SERVICE_VER)
         except:
             raise ValueError ("Failed to instantiate DataObjectToFileUtils client")
