@@ -8,14 +8,19 @@ MAINTAINER KBase Developer
 
 # -----------------------------------------
 
-ENV BLAST_VERSION='2.12.0+'
+# BLAST 2.13.0+ needs libgomp1
+RUN apt-get update -y && \
+  apt-get install -y libgomp1
+
+
+ENV BLAST_VERSION='2.13.0'
 
 WORKDIR /kb/module
 RUN \
-  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz > ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz && \
-  tar xfz ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz && \
-  ln -s ncbi-blast-${BLAST_VERSION} blast && \
-  rm -f ncbi-blast-${BLAST_VERSION}-x64-linux.tar.gz && \
+  curl ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${BLAST_VERSION}/ncbi-blast-${BLAST_VERSION}+-x64-linux.tar.gz > ncbi-blast-${BLAST_VERSION}+-x64-linux.tar.gz && \
+  tar xfz ncbi-blast-${BLAST_VERSION}+-x64-linux.tar.gz && \
+  ln -s ncbi-blast-${BLAST_VERSION}+ blast && \
+  rm -f ncbi-blast-${BLAST_VERSION}+-x64-linux.tar.gz && \
   rm -f blast/bin/blastdb_aliastool && \
   rm -f blast/bin/blastdbcheck && \
   rm -f blast/bin/blastdbcmd && \

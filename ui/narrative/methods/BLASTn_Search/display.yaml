@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: BLASTn nuc-nuc Search - v2.12.0+
+name: BLASTn nuc-nuc Search - v2.13.0+
 tooltip: |
     Search for untranslated feature matches to a nucleotide query sequence.
 screenshots:
@@ -47,7 +47,7 @@ parameters :
         ui-name : |
             Search Targets
         short-hint : |
-            The KBase data objects with proteins to be searched. Objects may be a FeatureSet, Genome, GenomeSet, or Annotated Metagenome Assembly.
+            The KBase data objects with proteins to be searched. Objects may be a FeatureSet, Genome, GenomeSet, SpeciesTree, or Annotated Metagenome Assembly.
     genome_disp_name_config :
         ui-name : |
             Display genome as
@@ -92,7 +92,7 @@ parameters :
 description : |
     <p>This App performs a nucleotide-nucleotide (nucleotide sequence alignment) BLASTn Search using NCBI's BLAST+ (version 2.11.0). At this time, the App <u>does not</u> search the non-coding regions of target Genomes and cannot be used to find RNAs, repeats, or other non-coding features in a Genome.</p>
 
-    <p>BLASTn is a nucleotide sequence search against a nucleotide sequence database. The KBase implementation is restricted to searches of the DNA sequences of features in a Genome object, the Genome members of a GenomeSet, the features in an Annotated Metagenome Assembly, or the features in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
+    <p>BLASTn is a nucleotide sequence search against a nucleotide sequence database. The KBase implementation is restricted to searches of the DNA sequences of features in a Genome object, the Genome members of a GenomeSet or SpeciesTree, the features in an Annotated Metagenome Assembly, or the features in a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
 
     <p>All output formats respect the e-value cutoff threshold. The on-screen table and downloadable files give the user the opportunity to examine the consequences of the other three thresholds (percent identity, bit score, and alignment coverage). On-screen, the proteins that fail to pass one or more of these three thresholds will appear in a gray line with the specific threshold that was not met highlighted in red. The downloadable files give users the most flexibility for exploring alternative thresholds. All hits that are below the e-value threshold are included in the downloadable text files and users can examine all of the cutoffs without having to rerun the App. Several NCBI BLAST formats are supported in the downloadable files (discussed below under extra text output).</p>
 
@@ -105,7 +105,7 @@ description : |
 
     <p><b><i>Input Query DNA Sequence:</i></b> If you don't provide an input query object, you must copy-and-paste in a query DNA sequence. The format can be with or without a Fasta header line. If this query DNA sequence is used, you must also supply an output name for the single-element SequenceSet object that will be saved. The resulting SequenceSet can then be used in subsequent BLASTn runs.</p>
 
-    <p><b><i>Search Targets:</i></b> The search database must be an object in your Narrative containing untranslated gene sequences. It may be a FeatureSet of genes, a Genome or a GenomeSet, or an Annotated Metagenome Assembly. More than one object may be added to the Search Targets. The App will automatically generate a database from the Narrative object for BLASTn.</p>
+    <p><b><i>Search Targets:</i></b> The search database must be an object in your Narrative containing untranslated gene sequences. It may be a FeatureSet of genes, a Genome or a GenomeSet, the Genomes in a SpeciesTree, or an Annotated Metagenome Assembly. More than one object may be added to the Search Targets. The App will automatically generate a database from the Narrative object for BLASTn.</p>
 
     <p><h4>Parameters:</h4></p>
     <p><b><i>E-value:</i></b> This sets the maximal e-value threshold for the reported search  hits. Hits with e-values above this threshold do not get reported in any of the output formats, i.e., the on-screen table, the text downloads, or the save FeatureSet.</p>
@@ -116,7 +116,9 @@ description : |
         <li><b><i>Sequence Identity Threshold (%)</i></b>: This bounds the percent sequence identity between the query and each hit for inclusion in the FeatureSet output object. Identity is calculated from the amino acid alignment. The value should be between 1-100.  Hits below this threshold are highlighted in red in the on-screen table.</li>
         <li><b><i>Alignment Coverage Threshold (%)</i></b>(advanced): This bounds the percent alignment coverage (portion of the query nucleotide sequence length covered by the hit nucleotide sequence in the  alignment) for inclusion in the FeatureSet output object. The value should be between 1-100. Hits below this threshold are highlighted in red in the on-screen table.</li>
     </ul></p>
+
     <p><b><i>Max Accepts</i></b>(advanced): A hard limit on how many hits to report. The default is 1000.</p>
+
     <p><b><i>Extra Text Output format</i></b>(advanced) <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> has several defined output formats (in the section called outfmt). Among them, the BLAST m=7 (tab-delimited table) text output format is automatically generated and is available for download, so it should not be redundantly included here. A user may request up to one extra format to be generated and made downloadable. These include:
       <ul>
         <li>0 Pairwise</li>
