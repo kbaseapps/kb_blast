@@ -20,7 +20,8 @@ module kb_blast {
     typedef string sequence;
     typedef string data_obj_name;
     typedef string data_obj_ref;
-
+    typedef int    bool;
+    
 
     /* BLAST Input Params
     */
@@ -38,6 +39,7 @@ module kb_blast {
 	float  bitscore;
 	float  overlap_fraction;
 	float  maxaccepts;
+	bool   write_off_code_prot_seq;
 	string output_extra_format;
 	float  rounds;  /* for psiBLAST_iter if I add it later*/
     } BLAST_Params;

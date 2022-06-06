@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import gzip
 import os
 import re
 import subprocess
@@ -10,14 +9,8 @@ import uuid
 from datetime import datetime
 from pprint import pformat
 
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-import requests
-from requests_toolbelt import MultipartEncoder
 
 # SDK Utils
-from installed_clients.AbstractHandleClient import AbstractHandle
 from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
 from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
 from installed_clients.KBaseReportClient import KBaseReport
@@ -47,9 +40,9 @@ class kb_blast:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.6.0"
+    VERSION = "1.7.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "b8b6ad36a9916585907094d3a32f4be2490df2a0"
+    GIT_COMMIT_HASH = "2018dc56c4e29ad8194541d65bb612242c078caa"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -134,8 +127,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -174,8 +168,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -214,8 +209,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -254,8 +250,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -294,8 +291,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -334,8 +332,9 @@ class kb_blast:
            "genome_disp_name_config" of String, parameter "ident_thresh" of
            Double, parameter "e_value" of Double, parameter "bitscore" of
            Double, parameter "overlap_fraction" of Double, parameter
-           "maxaccepts" of Double, parameter "output_extra_format" of String,
-           parameter "rounds" of Double
+           "maxaccepts" of Double, parameter "write_off_code_prot_seq" of
+           type "bool", parameter "output_extra_format" of String, parameter
+           "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

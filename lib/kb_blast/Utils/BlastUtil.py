@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import gzip
 import os
 import re
 import subprocess
@@ -9,14 +8,7 @@ import uuid
 from datetime import datetime
 from pprint import pformat
 
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-import requests
-from requests_toolbelt import MultipartEncoder
-
 # SDK Utils
-from installed_clients.AbstractHandleClient import AbstractHandle
 from installed_clients.KBaseDataObjectToFileUtilsClient import KBaseDataObjectToFileUtils
 from installed_clients.kb_SetUtilitiesClient import kb_SetUtilities
 from installed_clients.DataFileUtilClient import DataFileUtil as DFUClient
@@ -36,7 +28,7 @@ class BlastUtil:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.4.0"
+    VERSION = "1.7.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
     GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
 
@@ -84,13 +76,13 @@ class BlastUtil:
         self.handleURL = config['handle-service-url']
         self.serviceWizardURL = config['service-wizard-url']
 
-#        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] != None else 'https://kbase.us/services/njs_wrapper'
+#        self.callbackURL = os.environ['SDK_CALLBACK_URL'] if os.environ['SDK_CALLBACK_URL'] is not None else 'https://kbase.us/services/njs_wrapper'
         self.callbackURL = os.environ.get('SDK_CALLBACK_URL')
-        if self.callbackURL == None:
+        if self.callbackURL is None:
             raise ValueError ("SDK_CALLBACK_URL not set in environment")
 
         self.scratch = os.path.abspath(config['scratch'])
-        if self.scratch == None:
+        if self.scratch is None:
             self.scratch = os.path.join('/kb','module','local_scratch')
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
@@ -99,6 +91,23 @@ class BlastUtil:
             self.wsClient = workspaceService(self.workspaceURL, token=self.ctx['token'])
         except:
             raise ValueError ("Failed to connect to workspace service")
+        try:
+            REPORT_SERVICE_VER = 'release'
+            self.reportClient = KBaseReport(self.callbackURL, token=self.ctx['token'], service_ver=REPORT_SERVICE_VER)
+        except:
+            raise ValueError ("Failed to instantiate KBaseReport client")
+        try:
+            SU_SERVICE_VER = 'release'
+            self.set_util_Client = kb_SetUtilities(url=self.callbackURL, token=self.ctx['token'], service_ver=SU_SERVICE_VER)  # SDK Local
+            #self.set_util_Client = kb_SetUtilities(url=self.serviceWizardURL, token=self.ctx['token'], service_ver=SU_SERVICE_VER)  # Service
+        except:
+            raise ValueError("unable to instantiate kb_SetUtilities client")
+        try:
+            DOTFU_SERVICE_VER = 'release'
+            #DOTFU_SERVICE_VER = 'beta'  # DEBUG
+            self.DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=DOTFU_SERVICE_VER)
+        except:
+            raise ValueError ("Failed to instantiate DataObjectToFileUtils client")
 
         self.genome_id_feature_id_delim = '.f:'
 
@@ -134,7 +143,7 @@ class BlastUtil:
         PROT_pattern = re.compile("^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWYxX ]+$")
         NUC_pattern  = re.compile("^[acgtuACGTUnryNRY ]+$")   
 
-        if header_id == None:  header_id = 'N/A'
+        if header_id is None:  header_id = 'N/A'
 
         if seq_type.startswith('NUC'):
             if not NUC_pattern.match(sequence_str):
@@ -171,20 +180,15 @@ class BlastUtil:
                 raise ValueError('input_msa_ref parameter is required')
 
         else:  # need to store textarea query
-            if ('output_one_name' not in params or params['output_one_name'] == None) \
-                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+            if params.get('output_one_name') is None and params.get('input_one_sequence') is not None:
                 raise ValueError('output_one_name parameter required if input_one_sequence parameter is provided')
-            if ('output_one_name' in params and params['output_one_name'] != None) \
-                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+            if params.get('output_one_name') is not None and params.get('input_one_sequence') is None:
                 raise ValueError('input_one_sequence parameter required if output_one_name parameter is provided')
-            if ('input_one_ref' in params and params['input_one_ref'] != None) \
-                and ('input_one_sequence' in params and params['input_one_sequence'] != None):
+            if params.get('input_one_ref') is not None and params.get('input_one_sequence') is not None:
                 raise ValueError('cannot have both input_one_sequence and input_one_ref parameter')
-            if ('input_one_ref' in params and params['input_one_ref'] != None) \
-                and ('output_one_name' in params and params['output_one_name'] != None):
+            if params.get('input_one_ref') is not None and params.get('output_one_name') is not None:
                 raise ValueError('cannot have both input_one_ref and output_one_name parameter')
-            if ('input_one_ref' not in params or params['input_one_ref'] == None) \
-                and ('input_one_sequence' not in params or params['input_one_sequence'] == None):
+            if params.get('input_one_ref') is None and params.get('input_one_sequence') is None:
                 raise ValueError('input_one_sequence or input_one_ref parameter is required')
 
         return True
@@ -199,14 +203,10 @@ class BlastUtil:
 
         # Write the input_one_sequence to a SequenceSet object
         #
-        if 'input_one_sequence' in params \
-                and params['input_one_sequence'] != None \
+        if params.get('input_one_sequence') is not None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence...":
 
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            ParseFastaStr_retVal = DOTFU.ParseFastaStr ({
+            ParseFastaStr_retVal = self.DOTFU.ParseFastaStr ({
                 'fasta_str':    params['input_one_sequence'],
                 'residue_type': seq_type,
                 'case':         'UPPER',
@@ -260,6 +260,11 @@ class BlastUtil:
         appropriate_sequence_found_in_one_input = False
         feature_ids_by_genome_ref = None
 
+        # defaults
+        if not params.get('write_off_code_prot_seq'):
+            params['write_off_code_prot_seq'] = 1
+        params['write_off_code_prot_seq'] = int(params['write_off_code_prot_seq'])
+        
         # determine query object type
         #
         try:
@@ -282,8 +287,7 @@ class BlastUtil:
         # SequenceSet
         #
         if query_type_name == 'SequenceSet':
-            if 'input_one_sequence' in params \
-                and params['input_one_sequence'] != None \
+            if params.get('input_one_sequence') is not None \
                 and params['input_one_sequence'] != "Optionally enter DNA sequence..." \
                 and query_type_name != 'SequenceSet':
 
@@ -334,15 +338,14 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            FeatureSetToFASTA_retVal = self.DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             query_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            #query_short_id_to_rec_id = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             if len(list(FeatureSetToFASTA_retVal['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_one_input = True
 
@@ -376,6 +379,11 @@ class BlastUtil:
         target_fasta_file_compression = None
         sequencing_tech = 'N/A'
 
+        # defaults
+        if not params.get('write_off_code_prot_seq'):
+            params['write_off_code_prot_seq'] = 1
+        params['write_off_code_prot_seq'] = int(params['write_off_code_prot_seq'])
+        
         try:
             #objects = ws.get_objects([{'ref': input_many_ref}])
             objects = self.wsClient.get_objects2({'objects':[{'ref': input_many_ref}]})['data']
@@ -403,7 +411,7 @@ class BlastUtil:
             #to get the full stack trace: traceback.format_exc()
 
 
-        # Handle overloading (input_many can be FeatureSet, Genome, or GenomeSet - not SequenceSet or SingleEndLibrary at this time)
+        # Handle overloading (input_many can be FeatureSet, Genome, GenomeSet, or SpeciesTree - not SequenceSet or SingleEndLibrary at this time)
         #
         """
         if target_type_name == 'SequenceSet':
@@ -499,7 +507,7 @@ class BlastUtil:
                     elif line.startswith('@'):
                         was_fastq = True
                         header = line[1:]
-                        if last_header != None:
+                        if last_header is not None:
                             new_file_handle.write('>'+last_header)
                             new_file_handle.write(last_seq_buf)
                         last_seq_buf = None
@@ -510,7 +518,7 @@ class BlastUtil:
                         last_line_was_header = False
                     else:
                         continue
-                if last_header != None:
+                if last_header is not None:
                     new_file_handle.write('>'+last_header)
                     new_file_handle.write(last_seq_buf)
 
@@ -547,15 +555,14 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            FeatureSetToFASTA_retVal = DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
+            FeatureSetToFASTA_retVal = self.DOTFU.FeatureSetToFASTA (FeatureSetToFASTA_params)
             target_fasta_file_path = FeatureSetToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = FeatureSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_ref'] = FeatureSetToFASTA_retVal['feature_ids_by_genome_ref']
             if len(list(target_feature_info['feature_ids_by_genome_ref'].keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -587,15 +594,14 @@ class BlastUtil:
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
-                'linewrap':            50
+                'linewrap':            50,
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq']
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            GenomeToFASTA_retVal = DOTFU.GenomeToFASTA (GenomeToFASTA_params)
+            GenomeToFASTA_retVal = self.DOTFU.GenomeToFASTA (GenomeToFASTA_params)
             target_fasta_file_path = GenomeToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = GenomeToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = GenomeToFASTA_retVal['feature_ids']
             if len(target_feature_info['feature_ids']) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -630,15 +636,14 @@ class BlastUtil:
                 'record_desc_pattern': '[%%genome_ref%%]',
                 'case':                'upper',
                 'linewrap':            50,
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
                 'merge_fasta_files':   'TRUE'
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            GenomeSetToFASTA_retVal = DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
+            GenomeSetToFASTA_retVal = self.DOTFU.GenomeSetToFASTA (GenomeSetToFASTA_params)
             target_fasta_file_path = GenomeSetToFASTA_retVal['fasta_file_path_list'][0]
+            target_feature_info['short_id_to_rec_id'] = GenomeSetToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids_by_genome_id'] = GenomeSetToFASTA_retVal['feature_ids_by_genome_id']
             if len(list(target_feature_info['feature_ids_by_genome_id'].keys())) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -654,6 +659,52 @@ class BlastUtil:
             # DEBUG
             #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
             #self.log(console, "GenomeSetToFasta() took "+str(end_time-beg_time)+" secs")
+
+
+        # SpeciesTree
+        #
+        elif target_type_name == 'Tree':
+            input_many_speciesTree = input_many_data
+            target_fasta_file_dir = self.scratch
+            target_fasta_file = input_many_name+".fasta"
+
+            # DEBUG
+            #beg_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            SpeciesTreeToFASTA_params = {
+                'tree_ref':            input_many_ref,
+                'file':                target_fasta_file,
+                'dir':                 target_fasta_file_dir,
+                'console':             console,
+                'invalid_msgs':        invalid_msgs,
+                'residue_type':        seq_type,
+                'feature_type':        'ALL',
+                'record_id_pattern':   '%%genome_ref%%'+self.genome_id_feature_id_delim+'%%feature_id%%',
+                'record_desc_pattern': '[%%genome_ref%%]',
+                'case':                'upper',
+                'linewrap':            50,
+                'id_len_limit':        49,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
+                'merge_fasta_files':   'TRUE'
+                }
+
+            SpeciesTreeToFASTA_retVal = self.DOTFU.SpeciesTreeToFASTA (SpeciesTreeToFASTA_params)
+            target_fasta_file_path = SpeciesTreeToFASTA_retVal['fasta_file_path_list'][0]
+            target_feature_info['short_id_to_rec_id'] = SpeciesTreeToFASTA_retVal['short_id_to_rec_id']
+            target_feature_info['feature_ids_by_genome_id'] = SpeciesTreeToFASTA_retVal['feature_ids_by_genome_id']
+            if len(list(target_feature_info['feature_ids_by_genome_id'].keys())) > 0:
+                appropriate_sequence_found_in_many_input = True
+            target_feature_info['feature_id_to_function'] = SpeciesTreeToFASTA_retVal['feature_id_to_function']
+            target_feature_info['genome_ref_to_sci_name'] = SpeciesTreeToFASTA_retVal['genome_ref_to_sci_name']
+            target_feature_info['genome_ref_to_obj_name'] = SpeciesTreeToFASTA_retVal['genome_ref_to_obj_name']
+
+            target_feature_info['genome_id_to_genome_ref'] = dict()
+            for genome_id in input_many_speciesTree['ws_refs'].keys():
+                genome_ref = input_many_speciesTree['ws_refs'][genome_id]['g'][0]
+                target_feature_info['genome_id_to_genome_ref'][genome_id] = genome_ref
+
+            # DEBUG
+            #end_time = (datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()
+            #self.log(console, "SpeciesTreeToFasta() took "+str(end_time-beg_time)+" secs")
 
 
         # AnnotatedMetagenomeAssembly
@@ -675,15 +726,14 @@ class BlastUtil:
                 'record_id_pattern':   '%%feature_id%%',
                 'record_desc_pattern': '[%%genome_id%%]',
                 'case':                'upper',
-                'linewrap':            50
+                'linewrap':            50,
+                'write_off_code_prot_seq': params['write_off_code_prot_seq'],
+                'id_len_limit':        49
                 }
 
-            #self.log(console,"callbackURL='"+self.callbackURL+"'")  # DEBUG
-            #SERVICE_VER = 'release'
-            SERVICE_VER = 'beta'  # DEBUG
-            DOTFU = KBaseDataObjectToFileUtils (url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-            AnnotatedMetagenomeAssemblyToFASTA_retVal = DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
+            AnnotatedMetagenomeAssemblyToFASTA_retVal = self.DOTFU.AnnotatedMetagenomeAssemblyToFASTA (AnnotatedMetagenomeAssemblyToFASTA_params)
             target_fasta_file_path = AnnotatedMetagenomeAssemblyToFASTA_retVal['fasta_file_path']
+            target_feature_info['short_id_to_rec_id'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['short_id_to_rec_id']
             target_feature_info['feature_ids'] = AnnotatedMetagenomeAssemblyToFASTA_retVal['feature_ids']
             if len(target_feature_info['feature_ids']) > 0:
                 appropriate_sequence_found_in_many_input = True
@@ -957,7 +1007,7 @@ class BlastUtil:
         blast_cmd.append('-evalue')
         blast_cmd.append(str(e_value))
         # options (not allowed for format 0)
-        if BLAST_output_format_str != '0' and maxaccepts != None:
+        if BLAST_output_format_str != '0' and maxaccepts is not None:
             blast_cmd.append('-max_target_seqs')
             blast_cmd.append(str(maxaccepts))
 
@@ -1110,7 +1160,13 @@ class BlastUtil:
                 continue
             header_done = True
             hit_info = line.split("\t")
-            hit_seq_id     = hit_info[1]
+            sh_hit_seq_id  = hit_info[1]
+            if sh_hit_seq_id in target_feature_info['short_id_to_rec_id']:
+                hit_seq_id = target_feature_info['short_id_to_rec_id'][sh_hit_seq_id]
+                hit_info[1] = hit_seq_id
+                line = "\t".join(hit_info)
+            else:
+                hit_seq_id = sh_hit_seq_id
             hit_ident      = float(hit_info[2]) / 100.0
             hit_aln_len    = hit_info[3]
             hit_mismatches = hit_info[4]
@@ -1183,11 +1239,11 @@ class BlastUtil:
 
             output_sequenceSet = dict()
 
-            if 'sequence_set_id' in input_many_sequenceSet and input_many_sequenceSet['sequence_set_id'] != None:
+            if 'sequence_set_id' in input_many_sequenceSet and input_many_sequenceSet['sequence_set_id'] is not None:
                 output_sequenceSet['sequence_set_id'] = input_many_sequenceSet['sequence_set_id'] + "."+search_tool_name+"_Search_filtered"
             else:
                 output_sequenceSet['sequence_set_id'] = search_tool_name+"_Search_filtered"
-            if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] != None:
+            if 'description' in input_many_sequenceSet and input_many_sequenceSet['description'] is not None:
                 output_sequenceSet['description'] = input_many_sequenceSet['description'] + " - "+search_tool_name+"_Search filtered"
             else:
                 output_sequenceSet['description'] = search_tool_name+"_Search filtered"
@@ -1233,7 +1289,7 @@ class BlastUtil:
                     seq_id = line[1:]  # removes '>'
                     seq_id = pattern.findall(seq_id)[0]
 
-                    if last_seq_id != None:
+                    if last_seq_id is not None:
                         #self.log(console, 'ID: '+last_seq_id)  # DEBUG
                         id_untrans = last_seq_id
                         id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
@@ -1249,7 +1305,7 @@ class BlastUtil:
                 else:
                     last_seq_buf.append(line)
 
-            if last_seq_id != None:
+            if last_seq_id is not None:
                 #self.log(console, 'ID: '+last_seq_id)  # DEBUG
                 id_untrans = last_seq_id
                 id_trans = re.sub ('\|',':',id_untrans)  # BLAST seems to make this translation now when id format has simple 'kb|blah' format
@@ -1283,7 +1339,7 @@ class BlastUtil:
                     seq_total += 1
 
             output_featureSet = dict()
-            #if 'description' in input_many_featureSet and input_many_featureSet['description'] != None:
+            #if 'description' in input_many_featureSet and input_many_featureSet['description'] is not None:
             #    output_featureSet['description'] = input_many_featureSet['description'] + " - "+search_tool_name+"_Search filtered"
             #else:
             #    output_featureSet['description'] = search_tool_name+"_Search filtered"
@@ -1313,7 +1369,7 @@ class BlastUtil:
         elif target_type_name == 'Genome':
             seq_total = 0
             output_featureSet = dict()
-#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] is not None:
 #                output_featureSet['description'] = input_many_genome['scientific_name'] + " - "+search_tool_name+"_Search filtered"
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
@@ -1335,13 +1391,14 @@ class BlastUtil:
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [genome_ref]
 
-        # Parse GenomeSet hits into FeatureSet
+
+        # Parse GenomeSet or SpeciesTree hits into FeatureSet
         #
-        elif target_type_name == 'GenomeSet':
+        elif target_type_name == 'GenomeSet' or target_type_name == 'Tree':
             seq_total = 0
 
             output_featureSet = dict()
-            #if 'description' in input_many_genomeSet and input_many_genomeSet['description'] != None:
+            #if 'description' in input_many_genomeSet and input_many_genomeSet['description'] is not None:
             #    output_featureSet['description'] = input_many_genomeSet['description'] + " - "+search_tool_name+"_Search filtered"
             #else:
             #    output_featureSet['description'] = search_tool_name+"_Search filtered"
@@ -1369,12 +1426,13 @@ class BlastUtil:
                             output_featureSet['element_ordering'].append(feature_id)
                         output_featureSet['elements'][feature_id].append(genome_ref)
 
+
         # Parse AnnotatedMetagenomeAssembly hits into FeatureSet
         #
         elif target_type_name == 'AnnotatedMetagenomeAssembly':
             seq_total = 0
             output_featureSet = dict()
-#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] != None:
+#            if 'scientific_name' in input_many_genome and input_many_genome['scientific_name'] is not None:
 #                output_featureSet['description'] = input_many_genome['scientific_name'] + " - "+search_tool_name+"_Search filtered"
 #            else:
 #                output_featureSet['description'] = search_tool_name+"_Search filtered"
@@ -1541,7 +1599,6 @@ class BlastUtil:
                     continue
 
                 [query_id, hit_id, identity, aln_len, mismatches, gap_openings, q_beg, q_end, h_beg, h_end, e_value, bit_score] = line.split("\t")[0:12]
-
                 aln_len_calc = aln_len
                 if q_seq_type != t_seq_type:
                     aln_len_calc *= 3
@@ -1556,6 +1613,7 @@ class BlastUtil:
                     pass
                 elif target_type_name == 'Genome' or \
                      target_type_name == 'GenomeSet' or \
+                     target_type_name == 'Tree' or \
                      target_type_name == 'FeatureSet' or \
                      target_type_name == 'AnnotatedMetagenomeAssembly':
 
@@ -1577,7 +1635,7 @@ class BlastUtil:
                             #self.log (console, "GOT ONE!")  # DEBUG
                             if target_type_name == 'Genome' or target_type_name == 'AnnotatedMetagenomeAssembly':
                                 accept_id = fid
-                            elif target_type_name == 'GenomeSet' or target_type_name == 'FeatureSet':
+                            elif target_type_name == 'GenomeSet' or target_type_name == 'Tree' or target_type_name == 'FeatureSet':
                                 accept_id = genome_ref+self.genome_id_feature_id_delim+fid
                             if accept_id in accept_fids:
                                 row_color = accept_row_color
@@ -1586,7 +1644,7 @@ class BlastUtil:
                             fid_lookup = fid
                             break
                     #self.log (console, "HIT_FID: '"+str(hit_fid)+"' FID_LOOKUP: '"+str(fid_lookup)+"'")  # DEBUG
-                    if fid_lookup == None:
+                    if fid_lookup is None:
                         raise ValueError ("unable to find fid for hit_fid: '"+str(hit_fid))
                     elif fid_lookup not in target_feature_info['feature_id_to_function'][genome_ref]:
                         raise ValueError ("unable to find function for fid: '"+str(fid_lookup))
@@ -1841,7 +1899,7 @@ class BlastUtil:
                                             'name': target_name+'-'+search_tool_name+'_Search-m'+'7'+'.txt',
                                             'label': target_name+'-'+search_tool_name+' Results: m'+'7'})
 
-            if extra_bulk_save_info != None:
+            if extra_bulk_save_info is not None:
                 extension = 'txt'
                 if params['output_extra_format'] == '5':
                     extension = 'xml'
@@ -1865,10 +1923,7 @@ class BlastUtil:
         ##reportObj['message'] = report
 
         # save report object
-        SERVICE_VER = 'release'
-        reportClient = KBaseReport(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-        #report_info = report.create({'report':reportObj, 'workspace_name':params['workspace_name']})
-        report_info = reportClient.create_extended_report(reportObj)
+        report_info = self.reportClient.create_extended_report(reportObj)
 
         return report_info
 
@@ -1902,8 +1957,7 @@ class BlastUtil:
         #
         input_many_refs = params['input_many_refs']
 
-        if 'input_one_sequence' in params \
-                and params['input_one_sequence'] != None \
+        if params.get('input_one_sequence') is not None \
                 and not params['input_one_sequence'].startswith("Optionally enter"):
             input_one_ref = self.objectify_text_query (params, q_seq_type, method_name)
             params['input_one_ref'] = input_one_ref
@@ -2027,18 +2081,12 @@ class BlastUtil:
         # Merge FeatureSets into one output
         if len(output_featureSet_refs) > 1:
             self.log(console, "CREATING MERGED OUTPUT FEATURESET")
-            try:
-                SERVICE_VER = 'release'
-                set_util_Client = kb_SetUtilities(url=self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
-                #set_util_Client = kb_SetUtilities(url=self.serviceWizardURL, token=self.ctx['token'], service_ver=SERVICE_VER)  # SDK Local
-            except:
-                raise ValueError("unable to instantiate kb_SetUtilities")
             merge_featureSet_params = {'workspace_name': params['workspace_name'],
                                        'input_refs': output_featureSet_refs,
                                        'desc': 'Merged FeatureSets from '+search_tool_name+' Search',
                                        'output_name': params['output_filtered_name']
                                        }
-            merge_retVal = set_util_Client.KButil_Merge_FeatureSet_Collection(merge_featureSet_params)
+            merge_retVal = self.set_util_Client.KButil_Merge_FeatureSet_Collection(merge_featureSet_params)
             merge_report_obj = self.wsClient.get_objects2({'objects':[{'ref':merge_retVal['report_ref']}]})['data'][0]['data']
             merged_featureSet_ref = merge_report_obj['objects_created'][0]['ref']
             objects_created.append({'ref': merged_featureSet_ref,'description':'ALL '+search_tool_name+' hits'})

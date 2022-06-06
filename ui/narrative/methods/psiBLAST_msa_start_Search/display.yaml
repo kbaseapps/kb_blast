@@ -34,7 +34,7 @@ parameters :
             Query MSA
         short-hint : |
             A protein multiple sequence alignment (MSA) that includes the query sequences of interest. The MSA can be created with Apps such as MUSCLE or HMMER and can be trimmed using the Gblocks App.
-    input_many_ref:
+    input_many_refs:
         ui-name : |
             Search Database
         short-hint : |
@@ -71,60 +71,4 @@ parameters :
             Specify the format for an additional output file. Tab-delimited output is always generated as a default. This option is for one additional file. These options are described in the <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI BLAST</a> documentation.
 
 description : |
-    <p>This App performs a protein-protein (protein sequence alignment) PSI-BLAST Search that uses the input protein MSA as the profile with which to search using NCBI's BLAST+ (version 2.10.0).</p>
-
-    <p>PSI-BLAST MSA is a protein profile search based on a multiple sequence alignment (MSA) against a protein sequence database. Iteration is not currently implemented, and therefore, an MSA must first be generated using an App such as MUSCLE or HMMER, and potentially trimmed with GBLOCKS, to build an MSA from a FeatureSet object. The KBase implementation is restricted to searches of protein-coding genes in a Genome object, the Genome members of a GenomeSet, or a FeatureSet. The results of the search are displayed as a table, saved to a downloadable text file, and saved as a KBase FeatureSet object for later use.</p>
-
-    <p>All output formats respect the e-value cutoff threshold. The on-screen table and downloadable files give the user the opportunity to examine the consequences of the other two thresholds (bit score and alignment coverage). On-screen, the proteins that fail to pass one or more of these two thresholds will appear in a gray background with the specific threshold that was not met highlighted in red. The downloadable files give users the most flexibility for exploring alternative thresholds. All hits that are below the e-value threshold are included in the downloadable text files and users can examine all of the cutoffs without having to rerun the App.  Several NCBI BLAST formats are supported in the downloadable files (discussed below under “Extra Text Output”).</p>
-
-    <p>KBase does not have a database equivalent of NR. Large GenomeSets for searching can be created through the insertion of genomes into a species tree, annotation of an AssemblySet, or adding to and/or merging GenomeSets. Several Apps are available to support these set operations.</p>
-
-    <p><h3>Input:</h3></p>
-    <p><b><i>Query MSA Object:</i></b> The MSA to use as the query. It can be generated using an App such as MUSCLE or HMMER and trimmed with GBLOCKS.</p>
-
-    <p><b><i>Search Database:</i></b> The search database must be an object in your Narrative containing protein sequences. It may be a FeatureSet of genes, a Genome, or a GenomeSet. The App will automatically generate a database from the narrative object for PSI-BLAST.</p>
-
-    <p><h3>Parameters:</h3></p>
-    <p><b><i>E-value:</i></b> This sets the maximal e-value threshold for the reported search  hits. Hits with e-values above this threshold do not get reported in any of the output formats, i.e., the on-screen table, the text downloads, or the save FeatureSet.</p>
-    <p>The following two thresholds only affect the saved FeatureSet object:
-      <ul>
-        <li><b><i>Bit Score:</i></b> This bounds the bit score for the weakest hit to include in the FeatureSet output object. Hits below this threshold are highlighted in red in the on-screen table. Typically, hits with bit scores below 50 are not to be trusted (as are hits with bit scores above 50!).</li>
-        <li><b><i>Alignment Coverage Threshold (%)</i></b>(advanced): This bounds the percent alignment coverage (portion of the query protein sequence length covered by the hit protein sequence in the alignment) for inclusion in the FeatureSet output object. The longest sequence in the MSA is used for this calculation. The value should be between 1-100. Hits below this threshold are highlighted in red in the on-screen table.</li>
-      </ul>
-    </p>
-    <p><b><i>Max Accepts</i></b>(advanced): Hard limit on how many hits to report. The default is 1000.</p>
-
-    <p><b><i>Extra Text Output format</i></b>(advanced) <a href=”https://www.ncbi.nlm.nih.gov/books/NBK279684/”>NCBI PSI-BLAST</a> has several defined output formats (in the section called outfmt). Among them, the BLAST m=7 (tab-delimited table) text output format is automatically generated and is available for download, so should not be redundantly included here. A user may request up to one extra format to be generated and made downloadable. These include:
-      <ul>
-        <li>0 Pairwise</li>
-        <li>1 Query-anchored showing identities</li>
-        <li>2 Query-anchored no identities</li>
-        <li>3 Flat query-anchored, show identities</li>
-        <li>4 Flat query-anchored, no identities</li>
-        <li>5 XML Blast output</li>
-        <li>8 Text ASN.1</li>
-        <li>9 Binary ASN.1</li>
-        <li>10 Comma-separated values</li>
-        <li>11 BLAST archive format ASN.1)</li>
-      </ul>
-    </p>
-
-    <p><h3>Output:</h3></p>
-    <p><b><i>BLAST Hits Object:</i></b> PSI-BLAST hits (proteins) that pass all the user-defined filters are saved in an output FeatureSet. This field is for the name of the new FeatureSet.</p>
-
-    <p><b><i>Output HTML Table:</i></b> The on-screen table includes all the PSI-BLAST hits that meet the e-value cutoff threshold. It includes several columns commonly found in PSI-BLAST output and includes a graphic with the region of the query covered by the PSI-BLAST alignment. The table gives users the opportunity to explore the consequences of the other two thresholds (bit score and alignment coverage). On-screen, the hits that exceed these thresholds are included but appear in a gray line with the threshold that was not met highlighted in red. This gives users the opportunity to refine their thresholds, rerun the App, and recreate the output FeatureSet.</p>
-
-    <p><b><i>Downloadable files:</i></b> The downloadable files include all the PSI-BLAST hits that meet the e-value cutoff threshold. This gives the user the opportunity to explore the consequences of the other two thresholds (bit score and alignment coverage). After download, the thresholds can be explored without rerunning the App. By default, the PSI-BLAST output is automatically available for download in a tab-delimited (m=7) format. Up to one additional format can be selected. The additional formats are found in the advanced parameters as ‘Extra Text Output Format’. These formats are not altered from the direct output from the PSI-BLAST run.</p>
-
-    <p><strong>Team members who developed &amp; deployed algorithm in KBase: Dylan Chivian</strong>. For questions, please <a href=”http://kbase.us/contact-us/”>contact us</a>.</p>
-
-publications :
-    -
-        display-text: |
-            Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, et al. Gapped BLAST and PSI-BLAST: a new generation of protein database search programs. Nucleic Acids Res. 1997;25: 3389–3402. doi:10.1093/nar/25.17.3389
-        link: https://academic.oup.com/nar/article/25/17/3389/1061651
-
-    -
-        display-text: |
-            Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, et al. BLAST+: architecture and applications. BMC Bioinformatics. 2009;10: 421. doi:10.1186/1471-2105-10-421
-        link: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-421
+    <p>This App is no longer offered by KBase</p>
