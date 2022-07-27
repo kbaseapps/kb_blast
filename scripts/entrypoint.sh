@@ -23,46 +23,43 @@ elif [ "${1}" = "init" ] ; then
   mkdir -p /data/blast_dbs
   cd /data/blast_dbs
 
+  # Archaea-RS
   DB=Archaea-RS
-  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
-  curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
-  echo "gunzip $DB.faa.gz"
-  gunzip $DB.faa.gz
-  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
-  $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
-  echo "gzip $DB.faa"
-  gzip $DB.faa
-  
+  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz"
+  curl -o $DB-blast_2.13.0_dbs.tgz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz
+  echo "tar xfz $DB-blast_2.13.0_dbs.tgz"
+  tar xfz $DB-blast_2.13.0_dbs.tgz
+  echo "rm $DB-blast_2.13.0_dbs.tgz"
+  rm $DB-blast_2.13.0_dbs.tgz
+
+  # Archaea-GB
   DB=Archaea-GB
-  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
-  curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
-  echo "gunzip $DB.faa.gz"
-  gunzip $DB.faa.gz
-  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
-  $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
-  echo "gzip $DB.faa"
-  gzip $DB.faa
+  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz"
+  curl -o $DB-blast_2.13.0_dbs.tgz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz
+  echo "tar xfz $DB-blast_2.13.0_dbs.tgz"
+  tar xfz $DB-blast_2.13.0_dbs.tgz
+  echo "rm $DB-blast_2.13.0_dbs.tgz"
+  rm $DB-blast_2.13.0_dbs.tgz
 
+  # Bacteria-RS
   DB=Bacteria-RS
-  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
-  curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
-  echo "gunzip $DB.faa.gz"
-  gunzip $DB.faa.gz
-  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
-  $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
-  echo "gzip $DB.faa"
-  gzip $DB.faa
+  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz"
+  curl -o $DB-blast_2.13.0_dbs.tgz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz
+  echo "tar xfz $DB-blast_2.13.0_dbs.tgz"
+  tar xfz $DB-blast_2.13.0_dbs.tgz
+  echo "rm $DB-blast_2.13.0_dbs.tgz"
+  rm $DB-blast_2.13.0_dbs.tgz
 
+  # Bacteria-GB
   DB=Bacteria-GB
-  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
-  curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
-  echo "gunzip $DB.faa.gz"
-  gunzip $DB.faa.gz
-  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
-  $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
-  echo "gzip $DB.faa"
-  gzip $DB.faa
+  echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz"
+  curl -o $DB-blast_2.13.0_dbs.tgz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB-blast_2.13.0_dbs.tgz
+  echo "tar xfz $DB-blast_2.13.0_dbs.tgz"
+  tar xfz $DB-blast_2.13.0_dbs.tgz
+  echo "rm $DB-blast_2.13.0_dbs.tgz"
+  rm $DB-blast_2.13.0_dbs.tgz
 
+  # validate complete
   if [ -s "/data/blast_dbs/Archaea-RS.psq" -a -s "/data/blast_dbs/Archaea-GB.psq" -a -s "/data/blast_dbs/Bacteria-RS.10.psq" -a -s "/data/blast_dbs/Bacteria-GB.10.psq" ]; then
     echo "DATA DOWNLOADED SUCCESSFULLY"
     touch /data/__READY__
