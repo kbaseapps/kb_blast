@@ -26,29 +26,41 @@ elif [ "${1}" = "init" ] ; then
   DB=Archaea-RS
   echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
   curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
+  echo "gunzip $DB.faa.gz"
   gunzip $DB.faa.gz
+  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
   $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
+  echo "gzip $DB.faa"
   gzip $DB.faa
   
   DB=Archaea-GB
   echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
   curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
+  echo "gunzip $DB.faa.gz"
   gunzip $DB.faa.gz
+  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
   $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
+  echo "gzip $DB.faa"
   gzip $DB.faa
 
   DB=Bacteria-RS
   echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
   curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
+  echo "gunzip $DB.faa.gz"
   gunzip $DB.faa.gz
+  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
   $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
+  echo "gzip $DB.faa"
   gzip $DB.faa
 
   DB=Bacteria-GB
   echo "downloading: https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz"
   curl -o $DB.faa.gz https://portal.nersc.gov/project/kbase/GTDB/r207.0/blast_dbs/v1.0.0/$DB.faa.gz
+  echo "gunzip $DB.faa.gz"
   gunzip $DB.faa.gz
+  echo "$Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa"
   $Make_BLAST_DB -in $DB.faa -parse_seqids -dbtype prot -out $DB.faa
+  echo "gzip $DB.faa"
   gzip $DB.faa
 
   if [ -s "/data/blast_dbs/Archaea-RS.psq" -a -s "/data/blast_dbs/Archaea-GB.psq" -a -s "/data/blast_dbs/Bacteria-RS.10.psq" -a -s "/data/blast_dbs/Bacteria-GB.10.psq" ]; then

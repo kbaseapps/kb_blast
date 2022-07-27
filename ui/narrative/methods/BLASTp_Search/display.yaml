@@ -42,16 +42,16 @@ parameters :
             Must enter either a query protein sequence or an input query object. This is a data object with a single protein (amino acid) sequence to use as query. Data objects must be a SequenceSet with only one sequence.
         placeholder : |
             ...or select PROTEIN Query Object
-    gtdb_targets:
-        ui-name : |
-            GTDB Targets
-        short-hint : |
-            GTDB Genome objects to be searched.
     input_many_refs:
         ui-name : |
             Search Targets
         short-hint : |
             The KBase data objects with proteins to be searched. Objects may be FeatureSet, Genome, GenomeSet, SpeciesTree, or Annotated Metagenome Assembly.
+    gtdb_targets:
+        ui-name : |
+            GTDB Targets
+        short-hint : |
+            GTDB Genome objects to be searched.
     genome_disp_name_config :
         ui-name : |
             Display genome as

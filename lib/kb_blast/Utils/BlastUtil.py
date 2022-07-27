@@ -167,8 +167,8 @@ class BlastUtil:
         # do some basic checks
         if 'workspace_name' not in params:
             raise ValueError('workspace_name parameter is required')
-        if 'input_many_refs' not in params:
-            raise ValueError('input_many_refs parameter is required')
+        if 'input_many_refs' not in params and params.get('gtdb_targets','none') == 'none':
+            raise ValueError('either Search Targets or GTDB Targets are required')
         if 'output_filtered_name' not in params:
             raise ValueError('output_filtered_name parameter is required')
         if 'genome_disp_name_config' not in params:
