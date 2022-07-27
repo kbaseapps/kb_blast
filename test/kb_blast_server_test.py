@@ -327,7 +327,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTn: GenomeSet target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_02_GenomeSet")
+    @unittest.skip("skipped test_kb_blast_BLASTn_Search_02_GenomeSet")
     def test_kb_blast_BLASTn_Search_02_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -428,7 +428,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: Single Genome target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_Genome")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_03_Genome")
     def test_kb_blast_BLASTp_Search_03_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -480,7 +480,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: GenomeSet target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_GenomeSet")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_04_GenomeSet")
     def test_kb_blast_BLASTp_Search_04_GenomeSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -572,7 +572,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: SpeciesTree target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_GenomeSet")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_05_GenomeSet")
     def test_kb_blast_BLASTp_Search_05_SpeciesTree(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -648,7 +648,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: FeatureSet
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_06_FeatureSet")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_06_FeatureSet")
     def test_kb_blast_BLASTp_Search_06_FeatureSet(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
@@ -752,7 +752,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: AnnotatedMetagenomeAssembly Target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_07_AnnotatedMetagenomeAssembly")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_07_AnnotatedMetagenomeAssembly")
     def test_kb_blast_BLASTp_Search_07_AnnotatedMetagenomeAssembly(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -805,7 +805,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTp: Multiple targets of different types
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_08_MultipleTargets")
+    @unittest.skip("skipped test_kb_blast_BLASTp_Search_08_MultipleTargets")
     def test_kb_blast_BLASTp_Search_08_MultipleTargets(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -907,7 +907,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTx: Single Genome target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTx_Search_09_Genome")
+    @unittest.skip("skipped test_kb_blast_BLASTx_Search_09_Genome")
     def test_kb_blast_BLASTx_Search_09_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 

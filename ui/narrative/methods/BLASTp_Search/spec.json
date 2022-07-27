@@ -35,13 +35,85 @@
         },
         {
             "id": "input_many_refs",
-            "optional": false,
+            "optional": true,
             "advanced": false,
             "allow_multiple": true,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
                 "valid_ws_types": [ "KBaseCollections.FeatureSet","KBaseGenomes.Genome","KBaseSearch.GenomeSet","KBaseTrees.Tree","KBaseMetagenomes.AnnotatedMetagenomeAssembly" ]
+            }
+        },
+        {
+            "id": "gtdb_targets",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "none" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+                "options": [
+                                {
+                                        "value": "none",
+                                        "display": "NONE",
+                                        "id": "gtdb_refdata-none",
+                                        "ui-name": "grdb_refdata-none"
+                                },
+                                {
+                                        "value": "all",
+                                        "display": "ALL",
+                                        "id": "gtdb_refdata-all",
+                                        "ui-name": "grdb_refdata-all"
+                                },
+                                {
+                                        "value": "archaea-RS+GB",
+                                        "display": "Archaea (RefSeq + GenBank)",
+                                        "id": "gtdb_refdata-archaea-RS+GB",
+                                        "ui-name": "grdb_refdata-archaea-RS+GB"
+                                },
+                                {
+                                        "value": "archaea-RS",
+                                        "display": "Archaea (RefSeq)",
+                                        "id": "gtdb_refdata-archaea-RS",
+                                        "ui-name": "grdb_refdata-archaea-RS"
+                                },
+                                {
+                                        "value": "archaea-GB",
+                                        "display": "Archaea (GenBank)",
+                                        "id": "gtdb_refdata-archaea-GB",
+                                        "ui-name": "grdb_refdata-archaea-GB"
+                                },
+                                {
+                                        "value": "bacteria-RS+GB",
+                                        "display": "Bacteria (RefSeq + GenBank)",
+                                        "id": "gtdb_refdata-bacteria-RS+GB",
+                                        "ui-name": "grdb_refdata-bacteria-RS+GB"
+                                },
+                                {
+                                        "value": "bacteria-RS",
+                                        "display": "Bacteria (RefSeq)",
+                                        "id": "gtdb_refdata-bacteria-RS",
+                                        "ui-name": "grdb_refdata-bacteria-RS"
+                                },
+                                {
+                                        "value": "bacteria-GB",
+                                        "display": "Bacteria (GenBank)",
+                                        "id": "gtdb_refdata-bacteria-GB",
+                                        "ui-name": "grdb_refdata-bacteria-GB"
+                                },
+                                {
+                                        "value": "archaea-bacteria-RS",
+                                        "display": "Archaea + Bacteria (RefSeq)",
+                                        "id": "gtdb_refdata-archaea+bacteria-RS",
+                                        "ui-name": "grdb_refdata-archaea+bacteria-RS"
+                                },
+                                {
+                                        "value": "archaea-bacteria-GB",
+                                        "display": "Archaea + Bacteria (GenBank)",
+                                        "id": "gtdb_refdata-archaea+bacteria-GB",
+                                        "ui-name": "grdb_refdata-archaea+bacteria-GB"
+                                }
+                ]
             }
         },
         {
@@ -287,6 +359,10 @@
                     "input_parameter": "input_many_refs",
                     "target_property": "input_many_refs",
 		    "target_type_transform": "list<resolved-ref>"
+                },
+                {
+                    "input_parameter": "gtdb_targets",
+                    "target_property": "gtdb_targets"
                 },
                 {
                     "input_parameter": "genome_disp_name_config",

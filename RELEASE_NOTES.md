@@ -1,3 +1,8 @@
+### Version 1.8.0
+__Changes__
+- added ability to BLASTp against GTDB genomes
+- added GTDB_r207 refdata
+
 ### Version 1.7.0
 __Changes__
 - updated BLAST to 2.13.0
