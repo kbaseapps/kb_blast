@@ -129,7 +129,9 @@ class BlastUtil:
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
         if input_obj_refs:
-            provenance[0]['input_ws_objects'].extend(input_obj_refs)
+            for input_ref in input_obj_refs:
+                if '/' in input_ref:
+                    provenance[0]['input_ws_objects'].append(input_ref)
         provenance[0]['service'] = service
         provenance[0]['method'] = method_name
 
@@ -888,6 +890,11 @@ class BlastUtil:
         console = []
         BLAST_ready = True
 
+        #db_file = re.sub('.fasta$','',target_fasta_file_path)
+        db_file = re.sub('.faa$','',target_fasta_file_path)
+        db_file_prot_marker = db_file+'.pdb'
+        db_file_nuc_marker = db_file+'.ndb'
+        
         # check for necessary files
         if not os.path.isfile(blast_bin):
             self.log(console, "no such file '"+blast_bin+"'")
@@ -898,11 +905,11 @@ class BlastUtil:
         elif not os.path.getsize(query_fasta_file_path) > 0:
             self.log(console, "empty file '"+query_fasta_file_path+"'")
             BLAST_ready = False
-        if not os.path.isfile(target_fasta_file_path):
-            self.log(console, "no such file '"+target_fasta_file_path+"'")
+        if not os.path.isfile(db_file_prot_marker) and not os.path.isfile(db_file_nuc_marker):
+            self.log(console, "no such db '"+db_file+"'")
             BLAST_ready = False
-        elif not os.path.getsize(target_fasta_file_path):
-            self.log(console, "empty file '"+target_fasta_file_path+"'")
+        elif not os.path.getsize(db_file_prot_marker) and not os.path.getsize(db_file_nuc_marker):
+            self.log(console, "empty db '"+db_file+"'")
             BLAST_ready = False
 
         return BLAST_ready
@@ -1161,10 +1168,13 @@ class BlastUtil:
             header_done = True
             hit_info = line.split("\t")
             sh_hit_seq_id  = hit_info[1]
-            if sh_hit_seq_id in target_feature_info['short_id_to_rec_id']:
-                hit_seq_id = target_feature_info['short_id_to_rec_id'][sh_hit_seq_id]
-                hit_info[1] = hit_seq_id
-                line = "\t".join(hit_info)
+            if target_feature_info is not None:
+                if sh_hit_seq_id in target_feature_info['short_id_to_rec_id']:
+                    hit_seq_id = target_feature_info['short_id_to_rec_id'][sh_hit_seq_id]
+                    hit_info[1] = hit_seq_id
+                    line = "\t".join(hit_info)
+                else:
+                    hit_seq_id = sh_hit_seq_id
             else:
                 hit_seq_id = sh_hit_seq_id
             hit_ident      = float(hit_info[2]) / 100.0
@@ -1456,6 +1466,27 @@ class BlastUtil:
                     output_featureSet['element_ordering'].append(fid)
                     output_featureSet['elements'][fid] = [ama_ref]
 
+        # Parse RefData hits into FeatureSet
+        #
+        elif target_type_name == 'RefData':
+            seq_total = 0
+
+            output_featureSet = dict()
+            output_featureSet['description'] = search_tool_name+"_Search filtered"
+            output_featureSet['element_ordering'] = []
+            output_featureSet['elements'] = dict()
+
+            self.log(console,"READING HITS FOR REFDATA")  # DEBUG
+            for id_untrans in list(hit_seq_ids.keys()):
+                accept_fids[id_untrans] = True
+                [genome_ref, feature_id] = id_untrans.split(self.genome_id_feature_id_delim)
+                try:
+                    this_genome_ref_list = output_featureSet['elements'][feature_id]
+                except:
+                    output_featureSet['elements'][feature_id] = []
+                    output_featureSet['element_ordering'].append(feature_id)
+                output_featureSet['elements'][feature_id].append(genome_ref)
+
 
         # Upload results
         #
@@ -1476,6 +1507,7 @@ class BlastUtil:
                                     'data': output_featureSet,
                                     'name': output_featureSet_name,
                                     'meta': {},
+                                    'hidden': 1,
                                     'provenance': self._instantiate_provenance (method_name=method_name,
                                                                                 input_obj_refs=[params['input_one_ref'],target_ref])
                                 }]
@@ -1504,6 +1536,8 @@ class BlastUtil:
     # _add_html_tabs()
     #
     def _add_html_tabs (self, search_tool_name, targets_name, input_many_refs, input_many_ref):
+        # TODO: Add RefData tabs
+
         html_tabs = []
         for this_input_ref in input_many_refs:
             this_target_name = targets_name[this_input_ref]
@@ -1951,12 +1985,43 @@ class BlastUtil:
                 params['output_one_name'] = 'query-'+params['output_filtered_name']+'.Seq'
                 
         if not self.validate_BLAST_app_params (params, method_name):
-            raise ValueError('App input validation failed in CheckBlastParams() for App ' + method_name)
+            raise ValueError('App input validation failed in validate_BLAST_app_params() for App ' + method_name)
 
         # Get input obj refs
         #
-        input_many_refs = params['input_many_refs']
+        input_many_refs = params.get('input_many_refs',[])
 
+        # Get RefData targets
+        #
+        refdata_targets = []
+        refdata_names = {
+            'Archaea-RS': 'GTDB_Species_Reps-Archaea-RefSeq',
+            'Archaea-GB': 'GTDB_Species_Reps-Archaea-GenBank',
+            'Bacteria-RS': 'GTDB_Species_Reps-Bacteria-RefSeq',
+            'Bacteria-GB': 'GTDB_Species_Reps-Bacteria-GenBank'
+            }
+        if params.get('gtdb_targets','none') != 'none':
+            if params['gtdb_targets'] == 'all':
+                refdata_targets.extend(['Archaea-RS', 'Archaea-GB', 'Bacteria-RS', 'Bacteria-GB'])
+            elif params['gtdb_targets'] == 'archaea-RS+GB':
+                refdata_targets.extend(['Archaea-RS', 'Archaea-GB'])
+            elif params['gtdb_targets'] == 'archaea-RS':
+                refdata_targets.extend(['Archaea-RS'])
+            elif params['gtdb_targets'] == 'archaea-GB':
+                refdata_targets.extend(['Archaea-GB'])
+            elif params['gtdb_targets'] == 'bacteria-RS+GB':
+                refdata_targets.extend(['Bacteria-RS', 'Bacteria-GB'])
+            elif params['gtdb_targets'] == 'bacteria-RS':
+                refdata_targets.extend(['Bacteria-RS'])
+            elif params['gtdb_targets'] == 'bacteria-GB':
+                refdata_targets.extend(['Bacteria-GB'])
+            elif params['gtdb_targets'] == 'archaea-bacteria-RS':
+                refdata_targets.extend(['Archaea-RS', 'Bacteria-RS'])
+            elif params['gtdb_targets'] == 'archaea-bacteria-GB':
+                refdata_targets.extend(['Archaea-GB', 'Bacteria-GB'])
+                
+        # Get query
+        #
         if params.get('input_one_sequence') is not None \
                 and not params['input_one_sequence'].startswith("Optionally enter"):
             input_one_ref = self.objectify_text_query (params, q_seq_type, method_name)
@@ -1990,13 +2055,23 @@ class BlastUtil:
             invalid_msgs.extend(write_target_obj_to_file_result['invalid_msgs'])
 
             targets_feature_info[input_many_ref] = write_target_obj_to_file_result['target_feature_info']
-        
+
+
+        # Add refdata info to targets
+        #
+        for refdata_target in refdata_targets:
+            targets_name[refdata_target] = refdata_names[refdata_target]
+            targets_type_name[refdata_target] = 'RefData'
+            targets_fasta_file_path[refdata_target] = os.path.join(os.sep,'data','blast_dbs',refdata_target)
+            appropriate_sequence_found_in_many_inputs[refdata_target] = True
+            targets_feature_info[refdata_target] = None
+            
 
         # check for failed input file creation
         #
         if not appropriate_sequence_found_in_one_input:
             self.log(invalid_msgs,"no "+q_seq_type+" sequence found in '"+input_one_name+"'")
-        for input_many_ref in input_many_refs:
+        for input_many_ref in input_many_refs + refdata_targets:
             if not appropriate_sequence_found_in_many_inputs[input_many_ref]:
                 self.log(invalid_msgs,"no "+t_seq_type+" sequences found in '"+input_many_name+"'")
 
@@ -2010,7 +2085,7 @@ class BlastUtil:
 
         #### FORMAT DB
         ##
-        for input_many_ref in input_many_refs:
+        for input_many_ref in input_many_refs:  # Note: RefData dbs already formatted
             if not self.format_BLAST_db (search_tool_name, targets_fasta_file_path[input_many_ref]):
                 raise ValueError ("failed to format BLAST db for "+input_many_ref)
             
@@ -2019,10 +2094,10 @@ class BlastUtil:
         ##
         output_aln_file_paths = dict()
         base_bulk_save_infos = dict()
-        for input_many_ref in input_many_refs:
+        for input_many_ref in input_many_refs + refdata_targets:
             BLAST_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
                                                    query_fasta_file_path = query_fasta_file_path, 
-                                                   target_fasta_file_path = targets_fasta_file_path[input_many_ref], 
+                                                   target_fasta_file_path = targets_fasta_file_path[input_many_ref],
                                                    e_value = str(params['e_value']),
                                                    maxaccepts = str(params['maxaccepts']),
                                                    BLAST_output_format_str = str(base_BLAST_output_format)
@@ -2035,12 +2110,11 @@ class BlastUtil:
         ##
         output_extra_aln_file_paths = dict()
         extra_bulk_save_infos = dict()
-        for input_many_ref in input_many_refs:
+        for input_many_ref in input_many_refs + refdata_targets:
             if str(params.get('output_extra_format')) and str(params.get('output_extra_format')) != 'none':
-
-                BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
+                BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name,
                                                              query_fasta_file_path = query_fasta_file_path, 
-                                                             target_fasta_file_path = targets_fasta_file_path[input_many_ref], 
+                                                             target_fasta_file_path = targets_fasta_file_path[input_many_ref],
                                                              e_value = str(params['e_value']),
                                                              maxaccepts = str(params['maxaccepts']),
                                                              BLAST_output_format_str = str(params['output_extra_format'])
@@ -2060,8 +2134,8 @@ class BlastUtil:
         all_parsed_BLAST_results = dict()
         objects_created = []
         output_featureSet_refs = []
-        num_targets = len(input_many_refs)
-        for input_many_ref in input_many_refs:
+        num_targets = len(input_many_refs) + len(refdata_targets)
+        for input_many_ref in input_many_refs + refdata_targets:
             this_parsed_BLAST_results = \
                 self.parse_BLAST_tab_output (output_aln_file_path = output_aln_file_paths[input_many_ref],
                                              search_tool_name = search_tool_name,

@@ -275,7 +275,7 @@ class kb_blastTest(unittest.TestCase):
     # Test BLASTn: Single Genome target
     #
     # Uncomment to skip this test
-    # HIDE @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
+    @unittest.skip("skipped test_kb_blast_BLASTn_Search_01")
     def test_kb_blast_BLASTn_Search_01_Genome(self):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
 
@@ -448,6 +448,64 @@ class kb_blastTest(unittest.TestCase):
                        #'input_one_ref': "",
                        'output_one_name': obj_basename+'.'+"test_query.SS",
                        'input_many_refs': [genome_ref_0],
+                       'gtdb_targets': 'none',
+                       'output_filtered_name': obj_out_name,
+                       'genome_disp_name_config': 'sci_name',
+                       'e_value': ".001",
+                       'bitscore': "50",
+                       'ident_thresh': "40.0",
+                       'overlap_fraction': "50.0",
+                       'maxaccepts': "1000",
+                       'write_off_code_prot_seq': '1',
+                       'output_extra_format': "none"
+                     }
+
+        ret = self.getImpl().BLASTp_Search(self.getContext(), parameters)[0]
+        self.assertIsNotNone(ret['report_ref'])
+
+        # check created obj
+        #report_obj = self.getWsClient().get_objects2({'objects':[{'ref':ret['report_ref']}]})[0]['data']
+        report_obj = self.getWsClient().get_objects([{'ref':ret['report_ref']}])[0]['data']
+        self.assertIsNotNone(report_obj['objects_created'][0]['ref'])
+
+        created_obj_0_info = self.getWsClient().get_object_info_new({'objects':[{'ref':report_obj['objects_created'][0]['ref']}]})[0]
+        self.assertEqual(created_obj_0_info[NAME_I], obj_out_name)
+        self.assertEqual(created_obj_0_info[TYPE_I].split('-')[0], obj_out_type)
+
+        # check number of hits in featureSet output
+        featureSet_out_obj = self.getWsClient().get_objects([{'ref':report_obj['objects_created'][0]['ref']}])[0]['data']
+        self.assertEqual(expected_hit_cnt, len(featureSet_out_obj['element_ordering']))
+        pass
+
+
+    # Test BLASTp: Single Genome + RefData targets
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_kb_blast_BLASTp_Search_03b_Genome_RefData")
+    def test_kb_blast_BLASTp_Search_03b_Genome_RefData(self):
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
+
+        obj_basename = 'BLASTp_Genome_RefData'
+        obj_out_name = obj_basename+".test_output.FS"
+        obj_out_type = "KBaseCollections.FeatureSet"
+        expected_hit_cnt = 380
+        
+        #genomeInfo_0 = self.getGenomeInfo('GCF_001566335.1_ASM156633v1_genomic', 0)  # E. coli K-12 MG1655
+        genomeInfo_0 = self.getGenomeInfo('GCF_000025285.1_ASM2528v1_genomic', 1)  # # Archaeoglobus fulgidus
+        genome_ref_0 = self.get_obj_ref_from_obj_info(genomeInfo_0)
+
+        # E. coli K-12 MG1655 dnaA
+        #query_seq_prot = 'MSLSLWQQCLARLQDELPATEFSMWIRPLQAELSDNTLALYAPNRFVLDWVRDKYLNNINGLLTSFCGADAPQLRFEVGTKPVTQTPQAAVTSNVAAPAQVAQTQPQRAAPSTRSGWDNVPAPAEPTYRSNVNVKHTFDNFVEGKSNQLARAAARQVADNPGGAYNPLFLYGGTGLGKTHLLHAVGNGIMARKPNAKVVYMHSERFVQDMVKALQNNAIEEFKRYYRSVDALLIDDIQFFANKERSQEEFFHTFNALLEGNQQIILTSDRYPKEINGVEDRLKSRFGWGLTVAIEPPELETRVAILMKKADENDIRLPGEVAFFIAKRLRSNVRELEGALNRVIANANFTGRAITIDFVREALRDLLALQEKLVTIDNIQKTVAEYYKIKVADLLSKRRSRSVARPRQMAMALAKELTNHSLPEIGDAFGGRDHTTVLHACRKIEQLREESHDIKEDFSNLIRTLSS'
+        
+        # Archaeoglobus fulgidus gyrB
+        query_seq_prot = 'MVYRLLTHSRSGWRCGSKETVKSTTRSISAEAGHRTEVLGETKEHGTTVRFKPDREIFETTEFKYEIVAQRLKELAYLNRGLKIILFDEREGKEETFHFEDGIIGLVRSLNRNRKPLHEPIYIETTKDGVSVEVAIQFTDSDVENIQAFANNINTSEGGSHVVGFRAGLTRAVNEYGKKHLKKFEPVTGVDIREGLTAVISVKVPEPQFEGQTKTKLTNSDVKTVVESAVYSGVLRWLEENPAQAETLLNKFILNKKAREAAKRAKELVKRKNELITTLPGKLADCSSKNPEERELFIVEGESAGGSAKQARDRRFQAILPIKGKIINVEKAGMARVLKNDEIKAIISAIGAGIGKDFDITKARYRRIIIMTDADVDGAHIRTLLLTFFYRYMRPLIESGYLYIAQPPLYQIKKGKKSYYAYSDEELKRTLEQVGGGEVQRYKGLGEMNPQQLWETTMNPENRILIQVTLEDAKRADELFSILMGEDVESRRNFIMAHSKEVKNLDI'
+        
+        parameters = { 'workspace_name': self.getWsName(),
+                       'input_one_sequence': query_seq_prot,
+                       #'input_one_ref': "",
+                       'output_one_name': obj_basename+'.'+"test_query.SS",
+                       'input_many_refs': [genome_ref_0],
+                       'gtdb_targets': 'archaea-RS',
                        'output_filtered_name': obj_out_name,
                        'genome_disp_name_config': 'sci_name',
                        'e_value': ".001",
