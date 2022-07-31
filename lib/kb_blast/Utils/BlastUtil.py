@@ -2095,11 +2095,15 @@ class BlastUtil:
         output_aln_file_paths = dict()
         base_bulk_save_infos = dict()
         for input_many_ref in input_many_refs + refdata_targets:
+            if input_many_ref in refdata_targets:
+                max_accepts = str(params['refdata_maxaccepts'])
+            else:
+                max_accepts = str(params['maxaccepts'])
             BLAST_output_results = self.run_BLAST (search_tool_name = search_tool_name, 
                                                    query_fasta_file_path = query_fasta_file_path, 
                                                    target_fasta_file_path = targets_fasta_file_path[input_many_ref],
                                                    e_value = str(params['e_value']),
-                                                   maxaccepts = str(params['maxaccepts']),
+                                                   maxaccepts = max_accepts,
                                                    BLAST_output_format_str = str(base_BLAST_output_format)
             )
             output_aln_file_paths[input_many_ref] = BLAST_output_results['output_aln_file_path']
@@ -2111,12 +2115,16 @@ class BlastUtil:
         output_extra_aln_file_paths = dict()
         extra_bulk_save_infos = dict()
         for input_many_ref in input_many_refs + refdata_targets:
+            if input_many_ref in refdata_targets:
+                max_accepts = str(params['refdata_maxaccepts'])
+            else:
+                max_accepts = str(params['maxaccepts'])
             if str(params.get('output_extra_format')) and str(params.get('output_extra_format')) != 'none':
                 BLAST_extra_output_results = self.run_BLAST (search_tool_name = search_tool_name,
                                                              query_fasta_file_path = query_fasta_file_path, 
                                                              target_fasta_file_path = targets_fasta_file_path[input_many_ref],
                                                              e_value = str(params['e_value']),
-                                                             maxaccepts = str(params['maxaccepts']),
+                                                             maxaccepts = max_accepts,
                                                              BLAST_output_format_str = str(params['output_extra_format'])
                 )
 

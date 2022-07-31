@@ -87,6 +87,11 @@ parameters :
             Max Accepts
         short-hint : |
             Hard limit for the maximum number of hits in the result (default is 1000).
+    refdata_maxaccepts:
+        ui-name : |
+            RefData Max Accepts
+        short-hint : |
+            Hard limit for the maximum number of hits to RefData (e.g. GTDB) in the result (default is 100000).
     write_off_code_prot_seq:
         ui-name : |
             Allow Mistranslation

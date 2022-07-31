@@ -40,6 +40,7 @@ module kb_blast {
 	float  bitscore;
 	float  overlap_fraction;
 	float  maxaccepts;
+	float  refdata_maxaccepts;
 	bool   write_off_code_prot_seq;
 	string output_extra_format;
 	float  rounds;  /* for psiBLAST_iter if I add it later*/

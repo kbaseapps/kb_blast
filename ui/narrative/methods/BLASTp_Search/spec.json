@@ -233,6 +233,18 @@
             }
         },
         {
+            "id": "refdata_maxaccepts",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "100000" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "int",
+                "min_integer" : 1
+            }
+        },
+        {
             "id": "write_off_code_prot_seq",
             "optional": true,
             "advanced": true,
@@ -391,6 +403,10 @@
                 {
                     "input_parameter": "maxaccepts",
                     "target_property": "maxaccepts"
+                },
+                {
+                    "input_parameter": "refdata_maxaccepts",
+                    "target_property": "refdata_maxaccepts"
                 },
                 {
                     "input_parameter": "write_off_code_prot_seq",

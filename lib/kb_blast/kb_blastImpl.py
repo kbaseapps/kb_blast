@@ -42,7 +42,7 @@ class kb_blast:
     ######################################### noqa
     VERSION = "1.8.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast"
-    GIT_COMMIT_HASH = "791f72df62105af2c74f436e8f3452c932e8db68"
+    GIT_COMMIT_HASH = "061a9659dfd47c68dfd142c5bce6a8ee7dd26bd4"
 
     #BEGIN_CLASS_HEADER
     workspaceURL = None
@@ -128,6 +128,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
@@ -169,6 +170,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
@@ -210,6 +212,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
@@ -251,6 +254,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
@@ -292,6 +296,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
@@ -333,6 +338,7 @@ class kb_blast:
            parameter "ident_thresh" of Double, parameter "e_value" of Double,
            parameter "bitscore" of Double, parameter "overlap_fraction" of
            Double, parameter "maxaccepts" of Double, parameter
+           "refdata_maxaccepts" of Double, parameter
            "write_off_code_prot_seq" of type "bool", parameter
            "output_extra_format" of String, parameter "rounds" of Double
         :returns: instance of type "BLAST_Output" (BLAST Output) ->
