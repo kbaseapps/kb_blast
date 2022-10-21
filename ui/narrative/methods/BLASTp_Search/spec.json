@@ -47,7 +47,7 @@
         {
             "id": "gtdb_targets",
             "optional": false,
-            "advanced": false,
+            "advanced": true,
             "allow_multiple": false,
             "default_values": [ "none" ],
             "field_type": "dropdown",
