@@ -28,7 +28,7 @@ class BlastUtil:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.7.0"
+    VERSION = "1.8.0"
     GIT_URL = "https://github.com/kbaseapps/kb_blast.git"
     GIT_COMMIT_HASH = "0722ff0b7d723e654ef9ebe470e2b515d13671bc"
 
@@ -894,6 +894,8 @@ class BlastUtil:
         db_file = re.sub('.faa$','',target_fasta_file_path)
         db_file_prot_marker = db_file+'.pdb'
         db_file_nuc_marker = db_file+'.ndb'
+        db_file_prot_00_marker = db_file+'.00.pdb'
+        db_file_nuc_00_marker = db_file+'.00.ndb'
         
         # check for necessary files
         if not os.path.isfile(blast_bin):
@@ -905,10 +907,26 @@ class BlastUtil:
         elif not os.path.getsize(query_fasta_file_path) > 0:
             self.log(console, "empty file '"+query_fasta_file_path+"'")
             BLAST_ready = False
-        if not os.path.isfile(db_file_prot_marker) and not os.path.isfile(db_file_nuc_marker):
+        if not os.path.isfile(db_file_prot_marker) and \
+           not os.path.isfile(db_file_prot_00_marker) and \
+           not os.path.isfile(db_file_nuc_marker) and \
+           not os.path.isfile(db_file_nuc_00_marker):
             self.log(console, "no such db '"+db_file+"'")
             BLAST_ready = False
-        elif not os.path.getsize(db_file_prot_marker) and not os.path.getsize(db_file_nuc_marker):
+        elif os.path.isfile(db_file_prot_marker) and \
+             not os.path.getsize(db_file_prot_marker) > 0:
+            self.log(console, "empty db '"+db_file+"'")
+            BLAST_ready = False
+        elif os.path.isfile(db_file_prot_00_marker) and \
+             not os.path.getsize(db_file_prot_00_marker) > 0:
+            self.log(console, "empty db '"+db_file+"'")
+            BLAST_ready = False
+        elif os.path.isfile(db_file_nuc_marker) and \
+             not os.path.getsize(db_file_nuc_marker) > 0:
+            self.log(console, "empty db '"+db_file+"'")
+            BLAST_ready = False
+        elif os.path.isfile(db_file_nuc_00_marker) and \
+             not os.path.getsize(db_file_nuc_00_marker) > 0:
             self.log(console, "empty db '"+db_file+"'")
             BLAST_ready = False
 

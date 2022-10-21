@@ -2,6 +2,7 @@
 __Changes__
 - added ability to BLASTp against GTDB genomes
 - added GTDB_r207 refdata
+- fixed nucleotide db check
 
 ### Version 1.7.0
 __Changes__
