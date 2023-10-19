@@ -1525,7 +1525,7 @@ class BlastUtil:
                                     'data': output_featureSet,
                                     'name': output_featureSet_name,
                                     'meta': {},
-                                    'hidden': 1,
+                                    'hidden': 0,
                                     'provenance': self._instantiate_provenance (method_name=method_name,
                                                                                 input_obj_refs=[params['input_one_ref'],target_ref])
                                 }]
