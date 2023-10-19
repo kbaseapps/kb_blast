@@ -1,5 +1,5 @@
 FROM kbase/sdkbase2:python
-MAINTAINER KBase Developer
+MAINTAINER Dylan Chivian
 # -----------------------------------------
 # In this section, you can install any system dependencies required
 # to run your App.  For instance, you could place an apt-get update or
@@ -8,12 +8,13 @@ MAINTAINER KBase Developer
 
 # -----------------------------------------
 
-# BLAST 2.13.0+ needs libgomp1
-RUN apt-get update -y && \
-  apt-get install -y libgomp1
+# BLAST 2.14.1+ needs libgomp1
+RUN echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
+RUN apt-get update -y
+RUN apt-get install -y libgomp1
 
 
-ENV BLAST_VERSION='2.13.0'
+ENV BLAST_VERSION='2.14.1'
 
 WORKDIR /kb/module
 RUN \

@@ -1,7 +1,12 @@
+### Version 1.9.0
+__Changes__
+- updated BLAST to 2.14.1
+- added GTDB_r214 species reps blast_dbs as refdata
+
 ### Version 1.8.0
 __Changes__
 - added ability to BLASTp against GTDB genomes
-- added GTDB_r207 refdata
+- added GTDB_r207 species reps blast_dbs as refdata
 - fixed nucleotide db check
 
 ### Version 1.7.0
