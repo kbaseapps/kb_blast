@@ -42,3 +42,6 @@ Make BLAST dbs (for BLASTp App in kb_blast module)
 
   E. copy blast db tarballs to public download site at NERSC (make sure dirs are world r-x)
     $ scp blast_dbs/reps/GTDB_r214-sprep-*-blast_2.14.1_dbs.tgz dylan@perlmutter.nersc.gov:/global/cfs/cdirs/kbase/www/GTDB/r214.1/blast_dbs/v1.1.0/
+
+    log into perlmutter and
+    $ chmod 644 /global/cfs/cdirs/kbase/www/GTDB/r214.1/blast_dbs/v1.1.0/*
